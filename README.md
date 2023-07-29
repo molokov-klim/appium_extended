@@ -167,7 +167,16 @@ app.connect(capabilities=self.capabilities_without_install)
 ### Исключения
 
 Метод не генерирует исключения напрямую, но может пробросить исключения, сгенерированные внутренними вызовами, такими как ошибка запуска сервера Appium или ошибки, связанные с `webdriver.Remote`.
-		
+
+### Дополнительная информация
+
+В связи с использованием appium-device-farm указывать device udid необязательно.
+```python
+capabilities = {  
+"platformName": "android",  
+"appium:automationName": "uiautomator2",   
+}
+```
 	
 
 ## Метод: `disconnect()`
