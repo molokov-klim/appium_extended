@@ -88,7 +88,6 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
-Вы можете переходить по этим ссылкам для получения дополнительной информации о каждом методе.
 # class AppiumExtended
 
 ## Метод: `connect()`
@@ -1906,4 +1905,142 @@ navigator.perform_navigation(path)
 Примечания: 
 - Элементы списка `path` должны быть конкретными классами страниц в вашем приложении.
 - Рекомендуется вместо него использовать метод navigate()
+
+# Пример карты приложения
+
+`from pages.page_1 import page_1`
+`from pages.page_2 import page_2`
+`from pages.page_3 import page_3`
+`class ExampleAppMap(AppiumExtended):`
+
+	def __init__(self):  
+		super().__init__()  
+		self.page_1 = None
+		self.page_2 = None
+		self.page_3 = None
+		self.driver = None  
+		self.navigator: AppiumNavigator = None  
+		self.current_path = os.path.dirname(os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))  
+		self.page_images_path = os.path.join(self.current_path, ConstMapPath.FOLDER_TRANSACTION_IMAGES)  
+		self.pages_ndarray_images = None
+			  
+	def connect(self, capabilities: dict):  
+	    super().connect(capabilities=capabilities)    
+	    # LOGIC  
+	    self.navigator = AppiumNavigator(app=self)    
+	    # PAGES  
+	    self.page_1 = Page1(self)
+	    self.page_2 = Page2(self)
+	    self.page_3 = Page3(self)
+		# EDGES    
+		self.page_1.edges = {  
+		    self.page_2: self.go_1_2,  
+		}  
+		self.page_2.edges = {  
+		    self.page_1: self.go_2_1,
+		    self.page_3: self.go_2_3  
+		}
+		self.page_3.edges = {
+			self.page_2 = self.go_3_2
+		}
+		# INIT PAGES  
+		self.navigator.add_page(page=self.page_1,  
+		                        edges=self.page_1.edges)  
+		self.navigator.add_page(page=self.page_2,  
+		                        edges=self.page_2.edges)  
+		self.navigator.add_page(page=self.page_3,  
+		                        edges=self.page_3.edges)
+		self.pages_ndarray_images = {  
+		    self.page_1: self._get_ndarray_images(self.page_1.page_images),  
+		    self.page_2: self._get_ndarray_images(self.page_2.page_images),  
+		    self.page_3: self._get_ndarray_images(self.page_3.page_images),
+			}
+
+	def go_1_2(self):
+		...
+
+	def go_2_1(self):
+		...
+
+	def go_2_3(self):
+		...
+
+	def go_3_2(self):
+		...
+
+
+Структура файлов page:
+-pages
+  -page_1
+    -action_images
+      action_image_1.png
+      action_image_2.png
+    -images
+      current_page_fragment_image_1.png
+      current_page_fragment_image_2.png
+    page_1.py
+
+`#page_1.py`
+
+`class Page1(PageBase):  
+    `edges: list`  
+  
+    def __init__(self, app):  
+        super().__init__(app)  
+        self.app = app  
+        self.current_path = os.path.dirname(os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))  
+        self.page_images_path = os.path.join(self.current_path, 'images')  
+        self.page_action_images_path = os.path.join(self.current_path, 'action_images')  
+        self.page_images = self._get_page_images(self.page_images_path)  
+    
+    def is_current_page(self) -> bool:  
+        return self._is_current_page(self.page_images)
+
+	def some_logic_on_page(self):
+		...
+
+`#page_base.py`
+  
+`class PageBase(object):  `
+    `def __init__(self, app):`  
+        `self.app: AppiumExtended = app  `
+        `self.page_images_path: str  `
+        `self.page_images: list[str]  `
+       ` self.logger = logging.getLogger(config.LOGGER_NAME)  `
+  
+    def _is_current_page(self, page_images, max_attempts=3) -> bool:  
+        attempts = 0  
+  
+        while attempts < max_attempts:  
+            if len(page_images) == 0:  
+                return False  
+  
+            all_images_found = True  # Предполагаем, что все изображения найдены  
+  
+            for image in page_images:  
+                if not self.app.image.is_image_on_the_screen(image=image):  
+                    all_images_found = False  
+                    break  # Прерываем цикл, если хотя бы одно изображение не найдено  
+  
+            if all_images_found:  
+                return True  
+  
+            attempts += 1  
+            time.sleep(1)  # Подождать 1 секунду перед следующей попыткой  
+  
+        return False  
+  
+    @staticmethod  
+    def _get_page_images(page_images_path):  
+        page_images = []  
+        if os.path.exists(page_images_path):  
+            page_images = os.listdir(page_images_path)  
+        for index, image_name in enumerate(page_images):  
+            page_images[index] = os.path.join(page_images_path, image_name)  
+        return page_images
+
+
+
+
+
 
