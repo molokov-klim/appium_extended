@@ -1907,11 +1907,12 @@ navigator.perform_navigation(path)
 - Рекомендуется вместо него использовать метод navigate()
 
 # Пример карты приложения
-
-`from pages.page_1 import page_1`
-`from pages.page_2 import page_2`
-`from pages.page_3 import page_3`
-`class ExampleAppMap(AppiumExtended):`
+`#app_map.py`
+```python
+from pages.page_1 import page_1
+from pages.page_2 import page_2
+from pages.page_3 import page_3
+class ExampleAppMap(AppiumExtended):
 
 	def __init__(self):  
 		super().__init__()  
@@ -1967,7 +1968,7 @@ navigator.perform_navigation(path)
 
 	def go_3_2(self):
 		...
-
+```
 
 Структура файлов page:
 -pages
@@ -1981,9 +1982,9 @@ navigator.perform_navigation(path)
     page_1.py
 
 `#page_1.py`
-
-`class Page1(PageBase):  
-    `edges: list`  
+```python
+class Page1(PageBase):  
+    edges: list  
   
     def __init__(self, app):  
         super().__init__(app)  
@@ -1998,15 +1999,16 @@ navigator.perform_navigation(path)
 
 	def some_logic_on_page(self):
 		...
+```
 
 `#page_base.py`
-  
-`class PageBase(object):  `
-    `def __init__(self, app):`  
-        `self.app: AppiumExtended = app  `
-        `self.page_images_path: str  `
-        `self.page_images: list[str]  `
-       ` self.logger = logging.getLogger(config.LOGGER_NAME)  `
+  ```python
+class PageBase(object):  
+    def __init__(self, app):  
+        self.app: AppiumExtended = app  
+        self.page_images_path: str  
+        self.page_images: list[str]  
+        self.logger = logging.getLogger(config.LOGGER_NAME)  
   
     def _is_current_page(self, page_images, max_attempts=3) -> bool:  
         attempts = 0  
@@ -2038,6 +2040,7 @@ navigator.perform_navigation(path)
         for index, image_name in enumerate(page_images):  
             page_images[index] = os.path.join(page_images_path, image_name)  
         return page_images
+```
 
 
 
