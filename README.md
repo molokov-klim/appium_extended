@@ -11,6 +11,34 @@ appium plugin install --source=npm appium-device-farm
 appium plugin install --source=npm appium-dashboard
 ```
 
+# Установка AppiumExtended
+
+Существует три способа установки и использования AppiumExtended.
+
+1. Установка из [PyPi](https://pypi.org/), как ['AppiumExtended'](https://pypi.org/project/AppiumExtended/).
+    
+    ```shell
+    pip install AppiumExtended
+    ```
+    
+    Историю выпусков можно посмотреть [здесь](https://pypi.org/project/AppiumExtended/#history)
+    
+2. Установка исходного кода, через [PyPi](https://pypi.org/). Из ['AppiumExtended'](https://pypi.org/project/AppiumExtended/), скачайте и разархивируйте исходный архив (AppiumExtended-X.X.tar.gz).
+    
+    ```shell
+    tar -xvf AppiumExtended-X.X.tar.gz
+    cd AppiumExtended-X.X
+    python setup.py install
+    ```
+    
+3. Установка исходного кода из [GitHub](https://github.com/molokov-klim/appium_extended).
+    
+    ```shell
+    git clone https://github.com/molokov-klim/appium_extended.git
+    cd appium_extended
+    python setup.py install
+    ```
+
 # Содержание
 
 ### Класс `AppiumExtended`
