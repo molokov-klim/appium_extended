@@ -4,7 +4,7 @@ import time
 from typing import Union, Tuple, Dict
 
 from appium.webdriver import WebElement
-from selenium.common import StaleElementReferenceException, NoSuchElementException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 
 import config
 

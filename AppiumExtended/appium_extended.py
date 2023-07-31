@@ -7,7 +7,7 @@ from PIL import Image
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
-from selenium.common import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from AppiumExtended.appium_is import AppiumIs
@@ -15,7 +15,7 @@ from AppiumExtended.appium_swipe import AppiumSwipe
 from AppiumExtended.appium_tap import AppiumTap
 from AppiumExtended.appium_wait import AppiumWait
 from AppiumWebElementExtended.web_element_extended import WebElementExtended
-from adb import adb
+
 from utils import utils
 
 
@@ -24,12 +24,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     Класс работы с Appium.
     Обеспечивает работу с устройством
     """
-
-    def __init__(self):
-        super().__init__()
-
-    def __del__(self):
-        self.disconnect()
 
     def get_element(self,
                     locator: Union[Tuple, WebElementExtended, Dict[str, str], str] = None,
@@ -157,8 +151,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         if ocr:
             return self._get_text_coordinates(text=text, language=language, image=image)
-        else:
-            return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'}).get_coordinates()
+        return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'}).get_coordinates()
 
     # DOM
 
@@ -238,8 +231,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         if ocr:
             return self.image.is_text_on_ocr_screen(text=text, language=language)
-        else:
-            return self._is_element_within_screen(locator={'text': text})
+        return self._is_element_within_screen(locator={'text': text})
 
     def is_image_on_the_screen(self,
                                image: Union[bytes, np.ndarray, Image.Image, str],
@@ -329,7 +321,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             end_x, end_y = self._extract_point_coordinates_by_typing(end_position)
         else:
             # Извлечение координат конечной точки свайпа на основе направления и расстояния
-            end_x, end_y = self._extract_point_coordinates_by_direction(direction, distance, start_x, start_y)
+            end_x, end_y = self._extract_point_coordinates_by_direction(direction, distance, start_x, start_y,
+                                                                        screen_resolution=self.terminal.get_screen_resolution())
 
         # Выполнение свайпа
         assert self._swipe(start_x=start_x, start_y=start_y,
@@ -340,7 +333,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         return cast('AppiumExtended', self)
 
     def swipe_right_to_left(self):
-        window_size = adb.get_screen_resolution()
+        window_size = self.terminal.get_screen_resolution()
         width = window_size[0]
         height = window_size[1]
         left = int(width * 0.1)
@@ -349,7 +342,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                    end_position=(left, height // 2))
 
     def swipe_left_to_right(self):
-        window_size = adb.get_screen_resolution()
+        window_size = self.terminal.get_screen_resolution()
         width = window_size[0]
         height = window_size[1]
         left = int(width * 0.1)
@@ -358,7 +351,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                    end_position=(right, height // 2))
 
     def swipe_top_to_bottom(self):
-        window_size = adb.get_screen_resolution()
+        window_size = self.terminal.get_screen_resolution()
         height = window_size[1]
         top = int(height * 0.1)
         bottom = int(height * 0.9)
@@ -366,7 +359,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                    end_position=(bottom, height // 2))
 
     def swipe_bottom_to_top(self):
-        window_size = adb.get_screen_resolution()
+        window_size = self.terminal.get_screen_resolution()
         height = window_size[1]
         top = int(height * 0.1)
         bottom = int(height * 0.9)
@@ -472,9 +465,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 self.get_image_coordinates(image=position))
         return x, y
 
-    def _extract_point_coordinates_by_direction(self,
-                                                direction: int, distance: int,
-                                                start_x: int, start_y: int
+    @staticmethod
+    def _extract_point_coordinates_by_direction(direction: int, distance: int,
+                                                start_x: int, start_y: int,
+                                                screen_resolution: tuple
                                                 ) -> Tuple[int, int]:
         """
         Извлекает координаты точки на заданном расстоянии и в заданном направлении относительно начальных координат.
@@ -488,9 +482,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Возвращает:
             Tuple[int, int]: Координаты конечной точки в формате (x, y).
         """
-        window_size = adb.get_screen_resolution()
-        width = window_size[0]
-        height = window_size[1]
+        width = screen_resolution[0]
+        height = screen_resolution[1]
         end_x, end_y = utils.find_coordinates_by_vector(width=width, height=height,
                                                         direction=direction, distance=distance,
                                                         start_x=start_x, start_y=start_y)

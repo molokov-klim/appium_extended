@@ -3,7 +3,7 @@ import os
 from typing import Tuple, Dict, Union, List, Optional, Any
 
 from appium.webdriver import WebElement
-from selenium.common import WebDriverException
+from selenium.common.exceptions import WebDriverException
 
 from AppiumHelpers.appium_image import AppiumImage
 

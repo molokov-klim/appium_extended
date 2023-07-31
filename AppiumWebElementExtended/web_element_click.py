@@ -4,13 +4,13 @@ from typing import Union, Tuple, Dict
 
 from appium.webdriver import WebElement
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common import ElementNotInteractableException, StaleElementReferenceException, \
+from selenium.common.exceptions import ElementNotInteractableException, StaleElementReferenceException, \
     InvalidElementStateException
 
 import config
 
 from AppiumWebElementExtended.web_element_get import WebElementGet
-from adb import adb
+
 from AppiumHelpers.helpers_decorators import wait_for_window_change
 from utils.utils import find_coordinates_by_vector
 
@@ -200,7 +200,7 @@ class WebElementClick(WebElementGet):
             return True
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
-            window_size = adb.get_screen_resolution()
+            window_size = self.adb.get_screen_resolution()
             width = window_size[0]
             height = window_size[1]
 

@@ -1,7 +1,7 @@
 # coding: utf-8
 from typing import Optional
 
-from selenium.common import WebDriverException
+from selenium.common.exceptions import WebDriverException
 
 from AppiumExtended.appium_get import AppiumGet
 

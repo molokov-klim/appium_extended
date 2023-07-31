@@ -18,7 +18,7 @@ class AppiumServer(object):
         self.logger.info("Start Appium server")
         cmd = f'appium server -ka 800 --log-level {self.log_level} --log logs/appium_log.txt --log-timestamp ' \
               f'--use-plugins=device-farm,appium-dashboard -p {self.port} -a 0.0.0.0 -pa /wd/hub ' \
-              f'--plugin-device-farm-platform=android'
+              f'--plugin-device-farm-platform=android --allow-insecure=adb_shell'
         try:
             subprocess.Popen(cmd, shell=True)
             return True
@@ -52,7 +52,7 @@ class AppiumServer(object):
         except subprocess.CalledProcessError:
             return False
 
-    def wait_until_alive(self, timeout: int = 60, poll: int = 2):
+    def wait_until_alive(self, timeout: int = 600, poll: int = 2):
         self.logger.info("Wait for Appium server")
         start_time = time.time()
         while time.time() < start_time + timeout:

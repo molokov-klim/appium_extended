@@ -1,12 +1,10 @@
 # coding: utf-8
 import logging
-import subprocess
 
 from appium.webdriver import WebElement
 
 import config
 
-from adb import adb
 from AppiumWebElementExtended.web_element_get import WebElementGet
 from AppiumHelpers.helpers_decorators import wait_for_window_change
 from utils.utils import find_coordinates_by_vector
@@ -44,9 +42,8 @@ class WebElementAdbActions(WebElementGet):
                 decorator_args = {"timeout_window": 5,
                                   "tries": 5}
             return self._adb_tap_to_element_and_wait(decorator_args=decorator_args)
-        else:
-            # Если не нужно ожидать изменения окна.
-            return self._adb_tap_to_element()
+        # Если не нужно ожидать изменения окна.
+        return self._adb_tap_to_element()
 
     def _adb_tap_to_element(self) -> bool:
         return self.__adb_tap()
@@ -65,67 +62,8 @@ class WebElementAdbActions(WebElementGet):
         """
         try:
             x, y = self._get_center()
-            return adb.tap(x=x, y=y)
-        except Exception:
-            return False
-
-    def _adb_multi_tap(self,
-                       decorator_args: dict = None,
-                       wait: bool = False) -> bool:
-        """
-        Выполняет несколько нажатий с помощью adb.
-
-        Args:
-            decorator_args (dict, optional): Дополнительные аргументы для декоратора.
-                По умолчанию None.
-                Если None то будут преобразованы в decorator_args = {"timeout_window": 5, "tries": 5}), где
-                    timeout_window: время ожидания изменения окна в секундах.
-                    tries: количество попыток (выполнения настоящего метода) для изменения окна.
-            wait (bool, optional): Флаг, указывающий, нужно ли ожидать изменение окна после нажатия.
-                По умолчанию False.
-
-        Returns:
-            bool: True, если нажатие выполнено успешно, False в противном случае.
-        """
-        if wait:
-            if not decorator_args:
-                decorator_args = {"timeout_window": 5,
-                                  "tries": 5}
-            return self._adb_multi_tap_to_element_and_wait(decorator_args=decorator_args)
-        else:
-            return self._adb_multi_tap_to_element()
-
-    def _adb_multi_tap_to_element(self) -> bool:
-        """
-        Выполняет три быстрых нажатия с помощью adb.
-        """
-        return self.__adb_multi_tap()
-
-    @wait_for_window_change()
-    def _adb_multi_tap_to_element_and_wait(self,
-                                           decorator_args: dict = None) -> bool:
-        """
-        Выполняет три быстрых нажатия с помощью adb и ожидает изменения окна.
-        """
-        return self.__adb_multi_tap()
-
-    def __adb_multi_tap(self) -> bool:
-        """
-        Выполняет три быстрых нажатия с помощью adb.
-        Если подавать последовательно, через ";", то выполняются с задержкой в пару секунд.
-        Если подавать два тапа, то выполняются одновременно и сливаются.
-        С текущей конфигурацией команды - в 90% нажимает два раза. В 10% нажимает 3 раза.
-        Для выделения текста подходит.
-        """
-        try:
-            x, y = self._get_center()
-            # command = f'adb shell "input tap {x} {y} & input tap {x} {y} & input tap {x} {y}"'
-            command = ['adb', 'shell', f'input tap {x} {y} & input tap {x} {y} & input tap {x} {y}']
-
-            subprocess.run(command, check=True)
-            return True
+            return self.terminal.tap(x=x, y=y)
         except Exception as e:
-            self.logger.error("__adb_multi_tap() ERROR:\n", e)
             return False
 
     def _adb_swipe(self,
@@ -168,7 +106,7 @@ class WebElementAdbActions(WebElementGet):
             x2, y2 = x, y
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
-            window_size = adb.get_screen_resolution()
+            window_size = self.terminal.get_screen_resolution()
             width = window_size[0]
             height = window_size[1]
             x2, y2 = find_coordinates_by_vector(width=width, height=height,
@@ -176,7 +114,10 @@ class WebElementAdbActions(WebElementGet):
                                                 start_x=x1, start_y=y1)
 
         # Выполнение adb-команды прокрутки с заданными координатами и длительностью
-        command = ['adb', 'shell', 'input', 'swipe', str(x1), str(y1), str(x2), str(y2), str(duration * 1000)]
-        subprocess.run(command, check=True)
+        self.terminal.swipe(start_x=str(x1),
+                            start_y=str(y1),
+                            end_x=str(x2),
+                            end_y=str(y2),
+                            duration=str(duration * 1000))
 
         return True

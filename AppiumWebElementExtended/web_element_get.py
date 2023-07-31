@@ -6,7 +6,7 @@ from typing import Union, Dict, List, Tuple
 import xml.etree.ElementTree as ET
 
 from appium.webdriver import WebElement
-from selenium.common import WebDriverException
+from selenium.common.exceptions import WebDriverException
 
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
@@ -15,6 +15,7 @@ from selenium.webdriver.common.by import By
 import config
 from AppiumHelpers.appium_helpers import AppiumHelpers
 from AppiumHelpers.appium_image import AppiumImage
+from terminal.terminal import Terminal
 
 
 class WebElementGet(WebElement):
@@ -27,6 +28,7 @@ class WebElementGet(WebElement):
         super().__init__(*args, **kwargs)
         self.driver = args[0]
         self.image = AppiumImage(driver=self.driver)
+        self.terminal = Terminal(driver=self.driver)
         self.helper = None
         self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 

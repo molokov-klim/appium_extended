@@ -4,7 +4,6 @@ from typing import Union, Dict, Tuple
 from appium.webdriver import WebElement
 
 from AppiumExtended.appium_get import AppiumGet
-from adb import adb
 
 
 class AppiumIs(AppiumGet):
@@ -16,7 +15,6 @@ class AppiumIs(AppiumGet):
     def __init__(self):
         super().__init__()
         self.helper = None
-
 
     def _is_element_within_screen(
             self,
@@ -34,7 +32,7 @@ class AppiumIs(AppiumGet):
         Возвращает:
         - bool: True, если элемент находится на экране, False, если нет.
         """
-        screen_size = adb.get_screen_resolution()  # Получаем размеры экрана
+        screen_size = self.terminal.get_screen_resolution()  # Получаем размеры экрана
         screen_width = screen_size[0]  # Ширина экрана
         screen_height = screen_size[1]  # Высота экрана
         element = self._get_element(locator=locator, timeout_elem=timeout)  # Получаем элемент по локатору
@@ -55,5 +53,3 @@ class AppiumIs(AppiumGet):
             return False
         # Если элемент находится на экране
         return True
-
-

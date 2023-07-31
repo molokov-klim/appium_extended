@@ -5,5 +5,5 @@ AppiumNavigator
 AppiumServer
 AppiumWebElementExtended
 AppiumWebElementsExtended
-adb
+terminal
 utils

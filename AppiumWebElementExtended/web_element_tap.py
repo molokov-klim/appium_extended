@@ -11,7 +11,7 @@ from selenium.webdriver.common.actions.pointer_input import PointerInput
 import config
 
 from AppiumWebElementExtended.web_element_get import WebElementGet
-from adb import adb
+
 from AppiumHelpers.helpers_decorators import wait_for_window_change
 from utils.utils import find_coordinates_by_vector
 
@@ -223,7 +223,7 @@ class WebElementTap(WebElementGet):
             return True
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
-            window_size = adb.get_screen_resolution()
+            window_size = self.adb.get_screen_resolution()
             width = window_size[0]
             height = window_size[1]
 

@@ -12,8 +12,9 @@ from pytesseract import pytesseract
 from selenium.common.exceptions import WebDriverException
 
 import config
-from adb import adb
+
 from AppiumHelpers.helpers_decorators import retry
+from terminal.terminal import Terminal
 
 
 class AppiumImage(object):
@@ -25,6 +26,7 @@ class AppiumImage(object):
     def __init__(self, driver=None):
         self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
         self.driver = driver
+        self.terminal = Terminal(driver=self.driver)
 
     def get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
@@ -100,7 +102,7 @@ class AppiumImage(object):
                    Если внутреннее изображение не найдено, возвращает None.
         """
         # Получаем разрешение экрана
-        screen_width, screen_height = adb.get_screen_resolution()
+        screen_width, screen_height = self.terminal.get_screen_resolution()
 
         # Захватываем скриншот
         screenshot = base64.b64decode(self.driver.get_screenshot_as_base64())

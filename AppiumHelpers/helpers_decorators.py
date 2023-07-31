@@ -222,11 +222,51 @@ def step_info(my_str):
     def func_decorator(func):
         # Создаем обертку функции, сохраняющую метаданные исходной функции
         @allure.step(my_str)
-        def wrapper(*args, **kwargs):
+        def wrapper(self, *args, **kwargs):
+            result = None
             # Логируем информацию перед вызовом метода
             logger.info(my_str)
-            # Выполняем исходную функцию
-            result = func(*args, **kwargs)
+            # Получаем скриншот до вызова метода
+            screenshot = self.driver.get_screenshot_as_png()
+            # Генерируем временную метку для имени скриншота
+            timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            # Устанавливаем имя скриншота до вызова метода
+            screenshot_name_begin = f"screenshot_begin_{timestamp}.png"
+            video_filename = 'screenrecord_{}.mp4'.format(timestamp)  # Имя файла видеозаписи с временной меткой
+            self.driver.start_recording_screen()
+
+            try:
+                # Выполняем исходную функцию
+                result = func(self, *args, **kwargs)
+            except AssertionError as e:
+                # Если произошло исключение, прикрепляем скриншот до вызова метода к отчету
+                allure.attach(screenshot, name=screenshot_name_begin, attachment_type=allure.attachment_type.PNG)
+                # Получаем скриншот после вызова метода
+                screenshot = self.driver.get_screenshot_as_png()
+                # Генерируем временную метку для имени скриншота
+                timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+                # Устанавливаем имя скриншота до вызова метода
+                screenshot_name_end = f"screenshot_end_{timestamp}.png"
+                # Если произошло исключение, прикрепляем скриншот после вызова метода к отчету
+                allure.attach(screenshot, name=screenshot_name_end, attachment_type=allure.attachment_type.PNG)
+
+                # Если произошло исключение, прикрепляем видеозапись выполнения метода к отчету
+                allure.attach(base64.b64decode(self.driver.stop_recording_screen()),
+                              name=video_filename,
+                              attachment_type=allure.attachment_type.MP4)
+
+                # Прикрепляем информацию об ошибке AssertionError к отчету
+                allure.attach(str(e), name="AssertionError", attachment_type=allure.attachment_type.TEXT)
+
+                # Выводим информацию в лог
+                logger.error(f"{my_str} [не выполнено]")
+                logger.error("AssertionError:")
+                traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+                logger.error(traceback_info)
+
+                # Прокидываем исключение дальше
+                raise AssertionError(str(e)).with_traceback(sys.exc_info()[2])
+
             # Логируем информацию после успешного выполнения метода
             logger.info(f"{my_str} [выполнено успешно]")
             # Возвращаем результат выполнения исходной функции

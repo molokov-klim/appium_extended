@@ -5,8 +5,6 @@ import os
 import time
 import unittest
 
-from adb import adb
-
 from AppiumExtended.appium_extended import AppiumExtended
 from AppiumWebElementExtended.web_element_extended import WebElementExtended
 from AppiumHelpers.helpers_decorators import time_it
@@ -17,8 +15,8 @@ app = AppiumExtended()
 caps = {
     "platformName": "android",
     "appium:automationName": "uiautomator2",
-    "appium:deviceName": adb.get_device_model(),
-    "appium:udid": adb.get_device_uuid(),
+    # "appium:deviceName": adb.get_device_model(),
+    # "appium:udid": adb.get_device_uuid(),
     "appium:noReset": True,
     "appium: autoGrantPermissions": True,
     "appium: newCommandTimeout": 600000,
@@ -154,6 +152,7 @@ class WebElementExtendedUTGet(unittest.TestCase):
 
 class WebElementExtendedUTDOM(unittest.TestCase):
     app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView')).scroll_to_top()
+
     @time_it
     def test_get_parent(self):
         self.assertIsInstance(app.get_element(
@@ -213,6 +212,7 @@ class WebElementExtendedUTDOM(unittest.TestCase):
 
 class WebElementExtendedUTElements(unittest.TestCase):
     app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView')).scroll_to_top()
+
     @time_it
     def test_get_elements1(self):
         print("test_get_elements()")
@@ -320,7 +320,7 @@ class WebElementExtendedUTClick(unittest.TestCase):
 
     @time_it
     def test_double_click1(self):
-        #app.get_element(locator=locator_tuple).click()
+        # app.get_element(locator=locator_tuple).click()
         self.assertIsInstance(app.get_element(locator={'text': 'Банковский платежный агент'}).double_click(),
                               WebElementExtended)
         app.get_element(locator_back).click(wait=True)
@@ -378,10 +378,9 @@ class WebElementExtendedUTClick(unittest.TestCase):
             direction=180, distance=10000), WebElementExtended)
 
 
-
-
 class WebElementExtendedUTap(unittest.TestCase):
     app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView')).scroll_to_top()
+
     @time_it
     def test_tap(self):
         self.assertIsInstance(app.get_element(locator={'text': 'Банковский платежный'}).tap(wait=False),
@@ -434,6 +433,7 @@ class WebElementExtendedUTap(unittest.TestCase):
 
 class WebElementExtendedUTAdbActions(unittest.TestCase):
     app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView')).scroll_to_top()
+
     @time_it
     def test_adb_tap(self):
         element = app.get_element(locator={'text': 'Комиссионер'})
@@ -461,6 +461,7 @@ class WebElementExtendedUTAdbActions(unittest.TestCase):
 
 class WebElementExtendedUTScroll(unittest.TestCase):
     app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView')).scroll_to_top()
+
     @time_it
     def test_scroll_down(self):
         element = app.get_element(locator=('id', 'ru.sigma.app.debug:id/menuRecyclerView'))

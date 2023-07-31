@@ -8,8 +8,6 @@ import logging
 import numpy as np
 from PIL import Image
 
-from adb import adb
-
 from AppiumExtended.appium_extended import AppiumExtended
 from AppiumWebElementExtended.web_element_extended import WebElementExtended
 from AppiumHelpers.helpers_decorators import time_it
@@ -21,8 +19,8 @@ app = AppiumExtended()
 caps = {
     "platformName": "android",
     "appium:automationName": "uiautomator2",
-    "appium:deviceName": adb.get_device_model(),
-    "appium:udid": adb.get_device_uuid(),
+    # "appium:deviceName": adb.get_device_model(),
+    # "appium:udid": adb.get_device_uuid(),
     "appium:noReset": True,
     "appium: autoGrantPermissions": True,
     "appium: newCommandTimeout": 600000,

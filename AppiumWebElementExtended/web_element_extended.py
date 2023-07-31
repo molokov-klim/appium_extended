@@ -130,14 +130,6 @@ class WebElementExtended(WebElementClick,
                              decorator_args=decorator_args)
         return cast('WebElementExtended', self)
 
-    def adb_multi_tap(self) -> 'WebElementExtended':
-        """
-        double tap by adb
-        # TODO fill
-        """
-        assert self._adb_multi_tap()
-        return cast('WebElementExtended', self)
-
     def adb_swipe(self,
                   locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
                   x: int = None,
