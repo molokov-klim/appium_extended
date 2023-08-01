@@ -41,7 +41,7 @@ appium plugin install --source=npm appium-dashboard
 
 # Содержание
 
-### Класс `AppiumExtended`
+### [class `AppiumExtended`](https://github.com/molokov-klim/appium_extended#class-appiumextended)
 
 - [connect](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-connect)
 - [disconnect](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-disconnect)
@@ -71,7 +71,7 @@ appium plugin install --source=npm appium-dashboard
 - [draw_by_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-draw_by_coordinates)
 - [input_by_virtual_keyboard](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_by_virtual_keyboard)
 
-### Класс `WebElementExtended`
+### [class `WebElementExtended`](https://github.com/molokov-klim/appium_extended#class-webelementextended)
 
 - [get_element](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_element-1)
 - [get_attributes](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_attributes)
@@ -102,19 +102,96 @@ appium plugin install --source=npm appium-dashboard
 - [get_center](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_center)
 - [get_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_coordinates)
 
-### Класс `AppiumServer`
+### [class `AppiumServer`](https://github.com/molokov-klim/appium_extended#class-appiumserver)
 
 - [start](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-start)
 - [is_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_alive)
 - [stop](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop)
 - [wait_until_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-wait_until_alive)
 
-### Класс `AppiumNavigator`
+### [class `AppiumNavigator`](https://github.com/molokov-klim/appium_extended#class-appiumnavigator)
 
 - [add_page](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-add_page)
 - [navigate](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-navigate)
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
+
+### [class Aapt](https://github.com/molokov-klim/appium_extended#class-aapt)
+
+- [get_package_name](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_package_name)
+- [get_launchable_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_launchable_activity)
+
+### [class Terminal](https://github.com/molokov-klim/appium_extended#class-terminal)
+
+- [adb_shell](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-adb_shell)
+- [push](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-push)
+- [pull](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-pull)
+- [start_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-start_activity)
+- [get_current_app_package](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_current_app_package)
+- [close_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-close_app)
+- [reboot_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot_app)
+- [uninstall_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-uninstall_app)
+- [is_app_installed](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_app_installed)
+- [press_home](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_home)
+- [press_back](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_back)
+- [press_menu](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_menu)
+- [input_keycode_num](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_keycode_num_)
+- [input_keycode](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_keycode)
+- [input_by_virtual_keyboard](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_by_virtual_keyboard-1)
+- [input_text](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_text)
+- [tap](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-tap-2)
+- [swipe](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-swipe-1)
+- [check_vpn](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-check_vpn)
+- [stop_logcat](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop_logcat)
+- [know_pid](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-know_pid)
+- [is_process_exist](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_process_exist)
+- [run_background_process](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-run_background_process)
+- [kill_by_pid](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-kill_by_pid)
+- [kill_all](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-kill_all)
+- [delete_files_from_internal_storage](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-delete_files_from_internal_storage)
+- [delete_file_from_internal_storage](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-delete_file_from_internal_storage)
+- [record_video](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-record_video)
+- [stop_video](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop_video)
+- [reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot)
+- [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution)
+
+
+### [class Adb](https://github.com/molokov-klim/appium_extended#class-adb)
+
+1. [Метод install_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-install_app-1)
+2. [Метод is_app_installed](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_app_installed-1)
+3. [Метод uninstall_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-uninstall_app-1)
+4. [Метод get_device_model](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_device_model)
+5. [Метод push](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-push-1)
+6. [Метод pull](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-pull-1)
+7. [Метод start_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-start_activity-1)
+8. [Метод close_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-close_app-1)
+9. [Метод reboot_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot_app-1)
+10. [Метод press_home](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_home-1)
+11. [Метод press_back](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_back-1)
+12. [Метод press_menu](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-press_menu-1)
+13. [Метод input_keycode_num](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_keycode_num_-1)
+14. [Метод input_keycode](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_keycode-1)
+15. [Метод input_by_virtual_keyboard](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_by_virtual_keyboard-2)
+16. [Метод input_text](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_text-1)
+17. [Метод tap](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-tap-3)
+18. [Метод swipe](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-swipe-2)
+19. [Метод get_current_app_package](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_current_app_package-1)
+20. [Метод check_vpn](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-check_vpn-1)
+21. [Метод stop_logcat](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop_logcat-1)
+22. [Метод reload_adb](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reload_adb)
+23. [Метод know_pid](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-know_pid-1)
+25. [Метод is_process_exist](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_process_exist-1)
+26. [Метод run_background_process](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-run_background_process-1)
+27. [Метод kill_by_pid](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-kill_by_pid-1)
+28. [Метод kill_by_name](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-kill_by_name)
+29. [Метод kill_all](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-kill_all-1)
+30. [Метод delete_files_from_internal_storage](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-delete_files_from_internal_storage-1)
+31. [Метод pull_video](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-pull_video)
+32. [Метод stop_video](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop_video-1)
+33. [Метод record_video](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-record_video-1)
+34. [Метод reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot-1)
+35. [Метод get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution-1)
 
 # class AppiumExtended
 Основной класс расширяющий Appium-Python-Client.  
