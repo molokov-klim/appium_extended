@@ -116,6 +116,12 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
+### Класс ``
+
+
+
+
+
 # class AppiumExtended
 Основной класс расширяющий Appium-Python-Client.  
 
@@ -1955,9 +1961,11 @@ class ExampleAppMap(AppiumExtended):
 
 	def __init__(self):  
 		super().__init__()  
-		self.page_1 = None
-		self.page_2 = None
-		self.page_3 = None
+	    # PAGES  
+	    self.page_1 = Page1(self)
+	    self.page_2 = Page2(self)
+	    self.page_3 = Page3(self)
+	    # LOGIC
 		self.driver = None  
 		self.navigator: AppiumNavigator = None  
 		self.current_path = os.path.dirname(os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))  
@@ -1968,10 +1976,7 @@ class ExampleAppMap(AppiumExtended):
 	    super().connect(capabilities=capabilities)    
 	    # LOGIC  
 	    self.navigator = AppiumNavigator(app=self)    
-	    # PAGES  
-	    self.page_1 = Page1(self)
-	    self.page_2 = Page2(self)
-	    self.page_3 = Page3(self)
+
 		# EDGES    
 		self.page_1.edges = {  
 		    self.page_2: self.go_1_2,  
