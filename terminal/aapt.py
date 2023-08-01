@@ -1,8 +1,8 @@
 import logging
 import os
+import subprocess
 
 import config
-from utils.operations import subprocess_check_output
 
 
 class Aapt:
@@ -21,7 +21,7 @@ class Aapt:
         command = ["aapt", "dump", "badging", os.path.join(path_to_apk)]
 
         # Выполнение команды и получение вывода
-        output: str = subprocess_check_output(command)
+        output: str = str(subprocess.check_output(command)).strip()
 
         # Извлечение строки, содержащей информацию о пакете
         start_index = output.index("package: name='") + len("package: name='")
@@ -46,7 +46,7 @@ class Aapt:
         command = ["aapt", "dump", "badging", path_to_apk]
 
         # Выполнение команды и получение вывода
-        output = subprocess_check_output(command)
+        output = str(subprocess.check_output(command)).strip()
 
         # Извлечение строки, содержащей информацию о запускаемой активности
         package_line = [line for line in output.splitlines() if line.startswith("launchable-activity")][0]

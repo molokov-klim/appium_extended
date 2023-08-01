@@ -176,7 +176,3 @@ def calculate_center_of_coordinates(coordinates: Tuple[int, int, int, int]) -> T
     # Возвращаем кортеж с центральными координатами (center_x, center_y)
     return center_x, center_y
 
-
-
-
-

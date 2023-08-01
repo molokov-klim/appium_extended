@@ -435,6 +435,9 @@ class Terminal:
         """
         # Получение списка всех процессов с помощью adb shell ps
         processes = self.adb_shell(command="ps")
+        if name not in processes:
+            self.logger.error("know_pid() [Процесс не обнаружен]")
+            return False
         # Разделение вывода на строки и удаление пустых строк
         lines = processes.strip().split('\n')
         # Проход по каждой строке вывода, начиная с 2-й строки, игнорируя заголовки

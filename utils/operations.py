@@ -1,175 +1,15 @@
 import re
 import os
 import logging
-import subprocess
-import requests
 import serial.tools.list_ports
 import shutil
 import json
-from typing import List, Optional
+from typing import Optional
 
 import config
 
 logger = logging.getLogger(config.APPIUM_LOG_NAME)
 START_DIR = os.getcwd()
-
-
-def subprocess_run(command: List[str]) -> str:
-    """
-    Выполняет команду в подпроцессе и возвращает вывод команды в виде строки.
-
-    Аргументы:
-        command (List[str]): Список строк, представляющих команду и ее аргументы.
-
-    Возвращает:
-        str: Вывод команды в виде строки.
-
-    """
-    if config.PROXY:
-        # Если используется прокси, отправляем запрос к серверу Flask для выполнения команды
-        response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/subprocess_run',
-                                 data={'command': ' '.join(command)}).text
-    else:
-        # Иначе выполняем команду с помощью subprocess.run и получаем вывод команды
-        response = subprocess.run(command, stdout=subprocess.PIPE, text=True, check=True).stdout
-    return str(response).strip()
-
-
-def subprocess_popen(command: List[str]) -> str:
-    """
-    Выполняет команду в подпроцессе с использованием Popen и возвращает вывод команды в виде строки.
-
-    Аргументы:
-        command (List[str]): Список строк, представляющих команду и ее аргументы.
-
-    Возвращает:
-        str: Вывод команды в виде строки.
-
-    """
-    if config.PROXY:
-        # Если используется прокси, отправляем запрос к серверу Flask для выполнения команды
-        response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/subprocess_popen',
-                                 data={'command': ' '.join(command)}).text
-    else:
-        # Иначе выполняем команду с помощью subprocess.Popen и сохраняем объект процесса
-        response = subprocess.Popen(command, shell=True)
-    return str(response).strip()
-
-
-def subprocess_popen_background(command: List[str]) -> str:
-    """
-    Выполняет команду в подпроцессе с использованием Popen и возвращает вывод команды в виде строки.
-
-    Аргументы:
-        command (List[str]): Список строк, представляющих команду и ее аргументы.
-
-    Возвращает:
-        str: Вывод команды в виде строки.
-
-    """
-    if config.PROXY:
-        # Если используется прокси, отправляем запрос к серверу Flask для выполнения команды
-        response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/subprocess_popen_background',
-                                 data={'command': ' '.join(command)}).text
-    else:
-        # Иначе выполняем команду с помощью subprocess.Popen и сохраняем объект процесса
-        response = subprocess.Popen(command, shell=True)
-    return str(response).strip()
-
-
-def subprocess_check_output(command: List[str]) -> str:
-    """
-    Выполняет команду в подпроцессе с использованием check_output и возвращает вывод команды в виде строки.
-
-    Аргументы:
-        command (List[str]): Список строк, представляющих команду и ее аргументы.
-
-    Возвращает:
-        str: Вывод команды в виде строки.
-
-    """
-    if config.PROXY:
-        # Если используется прокси, отправляем запрос к серверу Flask для выполнения команды
-        response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/subprocess_check_output',
-                                 data={'command': ' '.join(command)}).text
-    else:
-        # Иначе выполняем команду с помощью subprocess.check_output и декодируем вывод в строку
-        response = subprocess.check_output(command).decode('utf-8')
-    return str(response).strip()
-
-
-def subprocess_call(command: List[str]) -> str:
-    """
-    Выполняет команду в подпроцессе с использованием call и возвращает код завершения команды в виде строки.
-
-    Аргументы:
-        command (List[str]): Список строк, представляющих команду и ее аргументы.
-
-    Возвращает:
-        str: Код завершения команды в виде строки.
-
-    """
-    if config.PROXY:
-        # Если используется прокси, отправляем запрос к серверу Flask для выполнения команды
-        response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/subprocess_call',
-                                 data={'command': ' '.join(command)}).text
-    else:
-        # Иначе выполняем команду с помощью subprocess.call
-        response = subprocess.call(command)
-    return str(response).strip()
-
-
-def requests_get(url: str, local_path: str) -> bool:
-    """
-    Выполняет запрос на удаленный сервер по указанному url и загружает файл по указанному local_path.
-
-    Аргументы:
-    - url (str): URL для загрузки файла.
-    - local_path (str): Путь для сохранения загруженного файла.
-
-    Возвращает:
-    - bool: True, если загрузка файла успешна, иначе False.
-    """
-
-    # Выполняем POST-запрос на удаленный сервер
-    response = requests.post(f'http://{config.FLASK_IP}:{config.FLASK_PORT}/requests_get',
-                             data={'url': url, 'local_path': local_path})
-
-    # Проверяем статус и результат запроса
-    if response.status_code == 200 and response.text == "OK":
-        return True
-    else:
-        return False
-
-
-def upload_file(file: str, path: str):
-    """
-    Загружает файл на сервер по указанному пути.
-
-    Аргументы:
-    - file (str): путь до файла (включая файл с расширением).
-    - path (str): Путь для сохранения загруженного файла.
-
-    Возвращает:
-    - bool: True, если загрузка файла успешна, иначе False.
-    """
-    command = ['chmod', '+rwx', file]
-    subprocess.run(command)
-    with open(file, 'rb') as file:
-        logger.info("file: < {}".format(file))
-        logger.info("path: < {}".format(path))
-
-        files = {'file': file}
-
-        response = requests.post(url=f'http://{config.FLASK_IP}:{config.FLASK_PORT}/upload_file',
-                                 files=files, data={'path': path})
-    # Проверяем статус и результат запроса
-    if response.status_code == 200 and response.text == "OK":
-        return True
-    else:
-        logger.info("upload_file(): response.status_code > {}".format(response.status_code))
-        logger.info("upload_file(): response.text > {}".format(response.text))
-        return False
 
 
 def extract_numeric(variable: str) -> Optional[float]:
@@ -320,9 +160,3 @@ def str_to_float(number: str) -> float:
     number = float(number.replace(',', '.').replace('₽', '').replace(' ', ''))
     # Возвращаем сумму в формате float
     return number
-
-
-
-
-
-
