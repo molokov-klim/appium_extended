@@ -116,12 +116,12 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
-### [class Aapt](https://github.com/molokov-klim/appium_extended#class-aapt)
+### [class `Aapt`](https://github.com/molokov-klim/appium_extended#class-aapt)
 
 - [get_package_name](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_package_name)
 - [get_launchable_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_launchable_activity)
 
-### [class Terminal](https://github.com/molokov-klim/appium_extended#class-terminal)
+### [class `Terminal`](https://github.com/molokov-klim/appium_extended#class-terminal)
 
 - [adb_shell](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-adb_shell)
 - [push](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-push)
@@ -156,7 +156,7 @@ appium plugin install --source=npm appium-dashboard
 - [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution)
 
 
-### [class Adb](https://github.com/molokov-klim/appium_extended#class-adb)
+### [class `Adb`](https://github.com/molokov-klim/appium_extended#class-adb)
 
 1. [Метод install_app](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-install_app-1)
 2. [Метод is_app_installed](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_app_installed-1)
