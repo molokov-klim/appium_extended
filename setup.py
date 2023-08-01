@@ -9,7 +9,7 @@ AppiumExtended is a collection of utilities and convenience functions designed t
 
 setup(
     name='AppiumExtended',
-    version='0.1.8',
+    version='0.1.9',
     description='An extension library for adding ease of use Appium-Python-Client',
     author='molokov-klim',
     packages=find_packages(),
