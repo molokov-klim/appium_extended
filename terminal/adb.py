@@ -4,11 +4,12 @@ import subprocess
 import sys
 import time
 import traceback
-from typing import Dict, Union, Tuple
+from typing import Dict, Union, Tuple, Optional, Any
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(
 #    __file__))))  # The sys.path.append line adds the parent directory of the tests directory to the Python module search path, allowing you to import modules from the root folder.
 
 import config
+from utils import operations
 
 
 class Adb:
@@ -30,24 +31,29 @@ class Adb:
 
         try:
             # Выполнение команды и получение вывода
-            response = subprocess.check_output(command)
+            response = str(subprocess.check_output(command))
 
             # Извлечение списка устройств из полученного вывода с использованием регулярных выражений
             device_list = re.findall(r'(\d+\.\d+\.\d+\.\d+:\d+|\d+)', response)
 
-            # Возвращение первого устройства из списка (UUID подключенного устройства Android)
-            logger.debug(f"get_device_uuid() > {device_list[0]}")
+            try:
+                # Возвращение первого устройства из списка (UUID подключенного устройства Android)
+                logger.debug(f"get_device_uuid() > {device_list[0]}")
 
-            return device_list[0]
-
+                return device_list[0]
+            except IndexError:
+                logger.error("get_device_uuid() > None")
+                logger.error("Нет подключенных устройств")
+                return None
         except subprocess.CalledProcessError as e:
             logger.error("get_device_uuid() > None")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
+            return None
 
     @staticmethod
-    def get_device_model() -> Union[str, None]:
+    def get_device_model() -> Optional[str]:
         """
         Получает модель подключенного устройства Android с помощью команды adb.
         Возвращает модель устройства.
@@ -59,9 +65,10 @@ class Adb:
         try:
             # Выполнение команды и получение вывода
             model = subprocess.check_output(command)
-            # Возвращение модели устройства в виде строки
-            logger.debug(f"get_device_model() > {model}")
+            # Преобразование байтовой строки в обычную строку и удаление пробельных символов и символов перевода строки
+            model = model.decode().strip()
             return model
+
         except subprocess.CalledProcessError as e:
             logger.error("get_device_model() > None")
             logger.error(e)
@@ -80,8 +87,14 @@ class Adb:
         Возвращает:
             bool: True, если файл или директория были успешно скопированы, False в противном случае.
         """
+        import os
+
         logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"push() < {source=}, {destination=}")
+
+        if not os.path.exists(source):
+            logger.error(f"Путь к копируемому файлу или директории не существует: {source=}")
+            return False
 
         command = ["adb", "push", source, destination]
         try:
@@ -123,7 +136,7 @@ class Adb:
             return False
 
     @staticmethod
-    def install(source: str) -> bool:
+    def install_app(source: str) -> bool:
         """
         Устанавливает файл APK на подключенном устройстве.
 
@@ -143,6 +156,56 @@ class Adb:
             return True
         except subprocess.CalledProcessError as e:
             logger.error("install() > False")
+            logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+            return False
+
+    @staticmethod
+    def is_app_installed(package) -> bool:
+        """
+        Проверяет, установлен ли пакет.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"is_installed() < {package=}")
+
+        command = "adb shell pm list packages"
+        try:
+            result = subprocess.check_output(command, shell=True).decode().strip()
+            # Фильтруем пакеты
+            if any([line.strip().endswith(package) for line in result.splitlines()]):
+                logger.debug("install() > True")
+                return True
+            logger.debug("install() > False")
+            return False
+        except subprocess.CalledProcessError as e:
+            logger.error("install() > False")
+            logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+            return False
+
+    @staticmethod
+    def uninstall_app(package: str) -> bool:
+        """
+        Удаляет указанный пакет с помощью ADB.
+
+        Аргументы:
+            package (str): Название пакета приложения для удаления.
+
+        Возвращает:
+            bool: True, если приложение успешно удалено, False в противном случае.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"uninstall_app() < {package=}")
+
+        command = ['adb', 'uninstall', package]
+        try:
+            subprocess.run(command, check=True)
+            logger.debug("uninstall_app() > True")
+            return True
+        except subprocess.CalledProcessError as e:
+            logger.error("uninstall_app() > False")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
@@ -174,6 +237,112 @@ class Adb:
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
             return False
+
+    @staticmethod
+    def get_current_activity() -> Union[str, None]:
+        """
+        Получает активити текущего запущенного приложения на устройстве с помощью ADB.
+        Возвращает имя активити в виде строки или None, если произошла ошибка.
+
+        Возвращает:
+            str: Название активити текущего запущенного приложения, либо None, если произошла ошибка.
+        """
+        # Получение логгера
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
+        # Вывод информации о запуске функции в лог
+        logger.debug("get_current_activity()")
+
+        # Команда для ADB для получения информации о текущих окнах
+        command = ['adb', 'shell', 'dumpsys', 'window', 'windows']
+
+        try:
+            # Выполнение команды и декодирование результата
+            result = subprocess.check_output(command, shell=True).decode().strip()
+
+            # Определение паттерна для поиска нужной информации в результатах
+            pattern = r'mCurrentFocus|mFocusedApp'
+
+            # Вызов функции grep_pattern для поиска соответствия паттерну
+            matched_lines = operations.grep_pattern(input_string=result, pattern=pattern)
+
+            # Если были найдены соответствующие строки
+            if matched_lines:
+                for line in matched_lines:
+                    # Поиск имени активити в строке
+                    match = re.search(r'\/([^\/}]*)', line)
+                    if match:
+                        # Возвращаем найденное значение, исключая '/'
+                        activity_name = match.group(1)
+                        logger.debug(f"get_current_activity() > {activity_name}")
+                        return activity_name
+
+            # Если не удалось найти активити, возвращаем None
+            logger.error("get_current_activity() > None")
+            return None
+        except subprocess.CalledProcessError as e:
+            # Обработка ошибки при выполнении команды
+            logger.error(e)
+
+            # Вывод информации о трассировке в лог
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+
+            logger.error("get_current_activity() > None")
+            return None
+
+    @staticmethod
+    def get_current_package() -> Union[str, None]:
+        """
+        Получает пакет текущего запущенного приложения на устройстве с помощью ADB.
+        Возвращает имя пакета в виде строки или None, если произошла ошибка.
+
+        Возвращает:
+            str: Название пакета текущего запущенного приложения, либо None, если произошла ошибка.
+        """
+        # Получение логгера
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
+        # Вывод информации о запуске функции в лог
+        logger.debug("get_current_app_package()")
+
+        # Команда для ADB для получения информации о текущих окнах
+        command = ['adb', 'shell', 'dumpsys', 'window', 'windows']
+
+        try:
+            # Выполнение команды и декодирование результата
+            result = subprocess.check_output(command, shell=True).decode().strip()
+
+            # Определение паттерна для поиска нужной информации в результатах
+            pattern = r'mCurrentFocus|mFocusedApp'
+
+            # Вызов функции grep_pattern для поиска соответствия паттерну
+            matched_lines = operations.grep_pattern(input_string=result, pattern=pattern)
+
+            # Если были найдены соответствующие строки
+            if matched_lines:
+                for line in matched_lines:
+                    # Поиск имени пакета в строке
+                    match = re.search(r'u0\s(.+?)/', line)
+                    if match:
+                        # Возвращаем найденное значение
+                        package_name = match.group(1)
+                        logger.debug(f"get_current_app_package() > {package_name}")
+                        return package_name
+
+            # Если не удалось найти имя пакета, возвращаем None
+            logger.error("get_current_app_package() > None")
+            return None
+        except subprocess.CalledProcessError as e:
+            # Обработка ошибки при выполнении команды
+            logger.error(e)
+
+            # Вывод информации о трассировке в лог
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+
+            logger.error("get_current_app_package() > None")
+            return None
 
     @staticmethod
     def close_app(package: str) -> bool:
@@ -225,32 +394,6 @@ class Adb:
             return False
         self.logger.debug("reboot_app() > True")
         return True
-
-    @staticmethod
-    def uninstall_app(package: str) -> bool:
-        """
-        Удаляет указанный пакет с помощью ADB.
-
-        Аргументы:
-            package (str): Название пакета приложения для удаления.
-
-        Возвращает:
-            bool: True, если приложение успешно удалено, False в противном случае.
-        """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        logger.debug(f"uninstall_app() < {package=}")
-
-        command = ['adb', 'uninstall', package]
-        try:
-            subprocess.run(command, check=True)
-            logger.debug("uninstall_app() > True")
-            return True
-        except subprocess.CalledProcessError as e:
-            logger.error("uninstall_app() > False")
-            logger.error(e)
-            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-            logger.error(traceback_info)
-            return False
 
     @staticmethod
     def press_home() -> bool:
@@ -492,40 +635,6 @@ class Adb:
             return False
 
     @staticmethod
-    def get_current_app_package() -> Union[str, None]:
-        """
-        Получает пакет текущего запущенного приложения на устройстве с помощью ADB.
-
-        Возвращает:
-            str: Название пакета текущего запущенного приложения, либо None, если произошла ошибка.
-        """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        logger.debug("get_current_app_package()")
-
-        # Определяем команду в виде списка строк
-        command = [
-            "adb", "shell", "dumpsys", "window", "windows", "|", "grep", "-E", "'mCurrentFocus|mFocusedApp'",
-            "|", "grep", "-e", "'mFo'"
-        ]
-        try:
-            # Выполняем команду и получаем результат
-            result = str(subprocess.check_output(command)).strip()
-            # Находим позицию последнего вхождения подстроки "/." в строке
-            end_index = result.rfind("/")
-            # Извлекаем название приложения из предшествующих символов
-            start_index = result.rfind(" ", 0, end_index) + 1
-            app_name = result[start_index:end_index]
-            logger.debug(f"get_current_app_package() > {app_name=}")
-            return app_name
-        except subprocess.CalledProcessError as e:
-            # Логируем ошибку, если возникло исключение
-            logger.error("adb.get_current_app_package() > None")
-            logger.error(e)
-            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-            logger.error(traceback_info)
-            return None
-
-    @staticmethod
     def check_vpn(ip_address: str = '') -> bool:
         """
         Проверяет, активно ли VPN-соединение на устройстве с помощью ADB.
@@ -537,29 +646,31 @@ class Adb:
             bool: True, если VPN-соединение активно, False в противном случае.
         """
         logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        logger.debug(f"check_VPN() < {ip_address=}")
+        logger.debug(f"check_vpn() < {ip_address=}")
 
         # Определяем команду в виде строки
-        command = f"adb shell netstat | grep -w -e {ip_address}"
+        command = "adb shell netstat"
         try:
             # Выполняем команду и получаем вывод
             output = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
 
-            if "ESTABLISHED" in output.stdout:
-                logger.debug("check_VPN() True")
-                return True
-            logger.debug("check_VPN() False")
+            # Поиск строки
+            lines = output.stdout.split("\n")
+            for line in lines:
+                if "ESTABLISHED" in line and ip_address in line:
+                    logger.debug("check_vpn() True")
+                    return True
+            logger.debug("check_vpn() False")
             return False
         except subprocess.CalledProcessError as e:
             # Логируем ошибку, если возникло исключение
-            logger.error("check_VPN() > False")
+            logger.error("check_vpn() > False")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
             return False
 
-    @staticmethod
-    def stop_logcat() -> bool:
+    def stop_logcat(self) -> bool:
         """
         Останавливает выполнение logcat на устройстве с помощью ADB.
 
@@ -568,30 +679,84 @@ class Adb:
         """
         logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("stop_logcat()")
+        if self.is_process_exist(name='logcat'):
+            if self.kill_all(name='logcat'):
+                logger.debug("stop_logcat() > True")
+                return True
+        logger.error("stop_logcat() > False")
+        logger.debug("stop_logcat() [Запущенного процесса logcat не обнаружено]")
+        return False
 
-        command = ['adb', 'shell', 'ps', '|', 'grep', 'logcat']
-        # Получаем список выполняющихся процессов logcat
+    @staticmethod
+    def is_process_exist(name) -> bool:
+        """
+        Проверяет, запущен ли процесс, используя adb shell ps.
+
+        Параметры:
+            name (str): Имя процесса.
+
+        Возвращает:
+            bool: True если процесс с указанным именем существует, False в ином случае.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"is_process_exist() < {name=}")
+        command = ['adb', 'shell', 'ps']
         try:
-            process_list = subprocess.check_output(command)
+            processes = subprocess.check_output(command, shell=True).decode().strip()
         except subprocess.CalledProcessError as e:
-            logger.error("adb.stop_logcat() > False")
+            logger.error("know_pid() > None")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
             return False
-        # Проходим по списку процессов и отправляем каждому сигнал SIGINT
-        for process in process_list.splitlines():
-            pid = process.split()[1]
-            try:
-                subprocess.call(['adb', 'shell', 'kill', '-s', 'SIGINT', pid])
-            except subprocess.CalledProcessError as e:
-                logger.error("adb.stop_logcat() > False")
-                logger.error(e)
-                traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-                logger.error(traceback_info)
-                return False
-        logger.debug("stop_logcat() > True")
-        return True
+        # Разделение вывода на строки и удаление пустых строк
+        lines = processes.strip().split('\n')
+        # Проход по каждой строке вывода, начиная с 2-й строки, игнорируя заголовки
+        for line in lines[1:]:
+            # Разделение строки на столбцы по пробелам
+            columns = line.split()
+            # Проверка, что строка имеет не менее 9 столбцов
+            if len(columns) >= 9:
+                # Извлечение PID и имени процесса из соответствующих столбцов
+                _, process_name = columns[1], columns[8]
+                # Сравнение имени процесса с искомым именем
+                if name == process_name:
+                    logger.debug("is_process_exist() > True")
+                    return True
+        # Возврат None, если процесс с заданным именем не найден
+        logger.debug("is_process_exist() > False")
+        return False
+
+    def run_background_process(self, command: str, process: str = "") -> bool:
+        """
+        Запускает процесс в фоновом режиме на устройстве Android с использованием ADB.
+
+        Аргументы:
+            command (str): Команда для выполнения на устройстве.
+            process (str): Название процесса, который будет запущен. По умолчанию "".
+            Если process == "", то не будет проверяться его запуск в системе.
+
+        Возвращает:
+            bool: True, если процесс был успешно запущен, False в противном случае.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"run_background_process() < {command=}")
+
+        command = f"{command} nohup > /dev/null 2>&1 &"
+        try:
+            subprocess.Popen(command, stdout=subprocess.DEVNULL)  # не добавлять with
+            if process != "":
+                time.sleep(1)
+                if not self.is_process_exist(name=process):
+                    return False
+            logger.debug("run_background_process() > True")
+            return True
+        except subprocess.CalledProcessError as e:
+            logger.error("run_background_process() > False")
+            logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+            return False
 
     @staticmethod
     def reload_adb() -> bool:
@@ -642,17 +807,13 @@ class Adb:
         logger.debug(f"know_pid() < {name=}")
         command = ['adb', 'shell', 'ps']
         try:
-            processes = str(subprocess.call(command)).strip()
+            processes = subprocess.check_output(command, shell=True).decode().strip()
         except subprocess.CalledProcessError as e:
-            logger.error("know_pid() > False")
+            logger.error("know_pid() > None")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
-            return False
-        if name not in processes:
-            logger.error("know_pid() > False")
-            logger.error("know_pid() [Процесс не обнаружен]")
-            return False
+            return None
         # Разделение вывода на строки и удаление пустых строк
         lines = processes.strip().split('\n')
         # Проход по каждой строке вывода, начиная с 2-й строки, игнорируя заголовки
@@ -669,10 +830,11 @@ class Adb:
                     return int(pid)
         # Возврат None, если процесс с заданным именем не найден
         logger.error("know_pid() > None")
+        logger.error("know_pid() [Процесс не обнаружен]")
         return None
 
     @staticmethod
-    def kill_by_pid(pid: str) -> bool:
+    def kill_by_pid(pid: Union[str, int]) -> bool:
         """
         Отправляет сигнал SIGINT для остановки процесса по указанному идентификатору PID с помощью ADB.
 
@@ -739,7 +901,7 @@ class Adb:
 
         command = ['adb', 'shell', 'pkill', '-f', str(name)]
         try:
-            subprocess.call(command)
+            subprocess.run(command, check=True)
         except subprocess.CalledProcessError as e:
             logger.error("kill_all() > False")
             logger.error(e)
@@ -776,7 +938,7 @@ class Adb:
         return True
 
     @staticmethod
-    def pull_video(wherefrom: str = None, destination: str = "", delete: bool = True) -> bool:
+    def pull_video(source: str = None, destination: str = ".", delete: bool = True) -> bool:
         """
         Копирует видеофайлы с устройства на компьютер с помощью ADB.
 
@@ -791,18 +953,16 @@ class Adb:
         logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"pull_video() < {destination=}")
 
-        if not wherefrom:
-            wherefrom = '/sdcard/Movies/'
-        if wherefrom.endswith('/'):
-            wherefrom = wherefrom + "/"
+        if not source:
+            source = '/sdcard/Movies/'
+        if source.endswith('/'):
+            source = source + "/"
         if destination.endswith('/'):
             destination = destination + "/"
 
-        command = ['adb', 'pull', f'{wherefrom}', f'{destination}']
+        command = ['adb', 'pull', f'{source}', f'{destination}']
         try:
-            with subprocess.Popen(command) as process:
-                process.communicate()
-            time.sleep(30)
+            subprocess.run(command, check=True)
         except subprocess.CalledProcessError as e:
             logger.error("pull_video() > False")
             logger.error(e)
@@ -811,10 +971,9 @@ class Adb:
             return False
 
         if delete:
-            command = ['adb', 'shell', 'rm', '-rf', f'{wherefrom}*']
+            command = ['adb', 'shell', 'rm', '-rf', f'{source}*']
             try:
-                with subprocess.Popen(command) as process:
-                    process.communicate()
+                subprocess.run(command, check=True)
             except subprocess.CalledProcessError as e:
                 logger.error("pull_video() > False")
                 logger.error(e)
@@ -849,36 +1008,61 @@ class Adb:
         return True
 
     @staticmethod
-    def record_video(filename: str) -> bool:
+    def record_video(path: str = "sdcard/Movies/", filename: str = "screenrecord.mp4") -> \
+            Union[subprocess.Popen[bytes], subprocess.Popen[Union[Union[str, bytes], Any]]]:
         """
         Записывает видео на устройстве с помощью ADB.
 
         Аргументы:
+            path (str): Путь куда сохранить файл
             filename (str): Имя файла для сохранения видео.
 
         Возвращает:
-            bool: True, если запись видео успешно начата, False в противном случае.
+            subprocess.CompletedProcess: Процесс записи видео.
         """
         logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"record_video() < {filename}")
+        if path.endswith('/'):
+            path = path[:-1]
+        if filename.endswith('.mp4'):
+            filename = filename + ".mp4"
 
-        command = ['adb', 'shell', 'screenrecord', f'sdcard/Movies/{filename}']
+        command = ['adb', 'shell', 'screenrecord', f'{path}/{filename}']
         try:
             # Запускаем команду adb shell screenrecord для начала записи видео
-            with subprocess.Popen(command) as process:
-                # Ожидаем завершения процесса записи видео
-                process.communicate()
+            return subprocess.Popen(command)
         except subprocess.CalledProcessError as e:
             # Если произошла ошибка при выполнении команды, логируем ошибку и возвращаем False
             logger.error("record_video() > False")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
-            return False
 
-        # Возвращаем True, т.к. запись видео начата успешно
-        logger.debug("record_video() > True")
-        return True
+    @staticmethod
+    def start_record_video(path: str = "sdcard/Movies/", filename: str = "screenrecord.mp4") -> bool:
+        """
+        Отправляет команду на устройство для начала записи видео.
+
+        Аргументы:
+            path (str): Путь куда сохранить файл
+            filename (str): Имя файла для сохранения видео.
+
+        Возвращает:
+            bool: True, если запись видео успешно начата, False в противном случае.
+        """
+        if path.endswith('/'):
+            path = path[:-1]
+        if not filename.endswith('.mp4'):
+            filename = filename + ".mp4"
+
+        command = ['adb', 'shell', 'screenrecord', f'{path}/{filename}']
+        try:
+            # Запускаем команду adb shell screenrecord для начала записи видео
+            subprocess.Popen(command)   # не добавлять with
+            return True
+        except subprocess.CalledProcessError:
+            # Если произошла ошибка при выполнении команды, возвращаем False
+            return False
 
     @staticmethod
     def reboot() -> bool:
@@ -916,16 +1100,17 @@ class Adb:
 
         command = ['adb', 'shell', 'wm', 'size']
         try:
-            output = str(subprocess.run(command, check=True)).strip()
+            output = subprocess.check_output(command).decode()
             if "Physical size" in output:
                 resolution_str = output.split(":")[1].strip()
                 width, height = resolution_str.split("x")
                 logger.debug(f"get_screen_resolution() > {width=}, {height=}")
                 return int(width), int(height)
-        except subprocess.CalledProcessError as e:
+            logger.error(f"Unexpected output from adb: {output}")
+        except (subprocess.CalledProcessError, ValueError) as e:
             logger.error("get_screen_resolution() > None")
             logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
-            return None
+        return None
 

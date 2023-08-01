@@ -160,3 +160,10 @@ def str_to_float(number: str) -> float:
     number = float(number.replace(',', '.').replace('₽', '').replace(' ', ''))
     # Возвращаем сумму в формате float
     return number
+
+
+def grep_pattern(input_string, pattern):
+    lines = input_string.split('\n')
+    regex = re.compile(pattern)
+    matched_lines = [line for line in lines if regex.search(line)]
+    return matched_lines

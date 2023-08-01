@@ -1,6 +1,9 @@
 import logging
 import base64
 import re
+import sys
+import time
+import traceback
 from typing import Dict, Any, Union, Tuple
 
 from AppiumHelpers.helpers_decorators import log_debug
@@ -18,7 +21,12 @@ class Terminal:
 
     @log_debug()
     def adb_shell(self, command: str, args: str = "") -> Any:
-        return self.driver.execute_script("mobile: shell", {'command': command, 'args': [args]})
+        try:
+            return self.driver.execute_script("mobile: shell", {'command': command, 'args': [args]})
+        except KeyError as e:
+            self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
 
     @log_debug()
     def push(self, source: str, destination: str) -> bool:
@@ -42,6 +50,8 @@ class Terminal:
         except IOError as e:
             self.logger.error("terminal.push()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -67,6 +77,8 @@ class Terminal:
         except IOError as e:
             self.logger.error("terminal.pull")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -87,6 +99,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.start_activity()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -110,6 +124,8 @@ class Terminal:
             # Логируем ошибку, если возникло исключение
             self.logger.error("terminal.get_current_app_package()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return None
 
     @log_debug()
@@ -129,6 +145,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.close_app()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -154,25 +172,6 @@ class Terminal:
         return True
 
     @log_debug()
-    def uninstall_app(self, package: str) -> bool:
-        """
-        Удаляет указанный пакет с помощью ADB.
-
-        Аргументы:
-            package (str): Название пакета приложения для удаления.
-
-        Возвращает:
-            bool: True, если приложение успешно удалено, False в противном случае.
-        """
-        try:
-            self.driver.remove_app(app_id=package)
-            return True
-        except KeyError as e:
-            self.logger.error("terminal.uninstall_app()")
-            self.logger.error(e)
-            return False
-
-    @log_debug()
     def install_app(self, app_path: str) -> bool:
         """
         Устанавливает указанный пакет с помощью Appium.
@@ -190,6 +189,52 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.install_app()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
+            return False
+
+    @log_debug()
+    def is_app_installed(self, package) -> bool:
+        """
+        Проверяет, установлен ли пакет.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"is_app_installed() < {package=}")
+
+        try:
+            result = self.adb_shell(command="pm", args="list packages")
+            # Фильтруем пакеты
+            if any([line.strip().endswith(package) for line in result.splitlines()]):
+                logger.debug("is_app_installed() > True")
+                return True
+            logger.debug("is_app_installed() > False")
+            return False
+        except KeyError as e:
+            self.logger.error("terminal.is_app_installed() > False")
+            self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
+            return False
+
+    @log_debug()
+    def uninstall_app(self, package: str) -> bool:
+        """
+        Удаляет указанный пакет с помощью ADB.
+
+        Аргументы:
+            package (str): Название пакета приложения для удаления.
+
+        Возвращает:
+            bool: True, если приложение успешно удалено, False в противном случае.
+        """
+        try:
+            self.driver.remove_app(app_id=package)
+            return True
+        except KeyError as e:
+            self.logger.error("terminal.uninstall_app()")
+            self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -206,6 +251,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.press_home()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -222,6 +269,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.press_back()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -238,6 +287,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.press_menu()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -258,6 +309,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.input_keycode_num_()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -277,6 +330,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.input_keycode()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -300,6 +355,8 @@ class Terminal:
             # Логируем ошибку и возвращаем False в случае возникновения исключения
             self.logger.error("terminal.input_by_virtual_keyboard")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -320,6 +377,8 @@ class Terminal:
             # Логируем ошибку, если возникло исключение
             self.logger.error("terminal.input_text()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -341,6 +400,8 @@ class Terminal:
             # Логируем ошибку, если возникло исключение
             self.logger.error("terminal.tap()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -367,6 +428,8 @@ class Terminal:
             # Логируем ошибку, если возникло исключение
             self.logger.error("terminal.swipe()")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -393,6 +456,8 @@ class Terminal:
             # Логируем ошибку, если возникло исключение
             self.logger.error("terminal.check_VPN")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
 
     @log_debug()
@@ -409,16 +474,20 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.stop_logcat")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         # Проходим по списку процессов и отправляем каждому сигнал SIGINT
         for process in process_list.splitlines():
             if "logcat" in process:
                 pid = process.split()[1]
                 try:
-                    self.adb_shell(command="kill", args=f"-SIGINT {pid}")
+                    self.adb_shell(command="kill", args=f"-SIGINT {str(pid)}")
                 except KeyError as e:
                     self.logger.error("terminal.stop_logcat")
                     self.logger.error(e)
+                    traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+                    self.logger.error(traceback_info)
                     return False
         return True
 
@@ -437,7 +506,7 @@ class Terminal:
         processes = self.adb_shell(command="ps")
         if name not in processes:
             self.logger.error("know_pid() [Процесс не обнаружен]")
-            return False
+            return None
         # Разделение вывода на строки и удаление пустых строк
         lines = processes.strip().split('\n')
         # Проход по каждой строке вывода, начиная с 2-й строки, игнорируя заголовки
@@ -450,9 +519,73 @@ class Terminal:
                 pid, process_name = columns[1], columns[8]
                 # Сравнение имени процесса с искомым именем
                 if name == process_name:
+                    self.logger.debug(f"know_pid() > {str(pid)}")
                     return int(pid)
+        self.logger.error("know_pid() [Процесс не обнаружен]")
         # Возврат None, если процесс с заданным именем не найден
         return None
+
+    @log_debug()
+    def is_process_exist(self, name) -> bool:
+        """
+        Проверяет, запущен ли процесс, используя adb shell ps.
+
+        Параметры:
+            name (str): Имя процесса.
+
+        Возвращает:
+            bool: True если процесс с указанным именем существует, False в ином случае.
+        """
+        # Получение списка всех процессов с помощью adb shell ps
+        processes = self.adb_shell(command="ps")
+        if name not in processes:
+            self.logger.debug("is_process_exist() > False")
+            return False
+        # Разделение вывода на строки и удаление пустых строк
+        lines = processes.strip().split('\n')
+        # Проход по каждой строке вывода, начиная с 2-й строки, игнорируя заголовки
+        for line in lines[1:]:
+            # Разделение строки на столбцы по пробелам
+            columns = line.split()
+            # Проверка, что строка имеет не менее 9 столбцов
+            if len(columns) >= 9:
+                # Извлечение PID и имени процесса из соответствующих столбцов
+                _, process_name = columns[1], columns[8]
+                # Сравнение имени процесса с искомым именем
+                if name == process_name:
+                    self.logger.debug("is_process_exist() > True")
+                    return True
+        self.logger.debug("is_process_exist() > False")
+        # Возврат None, если процесс с заданным именем не найден
+        return False
+
+    @log_debug()
+    def run_background_process(self, command: str, args: str = "", process: str = "") -> bool:
+        """
+        Запускает процесс в фоновом режиме на устройстве Android.
+
+        Аргументы:
+            command (str): Команда для выполнения на устройстве.
+            process (str): Название процесса, который будет запущен. По умолчанию "".
+            Если process == "", то не будет проверяться его запуск в системе.
+
+        Возвращает:
+            bool: True, если процесс был успешно запущен, False в противном случае.
+        """
+        self.logger.debug(f"run_background_process() < {command=}")
+
+        try:
+            self.adb_shell(command=command, args=args + " nohup > /dev/null 2>&1 &")
+            if process != "":
+                time.sleep(1)
+                if not self.is_process_exist(name=process):
+                    return False
+            return True
+        except KeyError as e:
+            self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
+            return False
 
     @log_debug()
     def kill_by_pid(self, pid: int) -> bool:
@@ -468,9 +601,34 @@ class Terminal:
         try:
             self.adb_shell(command="kill", args=f"-s SIGINT {str(pid)}")
         except KeyError as e:
-            self.logger.error("terminal.kill_by_pid")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
+        return True
+
+    @log_debug()
+    def kill_by_name(self, name: str) -> bool:
+        """
+        Останавливает все процессы с указанным именем на устройстве с помощью ADB.
+
+        Аргументы:
+            name (str): Имя процесса для остановки.
+
+        Возвращает:
+            bool: True, если все процессы успешно остановлены, False в противном случае.
+        """
+        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        logger.debug(f"kill_by_name() < {name=}")
+        try:
+            self.adb_shell(command="pkill", args=f"-l SIGINT {str(name)}")
+        except KeyError as e:
+            logger.error("kill_by_name() > False")
+            logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            logger.error(traceback_info)
+            return False
+        logger.debug("kill_by_name() > True")
         return True
 
     @log_debug()
@@ -489,6 +647,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.kill_all")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         return True
 
@@ -508,6 +668,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.delete_files_from_internal_storage")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         return True
 
@@ -530,6 +692,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.delete_file_from_internal_storage")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         return True
 
@@ -549,6 +713,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.record_video")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         return True
 
@@ -567,6 +733,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.stop_video")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return None
 
     @log_debug()
@@ -582,6 +750,8 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.reboot")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)
             return False
         return True
 
@@ -602,3 +772,5 @@ class Terminal:
         except KeyError as e:
             self.logger.error("terminal.get_screen_resolution")
             self.logger.error(e)
+            traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+            self.logger.error(traceback_info)

@@ -44,7 +44,7 @@ class Aapt:
         return package_name
 
     @staticmethod
-    def get_launchable_activity_from_apk(path_to_apk: str) -> str:
+    def get_launchable_activity(path_to_apk: str) -> str:
         """
         Получает название запускаемой активности из APK-файла с помощью команды aapt.
         Возвращает название активности в виде строки.
