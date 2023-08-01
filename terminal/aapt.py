@@ -20,15 +20,24 @@ class Aapt:
 
         command = ["aapt", "dump", "badging", os.path.join(path_to_apk)]
 
-        # Выполнение команды и получение вывода
-        output: str = str(subprocess.check_output(command)).strip()
+        try:
+            # Выполнение команды и получение вывода
+            output: str = str(subprocess.check_output(command)).strip()
 
-        # Извлечение строки, содержащей информацию о пакете
-        start_index = output.index("package: name='") + len("package: name='")
-        end_index = output.index("'", start_index)
+            # Извлечение строки, содержащей информацию о пакете
+            start_index = output.index("package: name='") + len("package: name='")
+            end_index = output.index("'", start_index)
 
-        # Извлекаем название пакета
-        package_name = output[start_index:end_index]
+            # Извлекаем название пакета
+            package_name = output[start_index:end_index]
+
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Could not extract package name. Error: {str(e)}")
+            raise  # Выбрасываем исключение дальше
+
+        except ValueError:
+            logger.error(f"Could not find package name in the output.")
+            raise  # Выбрасываем исключение дальше
 
         logger.info(f"get_package_name() > {package_name}")
         # Возвращение названия пакета в виде строки
@@ -45,16 +54,23 @@ class Aapt:
 
         command = ["aapt", "dump", "badging", path_to_apk]
 
-        # Выполнение команды и получение вывода
-        output = str(subprocess.check_output(command)).strip()
+        try:
+            # Выполнение команды и получение вывода
+            output = subprocess.check_output(command, universal_newlines=True).strip()
 
-        # Извлечение строки, содержащей информацию о запускаемой активности
-        package_line = [line for line in output.splitlines() if line.startswith("launchable-activity")][0]
+            # Извлечение строки, содержащей информацию о запускаемой активности
+            package_line = next(line for line in output.splitlines() if line.startswith("launchable-activity"))
 
-        # Извлечение названия активности из строки
-        launchable_activity = package_line.split("'")[1]
+            # Извлечение названия активности из строки
+            launchable_activity = package_line.split("'")[1]
 
-        # Возвращение названия активности в виде строки
+            # Возвращение названия активности в виде строки
+            logger.info(f"get_launchable_activity_from_apk() > {launchable_activity}")
+            return launchable_activity
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Could not extract launchable activity. Error: {str(e)}")
+        except StopIteration:
+            logger.error("Could not find 'launchable-activity' line in aapt output.")
 
-        logger.info(f"get_launchable_activity_from_apk() > {launchable_activity}")
-        return launchable_activity
+        return ""
+
