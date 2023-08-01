@@ -116,12 +116,6 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
-### Класс ``
-
-
-
-
-
 # class AppiumExtended
 Основной класс расширяющий Appium-Python-Client.  
 
@@ -1961,11 +1955,9 @@ class ExampleAppMap(AppiumExtended):
 
 	def __init__(self):  
 		super().__init__()  
-	    # PAGES  
-	    self.page_1 = Page1(self)
-	    self.page_2 = Page2(self)
-	    self.page_3 = Page3(self)
-	    # LOGIC
+		self.page_1 = None
+		self.page_2 = None
+		self.page_3 = None
 		self.driver = None  
 		self.navigator: AppiumNavigator = None  
 		self.current_path = os.path.dirname(os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))  
@@ -1976,7 +1968,10 @@ class ExampleAppMap(AppiumExtended):
 	    super().connect(capabilities=capabilities)    
 	    # LOGIC  
 	    self.navigator = AppiumNavigator(app=self)    
-
+	    # PAGES  
+	    self.page_1 = Page1(self)
+	    self.page_2 = Page2(self)
+	    self.page_3 = Page3(self)
 		# EDGES    
 		self.page_1.edges = {  
 		    self.page_2: self.go_1_2,  
@@ -2429,7 +2424,7 @@ else:
 
 Метод может генерировать исключение, если в процессе его выполнения возникают проблемы. Если метод `install_app()` вызывает исключение, это исключение будет логироваться, а метод `install_app()` вернет `False`.
 
-## Метод: `is_app_installed(package: str) -> bool`
+## Метод: `is_app_installed()`
 
 Метод класса `Terminal`, предназначенный для проверки установки указанного пакета приложения с помощью Appium.
 
@@ -2848,7 +2843,7 @@ else:
 Метод не обрабатывает исключения и, таким образом, может вызвать любое исключение, которое может вызвать `adb_shell(command)`.
 
 
-## Метод: `is_process_exist(name)`
+## Метод: `is_process_exist()`
 
 Это метод класса `Terminal`, который проверяет, существует ли процесс с указанным именем, используя команду `adb shell ps`.
 
@@ -2880,7 +2875,7 @@ else:
 
 **Примечание:** В описании метода `is_process_exist(name)` вместо `is_process_exist() > True` и `is_process_exist() > False`, используются логгеры для вывода отладочной информации. В реальной реализации эти строки не будут отображаться. Они присутствуют в данном контексте только для демонстрации логгирования.
 
-## Метод: `run_background_process(command, args="", process="")`
+## Метод: `run_background_process()`
 
 Это метод класса `Terminal`, который запускает процесс в фоновом режиме на устройстве Android.
 
@@ -2914,7 +2909,7 @@ else:
 Метод может вызывать исключение `KeyError`, и в таком случае он будет логировать ошибку и возвращать `False`.
 
 
-## Метод: `kill_by_pid(pid)`
+## Метод: `kill_by_pid()`
 
 Это метод класса `Terminal`, который посылает сигнал SIGINT процессу с указанным идентификатором процесса (PID), используя команду `adb shell kill`.
 
@@ -2948,7 +2943,7 @@ else:
 
 Метод обрабатывает исключение `KeyError`, которое может быть вызвано методом `adb_shell(command, args)`. Если исключение возникает, оно логируется и метод возвращает `False`.
 
-## Метод: `kill_all(name)`
+## Метод: `kill_all()`
 
 Этот метод класса `Terminal` предназначен для остановки всех процессов, соответствующих заданному имени или шаблону имени, с помощью команды `adb shell pkill`.
 
@@ -2978,7 +2973,7 @@ else:
 
 Метод обрабатывает исключение `KeyError`, которое может быть вызвано методом `adb_shell(command, args)`. Если исключение возникает, оно логируется и метод возвращает `False`.
 
-## Метод: `delete_files_from_internal_storage(path)`
+## Метод: `delete_files_from_internal_storage()`
 
 Этот метод класса `Terminal` предназначен для удаления файлов из внутреннего хранилища устройства с помощью команды `adb shell rm`.
 
@@ -3008,7 +3003,7 @@ else:
 
 Метод обрабатывает исключение `KeyError`, которое может быть вызвано методом `adb_shell(command, args)`. Если исключение возникает, оно логируется и метод возвращает `False`.
 
-## Метод: `delete_file_from_internal_storage(path, filename)`
+## Метод: `delete_file_from_internal_storage()`
 
 Этот метод класса `Terminal` предназначен для удаления конкретного файла из внутреннего хранилища устройства с помощью команды `adb shell rm`.
 
@@ -3039,7 +3034,7 @@ else:
 
 Метод обрабатывает исключение `KeyError`, которое может быть вызвано методом `adb_shell(command, args)`. Если исключение возникает, оно логируется и метод возвращает `False`.
 
-## Метод: `record_video(**options)`
+## Метод: `record_video()`
 
 Этот метод класса `Terminal` предназначен для начала записи видео с экрана устройства.
 
@@ -3069,7 +3064,7 @@ else:
 
 Метод обрабатывает исключение `KeyError`, которое может быть вызвано методом `start_recording_screen()`. Если исключение возникает, оно логируется и метод возвращает `False`.
 
-## Метод: `stop_video(**options)`
+## Метод: `stop_video()`
 
 Этот метод класса `Terminal` предназначен для остановки записи видео с экрана устройства и возвращения записанного видео в формате base64.
 
@@ -3979,7 +3974,7 @@ else:
 
 Метод обрабатывает исключение, которое может возникнуть при попытке выполнить команду ADB. Если исключение возникает, информация об ошибке логируется и метод возвращает `False`. Также, если процесс с указанным именем не найден, метод возвращает `None`.
 
-### Метод: `is_process_exist(name)`
+### Метод: `is_process_exist()`
 
 Проверяет, запущен ли процесс, используя `adb shell ps`.
 
@@ -4004,7 +3999,7 @@ else:
 Данный метод `is_process_exist()` используется внутри метода `know_pid()` для определения наличия процесса с заданным именем.
 
 
-## Метод: `run_background_process(self, command: str, process: str = "") -> bool`
+## Метод: `run_background_process()`
 
 Запускает процесс в фоновом режиме на устройстве Android с использованием ADB.
 
@@ -4329,69 +4324,3 @@ else:
 ### Исключения
 
 Метод обрабатывает исключение, которое может возникнуть при попытке выполнить команду ADB. Если исключение возникает, информация об ошибке логируется и метод возвращает `None`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
