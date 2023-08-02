@@ -13,7 +13,6 @@ class AppiumHelpers(AppiumImage):
 
     def __init__(self, driver, logger: logging.Logger):
         super().__init__(driver=driver, logger=logger)
-        self.logger = logger
 
     @staticmethod
     def handle_webelement_locator(locator, timeout: int,
