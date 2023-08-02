@@ -13,7 +13,7 @@ appium plugin install --source=npm appium-dashboard
 
 # Установка AppiumExtended
 
-Существует три способа установки и использования AppiumExtended.
+Существует три способа установки AppiumExtended.
 
 1. Установка из [PyPi](https://pypi.org/), как ['AppiumExtended'](https://pypi.org/project/AppiumExtended/).
     
