@@ -13,7 +13,7 @@ class AppiumSwipe(AppiumGet):
         super().__init__(*args, **kwargs)
         self.helper = None
 
-    def _swipe(self,
+    def _swipe(self,    # TODO +direction and distance
                start_x: int,
                start_y: int,
                end_x: int,

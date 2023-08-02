@@ -25,11 +25,8 @@ class WebElementExtended(WebElementClick,
     Основной интерфейс для работы с WebElementExtended
     """
 
-    def __init__(self, logger: logging.Logger = None, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.driver = args[0]
-        self.logger = logger
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(logger=logger, driver=driver, element_id=element_id)
 
     # GET
     def get_element(self,

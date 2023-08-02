@@ -6,8 +6,6 @@ from typing import Union, Tuple, Dict
 from appium.webdriver import WebElement
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 
-import config
-
 from AppiumWebElementExtended.web_element_get import WebElementGet
 
 
@@ -17,10 +15,8 @@ class WebElementScroll(WebElementGet):
     Наследуется от класса WebElementGet.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.driver = args[0]
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(logger=logger, driver=driver, element_id=element_id)
 
     def _scroll_down(self,
                      locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str] = None,

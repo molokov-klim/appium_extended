@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 from typing import Union, Tuple, Dict
 
 from appium.webdriver import WebElement
@@ -17,9 +18,8 @@ class WebElementClick(WebElementGet):
     Наследуется от класса WebElementGet.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.driver = args[0]
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(logger=logger, driver=driver, element_id=element_id)
 
     def _click(self,
                duration: int = 0,

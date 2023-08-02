@@ -68,7 +68,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                     timeout_method=timeout_method,
                                     elements_range=elements_range,
                                     contains=contains)
-        return WebElementExtended(element.parent, element.id)
+        return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
 
     def get_elements(self,
                      locator: Union[Tuple, List[WebElement], Dict[str, str], str] = None,
@@ -110,7 +110,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                          contains=contains)
         elements_ext = []
         for element in elements:
-            elements_ext.append(WebElementExtended(element.parent, element.id))
+            elements_ext.append(WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
         return elements_ext
 
     def get_image_coordinates(self,

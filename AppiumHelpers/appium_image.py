@@ -11,7 +11,7 @@ from pytesseract import pytesseract
 
 from selenium.common.exceptions import WebDriverException
 
-from AppiumHelpers.helpers_decorators import HelpersDecorators
+from AppiumHelpers import helpers_decorators
 from terminal.terminal import Terminal
 
 
@@ -21,7 +21,7 @@ class AppiumImage:
     Обеспечивает работу с изображениями
     """
 
-    def __init__(self, driver=None, logger: logging.Logger = None):
+    def __init__(self, driver, logger: logging.Logger):
         self.logger = logger
         self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
@@ -31,7 +31,7 @@ class AppiumImage:
         screenshot = base64.b64decode(screenshot)
         return screenshot
 
-    @HelpersDecorators.retry
+    @helpers_decorators.retry
     def get_image_coordinates(self,
                               image: Union[bytes, np.ndarray, Image.Image, str],
                               full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
@@ -80,7 +80,7 @@ class AppiumImage:
 
         return int(left), int(top), int(right), int(bottom)  # Возвращаем координаты наиболее вероятного совпадения
 
-    @HelpersDecorators.retry
+    @helpers_decorators.retry
     def get_inner_image_coordinates(self,
                                     outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                     inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
@@ -225,7 +225,7 @@ class AppiumImage:
         # Проверка наличия заданного текста в распознанном тексте
         return text.lower() in ocr_text.lower()
 
-    @HelpersDecorators.retry
+    @helpers_decorators.retry
     def get_many_coordinates_of_image(self,
                                       image: Union[bytes, np.ndarray, Image.Image, str],
                                       full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
@@ -292,7 +292,7 @@ class AppiumImage:
 
         return matches_with_corners
 
-    @HelpersDecorators.retry
+    @helpers_decorators.retry
     def get_text_coordinates(
             self,
             text: str,

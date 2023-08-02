@@ -13,8 +13,6 @@ from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
 
 from AppiumHelpers.appium_helpers import AppiumHelpers
-from AppiumHelpers.appium_image import AppiumImage
-from terminal.terminal import Terminal
 
 
 class WebElementGet(WebElement):
@@ -23,13 +21,12 @@ class WebElementGet(WebElement):
     Обеспечивает получение сущностей из элемента.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.driver = args[0]
-        self.image = AppiumImage(driver=self.driver)
-        self.terminal = Terminal(driver=self.driver)
-        self.helper = None
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(parent=driver, id_=element_id)
+        self.driver = driver
+        self.logger = logger
+        self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
+        self.terminal = self.helper.terminal
 
     def _get_element(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -91,7 +88,6 @@ class WebElementGet(WebElement):
             elements_range = self.find_elements("xpath", ".//*")
 
         # Объявление стратегии поиска элементов
-        self.helper = AppiumHelpers(driver=self.driver)
         locator_handler = {
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
             dict: self.helper.handle_dict_locator,
@@ -186,7 +182,6 @@ class WebElementGet(WebElement):
             return None
 
         # Объявление стратегии поиска элементов
-        self.helper = AppiumHelpers(driver=self.driver)
         locator_handler = {
             # подразумевается список элементов, возвращает себя же
             list: self.helper.handle_webelement_locator_elements,

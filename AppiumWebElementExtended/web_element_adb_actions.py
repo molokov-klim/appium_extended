@@ -1,8 +1,10 @@
 # coding: utf-8
+import logging
+
 from appium.webdriver import WebElement
 
 from AppiumWebElementExtended.web_element_get import WebElementGet
-from AppiumHelpers.helpers_decorators import HelpersDecorators  # wait_for_window_change
+from AppiumHelpers import helpers_decorators
 from utils.utils import find_coordinates_by_vector
 
 
@@ -12,9 +14,8 @@ class WebElementAdbActions(WebElementGet):
     Наследуется от класса WebElementGet.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.driver = args[0]
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(logger=logger, driver=driver, element_id=element_id)
 
     def _adb_tap(self,
                  decorator_args: dict = None,
@@ -43,7 +44,7 @@ class WebElementAdbActions(WebElementGet):
     def _adb_tap_to_element(self) -> bool:
         return self.__adb_tap()
 
-    @wait_for_window_change()
+    @helpers_decorators.wait_for_window_change()
     def _adb_tap_to_element_and_wait(self,
                                      decorator_args: dict = None) -> bool:
         return self.__adb_tap()

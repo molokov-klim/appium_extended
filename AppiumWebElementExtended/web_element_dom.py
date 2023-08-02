@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 import time
 from typing import Union, List, Dict
 
@@ -14,10 +15,8 @@ class WebElementDOM(WebElementGet):
     Наследуется от класса WebElementGet.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = None
-        self.driver = args[0]
+    def __init__(self, logger: logging.Logger, driver, element_id):
+        super().__init__(logger=logger, driver=driver, element_id=element_id)
 
         self.stable_attributes = ['bounds', 'enabled', 'displayed', 'focused', 'focusable', 'class', 'resource-id',
                                   'text']
