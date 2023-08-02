@@ -6,18 +6,16 @@ import time
 import traceback
 from typing import Dict, Any, Union, Tuple
 
-from AppiumHelpers.helpers_decorators import log_debug
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath( __file__))))  # The sys.path.append line adds the
 # parent directory of the tests directory to the Python module search path, allowing you to import modules from the
 # root folder.
-
-import config
+from AppiumHelpers.helpers_decorators import log_debug
 
 
 class Terminal:
-    def __init__(self, driver):
+    def __init__(self, driver, logger: logging.Logger):
         self.driver = driver
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        self.logger = logger
 
     @log_debug()
     def adb_shell(self, command: str, args: str = "") -> Any:
@@ -198,16 +196,15 @@ class Terminal:
         """
         Проверяет, установлен ли пакет.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        logger.debug(f"is_app_installed() < {package=}")
+        self.logger.debug(f"is_app_installed() < {package=}")
 
         try:
             result = self.adb_shell(command="pm", args="list packages")
             # Фильтруем пакеты
             if any([line.strip().endswith(package) for line in result.splitlines()]):
-                logger.debug("is_app_installed() > True")
+                self.logger.debug("is_app_installed() > True")
                 return True
-            logger.debug("is_app_installed() > False")
+            self.logger.debug("is_app_installed() > False")
             return False
         except KeyError as e:
             self.logger.error("terminal.is_app_installed() > False")
@@ -618,17 +615,16 @@ class Terminal:
         Возвращает:
             bool: True, если все процессы успешно остановлены, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        logger.debug(f"kill_by_name() < {name=}")
+        self.logger.debug(f"kill_by_name() < {name=}")
         try:
             self.adb_shell(command="pkill", args=f"-l SIGINT {str(name)}")
         except KeyError as e:
-            logger.error("kill_by_name() > False")
-            logger.error(e)
+            self.logger.error("kill_by_name() > False")
+            self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-            logger.error(traceback_info)
+            self.logger.error(traceback_info)
             return False
-        logger.debug("kill_by_name() > True")
+        self.logger.debug("kill_by_name() > True")
         return True
 
     @log_debug()

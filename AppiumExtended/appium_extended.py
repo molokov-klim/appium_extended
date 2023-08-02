@@ -1,19 +1,22 @@
 # coding: utf-8
+import logging
 import time
 from typing import Union, Tuple, Dict, List, Optional, cast, Any
-
 import numpy as np
 from PIL import Image
-from appium.webdriver import WebElement
+
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
+from appium.webdriver import WebElement
+
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
-from AppiumExtended.appium_is import AppiumIs
 from AppiumExtended.appium_swipe import AppiumSwipe
-from AppiumExtended.appium_tap import AppiumTap
 from AppiumExtended.appium_wait import AppiumWait
+from AppiumExtended.appium_tap import AppiumTap
+from AppiumExtended.appium_is import AppiumIs
+
 from AppiumWebElementExtended.web_element_extended import WebElementExtended
 
 from utils import utils
@@ -24,6 +27,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     Класс работы с Appium.
     Обеспечивает работу с устройством
     """
+    def __init__(self, logger: logging.Logger = None):
+        super().__init__(logger=logger)
 
     def get_element(self,
                     locator: Union[Tuple, WebElementExtended, Dict[str, str], str] = None,

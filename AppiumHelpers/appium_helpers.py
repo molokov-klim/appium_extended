@@ -57,14 +57,13 @@ class AppiumHelpers(AppiumImage):
                     xpath += f"[contains(@{attr}, '{value}')]"
                 new_locator = ("xpath", xpath)
                 return new_locator
-            else:
-                for attr, value in locator.items():
-                    xpath += f"[@{attr}='{value}']"
-                new_locator = ("xpath", xpath)
-                return new_locator
+            for attr, value in locator.items():
+                xpath += f"[@{attr}='{value}']"
+            new_locator = ("xpath", xpath)
+            return new_locator
         except KeyError as e:
             self.logger.error(f"Ошибка dict: {locator}")
-            self.logger.error("{}".format(e))
+            self.logger.error(f"{str(e)}")
             return None
 
     def handle_string_locator(self,
@@ -135,8 +134,8 @@ class AppiumHelpers(AppiumImage):
         closest_distance = float("inf")
 
         for element in elements:
-            left, top, right, bottom = map(int,
-                                           element.get_attribute('bounds').strip("[]").replace("][", ",").split(","))
+            left, top, _, _ = map(int,
+                                  element.get_attribute('bounds').strip("[]").replace("][", ",").split(","))
             distance = ((x - left) ** 2 + (y - top) ** 2) ** 0.5  # Euclidean distance formula
 
             if distance < closest_distance:  # and left <= x and top <= y:
@@ -196,14 +195,13 @@ class AppiumHelpers(AppiumImage):
                     xpath += f"[contains(@{attr}, '{value}')]"
                 new_locator = ("xpath", xpath)
                 return new_locator
-            else:
-                for attr, value in locator.items():
-                    xpath += f"[@{attr} = '{value}']"
-                new_locator = ("xpath", xpath)
-                return new_locator
+            for attr, value in locator.items():
+                xpath += f"[@{attr} = '{value}']"
+            new_locator = ("xpath", xpath)
+            return new_locator
         except KeyError as e:
             self.logger.error(f"Ошибка dict: {locator}")
-            self.logger.error("{}".format(e))
+            self.logger.error(f"{str(e)}")
             return None
 
     def handle_string_locator_elements(self,  # FIXME оптимизировать используя силу xpath и/или xml tree
@@ -227,8 +225,8 @@ class AppiumHelpers(AppiumImage):
             Union[List[Tuple], None]: Найденные элементы, либо None, если элементы не найдены.
         """
         #  Сохранение скриншота изображения и поиск координат совпадающих изображений
-        with open('full_image.png', 'wb') as f:
-            f.write(self.driver.get_screenshot_as_png())
+        with open('full_image.png', 'wb') as file:
+            file.write(self.driver.get_screenshot_as_png())
         max_locs = self.get_many_coordinates_of_image(full_image='full_image.png',
                                                       image=locator,
                                                       cv_threshold=cv_threshold,
@@ -282,7 +280,7 @@ class AppiumHelpers(AppiumImage):
                 left, top, right, bottom = map(int, coord[1:-1].replace("][", ",").split(','))
                 elements_with_bounds.append([element, left, top, right, bottom])
             except WebDriverException as e:
-                self.logger.error("Error sorting elements: {}".format(e))
+                self.logger.error(f"Error sorting elements: {str(e)}")
         return elements_with_bounds
 
     @staticmethod
@@ -357,4 +355,3 @@ class AppiumHelpers(AppiumImage):
 
     def find_only_children(self, element, elements):
         return
-

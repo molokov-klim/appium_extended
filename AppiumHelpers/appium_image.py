@@ -11,29 +11,27 @@ from pytesseract import pytesseract
 
 from selenium.common.exceptions import WebDriverException
 
-import config
-
-from AppiumHelpers.helpers_decorators import retry
+from AppiumHelpers.helpers_decorators import HelpersDecorators
 from terminal.terminal import Terminal
 
 
-class AppiumImage(object):
+class AppiumImage:
     """
     Класс работы с Appium.
     Обеспечивает работу с изображениями
     """
 
-    def __init__(self, driver=None):
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+    def __init__(self, driver=None, logger: logging.Logger = None):
+        self.logger = logger
         self.driver = driver
-        self.terminal = Terminal(driver=self.driver)
+        self.terminal = Terminal(driver=self.driver, logger=logger)
 
     def get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
         screenshot = base64.b64decode(screenshot)
         return screenshot
 
-    @retry
+    @HelpersDecorators.retry
     def get_image_coordinates(self,
                               image: Union[bytes, np.ndarray, Image.Image, str],
                               full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
@@ -65,7 +63,7 @@ class AppiumImage(object):
 
         result = cv2.matchTemplate(big_image, small_image, cv2.TM_CCOEFF_NORMED)  # Поиск совпадений методом шаблона
 
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(
+        _, max_val, _, max_loc = cv2.minMaxLoc(
             result)  # Получение наименьшего и наибольшего значения, а также соответствующих координат
 
         if not max_val >= threshold:  # Если наибольшее значение совпадения не превышает порога, возвращаем None
@@ -82,7 +80,7 @@ class AppiumImage(object):
 
         return int(left), int(top), int(right), int(bottom)  # Возвращаем координаты наиболее вероятного совпадения
 
-    @retry
+    @HelpersDecorators.retry
     def get_inner_image_coordinates(self,
                                     outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                     inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
@@ -186,16 +184,13 @@ class AppiumImage(object):
         result = cv2.matchTemplate(full_image, small_image, cv2.TM_CCOEFF_NORMED)
 
         # Извлечение коэффициента схожести и координат схожего участка
-        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        _, max_val, _, _ = cv2.minMaxLoc(result)
 
         # Логирование
         self.logger.debug(f"Коэффициент схожести изображения: {max_val}")
 
         # Сравнение коэффициента схожести и порогового значения
-        if max_val >= threshold:
-            return True
-        else:
-            return False
+        return max_val >= threshold
 
     def is_text_on_ocr_screen(self,
                               text: str,
@@ -228,12 +223,9 @@ class AppiumImage(object):
         ocr_text = pytesseract.image_to_string(image_bin, lang=language)
 
         # Проверка наличия заданного текста в распознанном тексте
-        if text.lower() in ocr_text.lower():
-            return True
-        else:
-            return False
+        return text.lower() in ocr_text.lower()
 
-    @retry
+    @HelpersDecorators.retry
     def get_many_coordinates_of_image(self,
                                       image: Union[bytes, np.ndarray, Image.Image, str],
                                       full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
@@ -272,16 +264,17 @@ class AppiumImage(object):
 
         # Фильтрация слишком близких совпадений
         unique_list = []  # Создаем пустой список для хранения уникальных кортежей
-        for i, (x1, y1) in enumerate(matches):  # Итерируемся по списку кортежей
+        for (x1_coordinate, y1_coordinate) in matches:  # Итерируемся по списку кортежей
             exclude = False  # Инициализируем флаг exclude значением False
-            for (x2, y2) in unique_list:  # Итерируемся по уникальным кортежам
-                if abs(x1 - x2) <= coord_threshold and abs(y1 - y2) <= coord_threshold:
+            for (x2_coordinate, y2_coordinate) in unique_list:  # Итерируемся по уникальным кортежам
+                if abs(x1_coordinate - x2_coordinate) <= coord_threshold and abs(
+                        y1_coordinate - y2_coordinate) <= coord_threshold:
                     # Если различие между значениями x и y двух кортежей меньше или равно порогу,
                     # помечаем exclude как True и выходим из цикла
                     exclude = True
                     break
             if not exclude:  # Если exclude равно False, добавляем кортеж в unique_list
-                unique_list.append((x1, y1))
+                unique_list.append((x1_coordinate, y1_coordinate))
         matches = unique_list
 
         if not matches:
@@ -291,21 +284,21 @@ class AppiumImage(object):
         # Добавляем правый нижний угол к каждому найденному совпадению
         matches_with_corners = []
         for match in matches:
-            x, y = match
-            w, h = small_image.shape[::-1]
-            top_left = (x, y)
-            bottom_right = (x + w, y + h)
+            x_coordinate, y_coordinate = match
+            width, height = small_image.shape[::-1]
+            top_left = (x_coordinate, y_coordinate)
+            bottom_right = (x_coordinate + width, y_coordinate + height)
             matches_with_corners.append((top_left + bottom_right))
 
         return matches_with_corners
 
-    @retry
+    @HelpersDecorators.retry
     def get_text_coordinates(
             self,
             text: str,
             image: Union[bytes, str, Image.Image, np.ndarray] = None,
             language: str = 'rus'
-    ) -> Union[Tuple[int, int, int, int], None]:
+    ) -> Optional[tuple[int, ...]]:
         """
         Возвращает координаты области с указанным текстом на предоставленном изображении или снимке экрана.
 
@@ -359,7 +352,7 @@ class AppiumImage(object):
         current_sequence = []  # Текущая последовательность слов
         result_coordinates = []  # Координаты текущей последовательности слов
 
-        for index, word_data in formatted_data.items():
+        for word_data in formatted_data.values():
             word = word_data['text']  # Текущее слово
             coordinates = word_data['coordinates']  # Координаты слова
 

@@ -4,13 +4,14 @@ from typing import Union, Dict, List, Tuple
 
 import numpy as np
 from PIL import Image
-from appium.webdriver import WebElement
+
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
+from appium.webdriver import WebElement
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
-from selenium.webdriver.common.by import By
 
 from AppiumExtended.appium_base import AppiumBase
 from AppiumHelpers.appium_helpers import AppiumHelpers
@@ -22,8 +23,8 @@ class AppiumGet(AppiumBase):
     Обеспечивает получение чего-либо со страницы.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.helper = None
 
     def _get_element(self,

@@ -1,12 +1,8 @@
 # coding: utf-8
-import logging
-
 from appium.webdriver import WebElement
 
-import config
-
 from AppiumWebElementExtended.web_element_get import WebElementGet
-from AppiumHelpers.helpers_decorators import wait_for_window_change
+from AppiumHelpers.helpers_decorators import HelpersDecorators  # wait_for_window_change
 from utils.utils import find_coordinates_by_vector
 
 
@@ -19,7 +15,6 @@ class WebElementAdbActions(WebElementGet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.driver = args[0]
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
     def _adb_tap(self,
                  decorator_args: dict = None,

@@ -1,11 +1,9 @@
 # coding: utf-8
-import logging
 import time
 from typing import Union, List, Dict
+
 from appium.webdriver import WebElement
 from selenium.common.exceptions import NoSuchElementException
-
-import config
 
 from AppiumWebElementExtended.web_element_get import WebElementGet
 
@@ -20,7 +18,6 @@ class WebElementDOM(WebElementGet):
         super().__init__(*args, **kwargs)
         self.helper = None
         self.driver = args[0]
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
         self.stable_attributes = ['bounds', 'enabled', 'displayed', 'focused', 'focusable', 'class', 'resource-id',
                                   'text']

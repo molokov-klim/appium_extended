@@ -1,5 +1,4 @@
 # coding: utf-8
-import logging
 from typing import Union, Tuple, Dict
 
 from appium.webdriver import WebElement
@@ -7,10 +6,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementNotInteractableException, StaleElementReferenceException, \
     InvalidElementStateException
 
-import config
-
 from AppiumWebElementExtended.web_element_get import WebElementGet
-
 from AppiumHelpers.helpers_decorators import wait_for_window_change
 from utils.utils import find_coordinates_by_vector
 
@@ -24,7 +20,6 @@ class WebElementClick(WebElementGet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.driver = args[0]
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
     def _click(self,
                duration: int = 0,

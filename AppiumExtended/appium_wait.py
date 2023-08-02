@@ -15,8 +15,8 @@ class AppiumWait(AppiumGet):
     Обеспечивает ....
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.helper = None
 
     def _wait_for(self,
@@ -58,7 +58,7 @@ class AppiumWait(AppiumGet):
             # Loop through each locator
             for i in locator:
                 # Check if the element is present
-                if isinstance(self._get_element(locator=i, timeout_elem=timeout, contains=contains), None):
+                if self._get_element(locator=i, timeout_elem=timeout, contains=contains) is None:
                     return False
 
         if image is not None:

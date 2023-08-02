@@ -12,7 +12,6 @@ from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
 
-import config
 from AppiumHelpers.appium_helpers import AppiumHelpers
 from AppiumHelpers.appium_image import AppiumImage
 from terminal.terminal import Terminal

@@ -7,7 +7,6 @@ from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 
-import config
 from AppiumWebElementExtended.web_element_click import WebElementClick
 from AppiumWebElementExtended.web_element_dom import WebElementDOM
 from AppiumWebElementExtended.web_element_scroll import WebElementScroll
@@ -26,11 +25,11 @@ class WebElementExtended(WebElementClick,
     Основной интерфейс для работы с WebElementExtended
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, logger: logging.Logger = None, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
         self.driver = args[0]
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        self.logger = logger
 
     # GET
     def get_element(self,

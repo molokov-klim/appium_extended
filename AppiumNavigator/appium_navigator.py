@@ -3,17 +3,16 @@ import logging
 from collections import deque
 from typing import Any, Optional, List
 
-import config
 from AppiumExtended.appium_extended import AppiumExtended
 from AppiumGraph.appium_graph import AppiumGraph
 from AppiumHelpers.appium_image import AppiumImage
 
 
 class AppiumNavigator:
-    def __init__(self, app):
+    def __init__(self, app, logger: logging.Logger):
         self.app: AppiumExtended = app
         self.graph_manager = AppiumGraph(self)
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
+        self.logger = logger
         self.image = AppiumImage()
 
     def add_page(self, page, edges):
@@ -49,7 +48,6 @@ class AppiumNavigator:
 
         # Выполняем навигацию, следуя найденному пути
         self.perform_navigation(path, timeout)
-
 
     def find_path(self, start_page: Any, target_page: Any) -> Optional[List[Any]]:
         """

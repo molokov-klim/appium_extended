@@ -10,62 +10,61 @@ from AppiumHelpers.appium_image import AppiumImage
 from terminal.terminal import Terminal
 from terminal.aapt import Aapt
 from terminal.adb import Adb
-import config
 
 
-class AppiumBase(object):
+class AppiumBase:
     """
     Класс работы с Appium.
     Обеспечивает подключение к устройству
     """
 
-    def __init__(self):
-
-        # keep_alive_server: bool = False,
-        # log_level = 'error',
-        # url = 'http://localhost:4723/wd/hub',
-        # port = 4723,
-
-        self.url = f"http://{config.APPIUM_IP}:{config.APPIUM_PORT}/wd/hub"
-        self.capabilities = None
-        self.keep_alive_server = True
+    def __init__(self, logger: logging.Logger = None):
+        self.server = None
+        self.logger = logger
         self.driver = None
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
-        self.server = AppiumServer(port=config.APPIUM_PORT, log_level=config.APPIUM_LOG_LEVEL)
         self.image = None
         self.terminal = None
+        self.keep_alive_server = True
         self.aapt = Aapt()
         self.adb = Adb()
 
-    def connect(self, capabilities: dict):
+    def connect(self,
+                capabilities: dict,
+                server_ip: str = '0.0.0.0',
+                server_port: int = 4723,
+                server_log_level: str = 'error',
+                remote: bool = False,
+                keep_alive_server: bool = True) -> None:
         """
         Подключение к устройству
         """
-        self.capabilities = capabilities
+        self.keep_alive_server = keep_alive_server
+        self.server = AppiumServer(server_ip=server_ip, server_port=server_port, remote_log_level=server_log_level,
+                                   logger=self.logger)
         self.logger.debug(
-            f"connect(capabilities {self.capabilities}")
-        if not config.PROXY:
+            f"connect(capabilities {capabilities}")
+        if not remote:
             # запускаем локальный сервер Аппиум
             if not self.server.is_alive():
                 self.server.start()
                 time.sleep(10)
                 self.server.wait_until_alive()
 
-        self.logger.info(f"Подключение к серверу: {self.url=}")
-        self.driver = webdriver.Remote(command_executor=self.url,
-                                       desired_capabilities=self.capabilities,
+        url = f'http://{server_ip}:{str(server_port)}/wd/hub'
+        self.logger.info(f"Подключение к серверу: {url}")
+        self.driver = webdriver.Remote(command_executor=url,
+                                       desired_capabilities=capabilities,
                                        keep_alive=True)
-
-        app_capabilities = json.dumps(capabilities)
 
         # Инициализация объектов требующих драйвер
         self.image = AppiumImage(driver=self.driver)
         self.terminal = Terminal(driver=self.driver)
 
-        self.logger.info('Подключение установлено: '.format(app_capabilities))
+        app_capabilities = json.dumps(capabilities)
+        self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
         self.logger.info(f'Сессия №: {self.driver.session_id}')
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """
         Отключение от устройства
         """
@@ -76,5 +75,8 @@ class AppiumBase(object):
         if not self.keep_alive_server:
             self.server.stop()
 
-    def is_running(self):
+    def is_running(self) -> bool:
+        """
+        Проверяет, запущен сервер или нет
+        """
         return self.driver.is_running()
