@@ -19,6 +19,9 @@ class AppiumBase:
     """
 
     def __init__(self, logger: logging.Logger = None):
+        self.server_log_level = None
+        self.server_port = None
+        self.server_ip = None
         self.server = None
         self.logger = logger
         self.driver = None
@@ -38,8 +41,13 @@ class AppiumBase:
         """
         Подключение к устройству
         """
+        self.server_ip = server_ip
+        self.server_port = server_port
+        self.server_log_level = server_log_level
         self.keep_alive_server = keep_alive_server
-        self.server = AppiumServer(server_ip=server_ip, server_port=server_port, remote_log_level=server_log_level,
+        self.server = AppiumServer(server_ip=self.server_ip,
+                                   server_port=self.server_port,
+                                   remote_log_level=self.server_log_level,
                                    logger=self.logger)
         self.logger.debug(
             f"connect(capabilities {capabilities}")

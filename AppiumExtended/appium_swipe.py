@@ -1,4 +1,6 @@
 # coding: utf-8
+import logging
+
 from selenium.common.exceptions import WebDriverException
 from AppiumExtended.appium_get import AppiumGet
 
@@ -9,8 +11,8 @@ class AppiumSwipe(AppiumGet):
     Обеспечивает swipe
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, logger: logging.Logger):
+        super().__init__(logger=logger)
         self.helper = None
 
     def _swipe(self,    # TODO +direction and distance

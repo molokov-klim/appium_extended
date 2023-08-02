@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 from typing import Optional
 
 from selenium.common.exceptions import WebDriverException
@@ -12,8 +13,8 @@ class AppiumTap(AppiumGet):
     Обеспечивает tap
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, logger: logging.Logger):
+        super().__init__(logger=logger)
         self.helper = None
 
     def _tap(self,

@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 from typing import Union, Dict, Tuple
 
 from appium.webdriver import WebElement
@@ -12,8 +13,8 @@ class AppiumIs(AppiumGet):
     Обеспечивает ....
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, logger: logging.Logger):
+        super().__init__(logger=logger)
         self.helper = None
 
     def _is_element_within_screen(

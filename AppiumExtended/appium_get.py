@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 import time
 from typing import Union, Dict, List, Tuple
 
@@ -23,8 +24,8 @@ class AppiumGet(AppiumBase):
     Обеспечивает получение чего-либо со страницы.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, logger: logging.Logger):
+        super().__init__(logger=logger)
         self.helper = None
 
     def _get_element(self,
