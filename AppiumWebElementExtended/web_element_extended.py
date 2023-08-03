@@ -11,13 +11,11 @@ from AppiumWebElementExtended.web_element_click import WebElementClick
 from AppiumWebElementExtended.web_element_dom import WebElementDOM
 from AppiumWebElementExtended.web_element_scroll import WebElementScroll
 from AppiumWebElementExtended.web_element_tap import WebElementTap
-from AppiumWebElementsExtended.web_elements_extended import WebElementsExtended
 from AppiumWebElementExtended.web_element_adb_actions import WebElementAdbActions
 
 
 class WebElementExtended(WebElementClick,
                          WebElementAdbActions,
-                         WebElementsExtended,
                          WebElementDOM,
                          WebElementTap,
                          WebElementScroll):
@@ -48,7 +46,7 @@ class WebElementExtended(WebElementClick,
                                           timeout_method=timeout_method,
                                           elements_range=elements_range,
                                           contains=contains)
-        return WebElementExtended(inner_element.parent, inner_element.id)
+        return WebElementExtended(logger=self.logger, driver=inner_element.parent, element_id=inner_element.id)
 
     def get_attributes(self,
                        desired_attributes: Union[str, List[str]] = None,
@@ -218,7 +216,9 @@ class WebElementExtended(WebElementClick,
                                       contains=contains)
         result = []
         for element in elements:
-            result.append(WebElementExtended(element.parent, element.id))
+            result.append(WebElementExtended(logger=self.logger,
+                                             driver=element.parent,
+                                             element_id=element.id))
         return result
 
     # SCROLL
@@ -297,7 +297,9 @@ class WebElementExtended(WebElementClick,
         """
         element = self._scroll_and_get(locator=locator,
                                        timeout_method=timeout_method)
-        return cast('WebElementExtended', element)
+        return WebElementExtended(logger=self.logger,
+                                  driver=element.parent,
+                                  element_id=element.id)
 
     # DOM
     def get_parent(self) -> 'WebElementExtended':
@@ -305,7 +307,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         element = self._get_parent()
-        return WebElementExtended(element.parent, element.id)
+        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
     def get_parents(self) -> List['WebElementExtended']:
         """
@@ -314,7 +316,7 @@ class WebElementExtended(WebElementClick,
         elements = self._get_parents()
         elements_ext = []
         for element in elements:
-            elements_ext.append(WebElementExtended(element.parent, element.id))
+            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
         return elements_ext
 
     def get_sibling(self,
@@ -325,7 +327,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         element = self._get_sibling(attributes=attributes, contains=contains)
-        return WebElementExtended(element.parent, element.id)
+        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
     def get_siblings(self) -> List['WebElementExtended']:
         """
@@ -334,7 +336,7 @@ class WebElementExtended(WebElementClick,
         elements = self._get_siblings()
         elements_ext = []
         for element in elements:
-            elements_ext.append(WebElementExtended(element.parent, element.id))
+            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
         return elements_ext
 
     def get_cousin(self,
@@ -350,7 +352,7 @@ class WebElementExtended(WebElementClick,
         ancestor = root.get_element(ancestor)
         ancestor = WebElement(ancestor.parent, ancestor.id)
         element = self._get_cousin(ancestor=ancestor, cousin=cousin, contains=contains)
-        return WebElementExtended(element.parent, element.id)
+        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
     def get_cousins(self,
                     ancestor: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -367,7 +369,7 @@ class WebElementExtended(WebElementClick,
         elements = self._get_cousins(ancestor=ancestor, cousin=cousin, contains=contains)
         elements_ext = []
         for element in elements:
-            elements_ext.append(WebElementExtended(element.parent, element.id))
+            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
         return elements_ext
 
     def is_contains(self,
