@@ -65,8 +65,8 @@ class AppiumBase:
                                        keep_alive=True)
 
         # Инициализация объектов требующих драйвер
-        self.image = AppiumImage(driver=self.driver)
-        self.terminal = Terminal(driver=self.driver)
+        self.image = AppiumImage(driver=self.driver, logger=self.logger)
+        self.terminal = Terminal(driver=self.driver, logger=self.logger)
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
