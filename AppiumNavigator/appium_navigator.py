@@ -13,7 +13,7 @@ class AppiumNavigator:
         self.app: AppiumExtended = app
         self.graph_manager = AppiumGraph(self)
         self.logger = logger
-        self.image = AppiumImage()
+        self.image = AppiumImage(driver=app.driver, logger=self.logger)
 
     def add_page(self, page, edges):
         """

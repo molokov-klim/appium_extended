@@ -6,7 +6,7 @@ import requests
 
 
 class AppiumServer:
-    def __init__(self, server_ip: str = "0.0.0.0", server_port: int = 4723, logger: logging.Logger = None,
+    def __init__(self, server_ip: str = "127.0.0.1", server_port: int = 4723, logger: logging.Logger = None,
                  remote_log_level: str = 'error'):
         self.server_ip = server_ip
         self.server_port = server_port

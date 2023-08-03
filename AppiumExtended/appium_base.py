@@ -33,7 +33,7 @@ class AppiumBase:
 
     def connect(self,
                 capabilities: dict,
-                server_ip: str = '0.0.0.0',
+                server_ip: str = '127.0.0.1',
                 server_port: int = 4723,
                 server_log_level: str = 'error',
                 remote: bool = False,
