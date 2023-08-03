@@ -405,7 +405,7 @@ def log_debug():
             self.logger.debug(f"{method_name}() < {', '.join(map(str, args))}, "
                               f"{', '.join(f'{k}={v}' for k, v in kwargs.items())}")
             # Выполняем исходную функцию
-            result = func(*args, **kwargs)
+            result = func(self, *args, **kwargs)
             # Если результат существует, логируем его
             if result:
                 self.logger.debug(f"{method_name}() > {str(result)}")
