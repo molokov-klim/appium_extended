@@ -1,13 +1,15 @@
 # coding: utf-8
 import logging
 import time
-from typing import Union, Tuple, Dict
+from typing import Union, Tuple, Dict, Optional
 
 from appium.webdriver import WebElement
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 
 from AppiumWebElementExtended.web_element_get import WebElementGet
 
+
+# TODO add scroll_and_get() - возвращает найденный элемент
 
 class WebElementScroll(WebElementGet):
     """
@@ -232,3 +234,66 @@ class WebElementScroll(WebElementGet):
 
         self.logger.error("_scroll_until_find(): Элемент не найден")
         return False
+
+    def _scroll_and_get(self,
+                        locator: Union[Tuple, WebElement, Dict[str, str], str],
+                        timeout_method: int = 120) -> Optional[WebElement]:
+        """
+        Крутит элемент вниз, а затем вверх для поиска элемента по заданному локатору.
+
+        Args:
+            locator (Union[Tuple, WebElement, Dict[str, str], str]): Локатор или элемент, для которого производится
+                поиск.
+            timeout_method (int): Время на поиск в одном направлении (по умолчанию: 120 вниз и 120 вверх).
+
+        Returns:
+            bool: True, если элемент найден. False, если элемент не найден.
+
+        """
+        recycler = self
+
+        # Проверка, является ли элемент scrollable
+        if recycler.get_attribute('scrollable') != 'true':
+            self.logger.error("Элемент не крутится")
+            return None
+
+        start_time = time.time()
+
+        last_element_image = None
+
+        # Прокрутка вниз до поиска элемента
+        while time.time() - start_time < timeout_method:
+            try:
+                if isinstance(locator, str):
+                    if self.image.is_image_on_the_screen(image=locator):
+                        return self._get_element(locator=locator, timeout_elem=1)
+                element = self._get_element(locator=locator, timeout_elem=1)
+                if element is not None:
+                    return element
+            except NoSuchElementException:
+                continue
+            current_element_image = self.screenshot_as_base64
+            if current_element_image == last_element_image:
+                break
+            last_element_image = self.screenshot_as_base64
+            recycler._scroll_down()
+
+        # Прокрутка вверх до поиска элемента
+        while time.time() - start_time < timeout_method:
+            try:
+                if isinstance(locator, str):
+                    if self.image.is_image_on_the_screen(image=locator):
+                        return self._get_element(locator=locator, timeout_elem=1)
+                element = self._get_element(locator=locator, timeout_elem=1)
+                if element is not None:
+                    return element
+            except NoSuchElementException:
+                pass
+            current_element_image = self.screenshot_as_base64
+            if current_element_image == last_element_image:
+                break
+            last_element_image = self.screenshot_as_base64
+            recycler._scroll_up()
+
+        self.logger.error("_scroll_until_find(): Элемент не найден")
+        return None

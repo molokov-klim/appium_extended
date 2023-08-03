@@ -278,7 +278,6 @@ class WebElementExtended(WebElementClick,
 
     def scroll_until_find(self,
                           locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
-                          roll_locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str] = None,
                           timeout_method: int = 120,
                           ) -> Union['WebElementExtended', None]:
         """
@@ -288,6 +287,17 @@ class WebElementExtended(WebElementClick,
                                        timeout_method=timeout_method):
             return None
         return cast('WebElementExtended', self)
+
+    def scroll_and_get(self,
+                       locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
+                       timeout_method: int = 120,
+                       ) -> Union['WebElementExtended', None]:
+        """
+        # TODO fill
+        """
+        element = self._scroll_and_get(locator=locator,
+                                       timeout_method=timeout_method)
+        return cast('WebElementExtended', element)
 
     # DOM
     def get_parent(self) -> 'WebElementExtended':

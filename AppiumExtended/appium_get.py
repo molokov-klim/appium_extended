@@ -15,7 +15,6 @@ from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
 
 from AppiumExtended.appium_base import AppiumBase
-from AppiumHelpers.appium_helpers import AppiumHelpers
 
 
 class AppiumGet(AppiumBase):
@@ -84,8 +83,6 @@ class AppiumGet(AppiumBase):
             return None
 
         # Объявление стратегии поиска элементов
-        self.helper = AppiumHelpers(driver=self.driver)
-
         locator_handler = {
             # возвращает себя же
             WebElement: self.helper.handle_webelement_locator,
@@ -189,7 +186,6 @@ class AppiumGet(AppiumBase):
             return None
 
         # Объявление стратегии поиска элементов
-        self.helper = AppiumHelpers(driver=self.driver)
         locator_handler = {
             # подразумевается список элементов, возвращает себя же
             list: self.helper.handle_webelement_locator_elements,

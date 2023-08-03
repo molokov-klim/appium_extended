@@ -5,6 +5,7 @@ import time
 
 from appium import webdriver
 
+from AppiumHelpers.appium_helpers import AppiumHelpers
 from AppiumServer.appium_server import AppiumServer
 from AppiumHelpers.appium_image import AppiumImage
 from terminal.terminal import Terminal
@@ -27,9 +28,11 @@ class AppiumBase:
         self.driver = None
         self.image = None
         self.terminal = None
+        self.helper = None
         self.keep_alive_server = True
         self.aapt = Aapt()
         self.adb = Adb()
+
 
     def connect(self,
                 capabilities: dict,
@@ -67,6 +70,7 @@ class AppiumBase:
         # Инициализация объектов требующих драйвер
         self.image = AppiumImage(driver=self.driver, logger=self.logger)
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
+        self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
