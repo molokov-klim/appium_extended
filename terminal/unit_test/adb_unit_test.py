@@ -278,7 +278,7 @@ class TestAdb(unittest.TestCase):
 suite = unittest.TestSuite()
 
 # ADD CLASS
-# suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestAdb))
+suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestAdb))
 
 # ADD METHODS
 # suite.addTest(TestAdb('test_get_device_uuid'))    # ok

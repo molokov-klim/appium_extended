@@ -27,7 +27,18 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     Класс работы с Appium.
     Обеспечивает работу с устройством
     """
-    def __init__(self, logger: logging.Logger = None):
+    def __init__(self, logger: logging.Logger = None, log_level: int = logging.INFO, log_path: str = ''):
+        if logger is None:
+            logger = logging.getLogger(__name__)
+        logger.setLevel(log_level)
+        if bool(log_path):
+            if not log_path.endswith('.log'):
+                log_path = log_path + '.log'
+            file_handler = logging.FileHandler(log_path)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+
         super().__init__(logger=logger)
 
     def get_element(self,

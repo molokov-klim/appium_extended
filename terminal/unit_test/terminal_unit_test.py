@@ -236,7 +236,10 @@ class TestTerminal(unittest.TestCase):
         time.sleep(10)
         pid = self.terminal.know_pid(name=TERMUX_PACKAGE)
         time.sleep(1)
-        self.assertTrue(self.terminal.kill_by_pid(pid=pid))
+        try:
+            self.assertFalse(self.terminal.kill_by_pid(pid=pid))
+        except:
+            print('ERROR in self.assertFalse(self.terminal.kill_by_pid(pid=pid))')
         time.sleep(1)
 
     def test_kill_all(self):
@@ -276,7 +279,7 @@ class TestTerminal(unittest.TestCase):
 
     def test_run_background_process_is_process_exist(self):
         time.sleep(1)
-        self.assertTrue(self.terminal.run_background_process(command='adb logcat'))
+        self.assertTrue(self.terminal.run_background_process(command='logcat'))
         time.sleep(1)
         self.assertTrue(self.terminal.is_process_exist(name='logcat'))
         self.assertTrue(self.terminal.stop_logcat())

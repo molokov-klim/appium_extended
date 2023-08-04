@@ -6,10 +6,9 @@ import shutil
 import json
 from typing import Optional
 
-import config
-
-logger = logging.getLogger(config.APPIUM_LOG_NAME)
 START_DIR = os.getcwd()
+
+logger = logging.getLogger(__name__)
 
 
 def extract_numeric(variable: str) -> Optional[float]:
@@ -89,15 +88,15 @@ def copy_file(source: str, destination: str) -> None:
         None
     """
     # Отладочное сообщение с выводом исходного и целевого пути
-    logger.debug("copy_file() source %s, destination %s", source, destination)
+    logging.debug("copy_file() source %s, destination %s", source, destination)
     try:
         # Копирование файла из исходного пути в целевой путь
         shutil.copy(source, destination)
         # Отладочное сообщение об успешном копировании файла
-        logger.debug("File copied successfully!")
+        logging.debug("File copied successfully!")
     except IOError as e:
         # Сообщение об ошибке при копировании файла
-        logger.error("Unable to copy file: %s" % e)
+        logging.error("Unable to copy file: %s" % e)
 
 
 def count_currency_numbers(number: int) -> tuple:
@@ -139,7 +138,7 @@ def read_json(path: str, filename: str):
         with open(filepath, 'r', encoding='utf-8') as f:  # Открываем JSON-файл для чтения
             data = json.load(f)  # Загружаем данные из JSON-файла
     except FileNotFoundError:
-        logger.error("Файл не найден")  # Выводим сообщение об ошибке, если файл не найден
+        logging.error("Файл не найден")  # Выводим сообщение об ошибке, если файл не найден
         return None
     return data  # Возвращаем данные из JSON-файла
 

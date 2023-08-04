@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import subprocess
 import sys
@@ -8,13 +9,12 @@ from typing import Dict, Union, Tuple, Optional, Any
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(
 #    __file__))))  # The sys.path.append line adds the parent directory of the tests directory to the Python module search path, allowing you to import modules from the root folder.
 
-import config
 from utils import operations
+
+logger = logging.getLogger(__name__)
 
 
 class Adb:
-    def __init__(self):
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
     @staticmethod
     def get_device_uuid() -> Union[str, None]:
@@ -23,7 +23,6 @@ class Adb:
         Returns:
             UUID в виде строки.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("get_device_uuid()")
 
         # Определение команды для выполнения с помощью adb для получения списка устройств
@@ -58,7 +57,6 @@ class Adb:
         Получает модель подключенного устройства Android с помощью команды adb.
         Возвращает модель устройства.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("get_device_model()")
 
         command = ["adb", "shell", "getprop", "ro.product.model"]
@@ -87,9 +85,6 @@ class Adb:
         Возвращает:
             bool: True, если файл или директория были успешно скопированы, False в противном случае.
         """
-        import os
-
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"push() < {source=}, {destination=}")
 
         if not os.path.exists(source):
@@ -120,7 +115,6 @@ class Adb:
         Возвращает:
             bool: True, если файл или директория были успешно скопированы, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"pull() < {source=}, {destination=}")
 
         command = ["adb", "pull", source, destination]
@@ -146,7 +140,6 @@ class Adb:
         Возвращает:
             bool: True, если файл APK был успешно установлен, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"install() < {source=}")
 
         command = ["adb", "install", "-r", source]
@@ -166,7 +159,6 @@ class Adb:
         """
         Проверяет, установлен ли пакет.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"is_installed() < {package=}")
 
         command = "adb shell pm list packages"
@@ -196,7 +188,6 @@ class Adb:
         Возвращает:
             bool: True, если приложение успешно удалено, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"uninstall_app() < {package=}")
 
         command = ['adb', 'uninstall', package]
@@ -223,7 +214,6 @@ class Adb:
         Возвращает:
             bool: True, если активность была успешно запущена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"start_activity() < {package=}, {activity=}")
 
         command = ['adb', 'shell', 'am', 'start', '-n', f'{package}/{activity}']
@@ -247,8 +237,6 @@ class Adb:
         Возвращает:
             str: Название активити текущего запущенного приложения, либо None, если произошла ошибка.
         """
-        # Получение логгера
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
         # Вывод информации о запуске функции в лог
         logger.debug("get_current_activity()")
@@ -300,9 +288,6 @@ class Adb:
         Возвращает:
             str: Название пакета текущего запущенного приложения, либо None, если произошла ошибка.
         """
-        # Получение логгера
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
-
         # Вывод информации о запуске функции в лог
         logger.debug("get_current_app_package()")
 
@@ -355,7 +340,6 @@ class Adb:
         Возвращает:
             bool: True, если приложение успешно закрыто, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"close_app() < {package=}")
 
         command = ['adb', 'shell', 'am', 'force-stop', package]
@@ -370,7 +354,8 @@ class Adb:
             logger.error(traceback_info)
             return False
 
-    def reboot_app(self, package: str, activity: str) -> bool:
+    @staticmethod
+    def reboot_app(package: str, activity: str) -> bool:
         """
         Перезапускает приложение, закрывая его и затем запуская указанную активность.
 
@@ -381,18 +366,18 @@ class Adb:
         Возвращает:
             bool: True, если перезапуск приложения выполнен успешно, False в противном случае.
         """
-        self.logger.debug(f"reboot_app() < {package=}, {activity=}")
+        logger.debug(f"reboot_app() < {package=}, {activity=}")
 
         # Закрытие приложения
-        if not self.close_app(package=package):
-            self.logger.error("reboot_app() > False")
+        if not Adb.close_app(package=package):
+            logger.error("reboot_app() > False")
             return False
 
         # Запуск указанной активности
-        if not self.start_activity(package=package, activity=activity):
-            self.logger.error("reboot_app() > False")
+        if not Adb.start_activity(package=package, activity=activity):
+            logger.error("reboot_app() > False")
             return False
-        self.logger.debug("reboot_app() > True")
+        logger.debug("reboot_app() > True")
         return True
 
     @staticmethod
@@ -403,7 +388,6 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("press_home()")
 
         command = ['adb', 'shell', 'input', 'keyevent', 'KEYCODE_HOME']
@@ -426,7 +410,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug("press_back()")
 
         command = ['adb', 'shell', 'input', 'keyevent', 'KEYCODE_BACK']
@@ -449,7 +433,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug("press_menu()")
 
         command = ['adb', 'shell', 'input', 'keyevent', 'KEYCODE_MENU']
@@ -476,7 +460,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"input_keycode_num_() < {num=}")
 
         command = ['adb', 'shell', 'input', 'keyevent', f'KEYCODE_NUMPAD_{num}']
@@ -502,7 +486,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"input_keycode() < {keycode=}")
 
         command = ['adb', 'shell', 'input', 'keyevent', f'{keycode}']
@@ -517,7 +501,8 @@ class Adb:
             logger.error(traceback_info)
             return False
 
-    def input_by_virtual_keyboard(self, text: str, keyboard: Dict[str, tuple]) -> bool:
+    @staticmethod
+    def input_by_virtual_keyboard(text: str, keyboard: Dict[str, tuple]) -> bool:
         """
         Вводит строку символов с помощью виртуальной клавиатуры.
 
@@ -528,19 +513,19 @@ class Adb:
         Возвращает:
             bool: True, если ввод выполнен успешно, False в противном случае.
         """
-        self.logger.debug(f"input_by_virtual_keyboard() < {text=}, {keyboard=}")
+        logger.debug(f"input_by_virtual_keyboard() < {text=}, {keyboard=}")
 
         try:
             for char in text:
                 # Вызываем функцию tap с координатами, соответствующими символу char
-                self.tap(*keyboard[char])
-            self.logger.debug("input_by_virtual_keyboard() > True")
+                Adb.tap(*keyboard[char])
+            logger.debug("input_by_virtual_keyboard() > True")
             return True
         except subprocess.CalledProcessError as e:
-            self.logger.error("input_by_virtual_keyboard() > False")
-            self.logger.error(e)
+            logger.error("input_by_virtual_keyboard() > False")
+            logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-            self.logger.error(traceback_info)
+            logger.error(traceback_info)
             return False
 
     @staticmethod
@@ -554,7 +539,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"input_text() < {text=}")
 
         # Формируем команду для ввода текста с использованием ADB
@@ -583,7 +568,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"tap() < {x=}, {y=}")
 
         # Формируем команду для выполнения нажатия по указанным координатам с использованием ADB
@@ -616,7 +601,7 @@ class Adb:
         Возвращает:
             bool: True, если команда была успешно выполнена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"swipe() < {start_x=}, {start_y=}, {end_x=}, {end_y=}, {duration=}")
 
         # Формируем команду для выполнения свайпа с использованием ADB
@@ -645,7 +630,6 @@ class Adb:
         Возвращает:
             bool: True, если VPN-соединение активно, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"check_vpn() < {ip_address=}")
 
         # Определяем команду в виде строки
@@ -670,17 +654,17 @@ class Adb:
             logger.error(traceback_info)
             return False
 
-    def stop_logcat(self) -> bool:
+    @staticmethod
+    def stop_logcat() -> bool:
         """
         Останавливает выполнение logcat на устройстве с помощью ADB.
 
         Возвращает:
             bool: True, если выполнение logcat остановлено успешно, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("stop_logcat()")
-        if self.is_process_exist(name='logcat'):
-            if self.kill_all(name='logcat'):
+        if Adb.is_process_exist(name='logcat'):
+            if Adb.kill_all(name='logcat'):
                 logger.debug("stop_logcat() > True")
                 return True
         logger.error("stop_logcat() > False")
@@ -698,7 +682,6 @@ class Adb:
         Возвращает:
             bool: True если процесс с указанным именем существует, False в ином случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug(f"is_process_exist() < {name=}")
         command = ['adb', 'shell', 'ps']
         try:
@@ -727,7 +710,8 @@ class Adb:
         logger.debug("is_process_exist() > False")
         return False
 
-    def run_background_process(self, command: str, process: str = "") -> bool:
+    @staticmethod
+    def run_background_process(command: str, process: str = "") -> bool:
         """
         Запускает процесс в фоновом режиме на устройстве Android с использованием ADB.
 
@@ -739,7 +723,7 @@ class Adb:
         Возвращает:
             bool: True, если процесс был успешно запущен, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"run_background_process() < {command=}")
 
         command = f"{command} nohup > /dev/null 2>&1 &"
@@ -747,7 +731,7 @@ class Adb:
             subprocess.Popen(command, stdout=subprocess.DEVNULL)  # не добавлять with
             if process != "":
                 time.sleep(1)
-                if not self.is_process_exist(name=process):
+                if not Adb.is_process_exist(name=process):
                     return False
             logger.debug("run_background_process() > True")
             return True
@@ -766,7 +750,6 @@ class Adb:
         Возвращает:
             bool: True, если adb-сервер успешно перезапущен, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.debug("reload_adb()")
 
         try:
@@ -803,7 +786,7 @@ class Adb:
         Возвращает:
             Union[int, None]: PID процесса, если он найден, или None, если процесс не найден.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"know_pid() < {name=}")
         command = ['adb', 'shell', 'ps']
         try:
@@ -844,7 +827,7 @@ class Adb:
         Возвращает:
             bool: True, если процесс успешно остановлен, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"kill_by_pid() < {pid=}")
 
         command = ['adb', 'shell', 'kill', '-s', 'SIGINT', str(pid)]
@@ -870,7 +853,7 @@ class Adb:
         Возвращает:
             bool: True, если все процессы успешно остановлены, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"kill_by_name() < {name=}")
 
         command = ['adb', 'shell', 'pkill', '-l', 'SIGINT', str(name)]
@@ -896,7 +879,7 @@ class Adb:
         Возвращает:
             bool: True, если все процессы успешно остановлены, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"kill_all() < {name=}")
 
         command = ['adb', 'shell', 'pkill', '-f', str(name)]
@@ -922,7 +905,7 @@ class Adb:
         Возвращает:
             bool: True, если файлы успешно удалены, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"delete_files_from_internal_storage() < {path=}")
 
         command = ['adb', 'shell', 'rm', '-rf', f'{path}*']
@@ -950,7 +933,7 @@ class Adb:
         Возвращает:
             bool: True, если видеофайлы успешно скопированы, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"pull_video() < {destination=}")
 
         if not source:
@@ -992,7 +975,7 @@ class Adb:
         Возвращает:
             bool: True, если запись видео успешно остановлена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug("stop_video()")
 
         command = ['adb', 'shell', 'pkill', '-l', 'SIGINT', 'screenrecord']
@@ -1020,7 +1003,7 @@ class Adb:
         Возвращает:
             subprocess.CompletedProcess: Процесс записи видео.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug(f"record_video() < {filename}")
         if path.endswith('/'):
             path = path[:-1]
@@ -1058,7 +1041,7 @@ class Adb:
         command = ['adb', 'shell', 'screenrecord', f'{path}/{filename}']
         try:
             # Запускаем команду adb shell screenrecord для начала записи видео
-            subprocess.Popen(command)   # не добавлять with
+            subprocess.Popen(command)  # не добавлять with
             return True
         except subprocess.CalledProcessError:
             # Если произошла ошибка при выполнении команды, возвращаем False
@@ -1072,7 +1055,7 @@ class Adb:
         Возвращает:
             bool: True, если перезагрузка успешно запущена, False в противном случае.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug("reboot()")
 
         command = ['adb', 'shell', 'reboot']
@@ -1095,7 +1078,7 @@ class Adb:
         Возвращает:
             tuple[int, int] or None: Кортеж с шириной и высотой экрана в пикселях, или None в случае ошибки.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
+
         logger.debug("get_screen_resolution()")
 
         command = ['adb', 'shell', 'wm', 'size']
@@ -1113,4 +1096,3 @@ class Adb:
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
         return None
-

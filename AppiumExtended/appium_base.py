@@ -33,6 +33,10 @@ class AppiumBase:
         self.aapt = Aapt()
         self.adb = Adb()
 
+        aapt_logger = logging.getLogger('aapt')
+        aapt_logger.setLevel(self.logger.level)
+        adb_logger = logging.getLogger('adb')
+        adb_logger.setLevel(self.logger.level)
 
     def connect(self,
                 capabilities: dict,
@@ -68,9 +72,9 @@ class AppiumBase:
                                        keep_alive=True)
 
         # Инициализация объектов требующих драйвер
-        self.image = AppiumImage(driver=self.driver, logger=self.logger)
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
         self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
+
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')

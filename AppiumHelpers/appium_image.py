@@ -26,6 +26,7 @@ class AppiumImage:
         self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
 
+
     def get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
         screenshot = base64.b64decode(screenshot)

@@ -4,11 +4,10 @@ import math
 import os
 from typing import Tuple
 
-import config
 
 START_DIR = os.getcwd()
 PROJECT_ROOT_DIR = os.path.dirname(__file__)
-logger = logging.getLogger(config.APPIUM_LOG_NAME)
+logger = logging.getLogger(__name__)
 
 
 def write_to_json(path, filename, data):
@@ -48,7 +47,7 @@ def remove_keys_from_json_files_recursively(keys: list, path: str):
             if file.endswith('.json'):
                 # Load the JSON data from the file
                 file_path = os.path.join(subdir, file)
-                print("file_path: ", file_path)
+                logger.debug(f"file_path: {file_path}")
                 with open(file_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
 
@@ -74,9 +73,6 @@ def change_values_in_json_files_recursively(keys: dict, path: str):
     path = os.path.join('test_data', 'FFD_1_05', 'card')
     operations.change_values_in_json_files_recursively(keys=keys, path=path)
     """
-    print("change_values_in_json_files_recursively()")
-    print("keys: ", keys)
-    print("path: ", path)
     # Define the directory to traverse
     root_dir = os.path.join(START_DIR, path)
 
@@ -87,15 +83,15 @@ def change_values_in_json_files_recursively(keys: dict, path: str):
             if file.endswith('.json'):
                 # Load the JSON data from the file
                 file_path = os.path.join(subdir, file)
-                print("file_path: ", file_path)
+                logger.debug(f"file_path: {file_path}")
                 with open(file_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
 
                 # Delete the text-value pair from the JSON data
                 for key in keys:
                     if key in data:
-                        print("data[text]: ", data[key])
-                        print("keys[text]: ", keys[key])
+                        logger.debug(f"data[text]: {data[key]}")
+                        logger.debug(f"keys[text]: {keys[key]}")
                         data[key] = keys[key]
 
                 # Write the modified JSON data back to the file

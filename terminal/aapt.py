@@ -2,12 +2,10 @@ import logging
 import os
 import subprocess
 
-import config
+logger = logging.getLogger(__name__)
 
 
 class Aapt:
-    def __init__(self):
-        self.logger = logging.getLogger(config.APPIUM_LOG_NAME)
 
     @staticmethod
     def get_package_name(path_to_apk: str) -> str:
@@ -15,7 +13,6 @@ class Aapt:
         Получает название пакета APK-файла с помощью команды aapt.
         Возвращает название пакета.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.info(f"get_package_name() < {path_to_apk}")
 
         command = ["aapt", "dump", "badging", os.path.join(path_to_apk)]
@@ -49,7 +46,6 @@ class Aapt:
         Получает название запускаемой активности из APK-файла с помощью команды aapt.
         Возвращает название активности в виде строки.
         """
-        logger = logging.getLogger(config.APPIUM_LOG_NAME)
         logger.info(f"get_launchable_activity_from_apk() < {path_to_apk}")
 
         command = ["aapt", "dump", "badging", path_to_apk]
@@ -73,4 +69,3 @@ class Aapt:
             logger.error("Could not find 'launchable-activity' line in aapt output.")
 
         return ""
-

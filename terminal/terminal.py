@@ -13,9 +13,19 @@ from AppiumHelpers.helpers_decorators import log_debug
 
 
 class Terminal:
-    def __init__(self, driver, logger: logging.Logger):
+    def __init__(self, driver, logger: logging.Logger = None, log_level: int = logging.INFO, log_path: str = ''):
         self.driver = driver
         self.logger = logger
+        if logger is None:
+            self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(log_level)
+        if bool(log_path):
+            if not log_path.endswith('.log'):
+                log_path = log_path + '.log'
+            file_handler = logging.FileHandler(log_path)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
 
     @log_debug()
     def adb_shell(self, command: str, args: str = "") -> Any:
