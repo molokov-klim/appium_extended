@@ -26,7 +26,6 @@ class AppiumBase:
         self.server = None
         self.logger = logger
         self.driver = None
-        self.image = None
         self.terminal = None
         self.helper = None
         self.keep_alive_server = True
@@ -74,7 +73,6 @@ class AppiumBase:
         # Инициализация объектов требующих драйвер
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
         self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
-
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
