@@ -27,7 +27,7 @@ class AppiumBase:
         self.logger = logger
         self.driver = None
         self.terminal = None
-        self.helper = None
+        self.helper: AppiumHelpers = None
         self.keep_alive_server = True
         self.aapt = Aapt()
         self.adb = Adb()

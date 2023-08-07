@@ -15,12 +15,12 @@ class AppiumIs(AppiumGet):
 
     def __init__(self, logger: logging.Logger):
         super().__init__(logger=logger)
-        self.helper = None
 
     def _is_element_within_screen(
             self,
             locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
-            timeout: int = 10
+            timeout: int = 10,
+            contains: bool = True
     ) -> bool:
         """
         Метод проверяет, находится ли заданный элемент на видимом экране.
@@ -29,6 +29,7 @@ class AppiumIs(AppiumGet):
         - locator (Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str]):
             Локатор или элемент, который нужно проверить.
         - timeout (int): Время ожидания элемента. Значение по умолчанию: 10.
+        - contains (bool): Допускает фрагмент текста.
 
         Возвращает:
         - bool: True, если элемент находится на экране, False, если нет.
@@ -36,7 +37,7 @@ class AppiumIs(AppiumGet):
         screen_size = self.terminal.get_screen_resolution()  # Получаем размеры экрана
         screen_width = screen_size[0]  # Ширина экрана
         screen_height = screen_size[1]  # Высота экрана
-        element = self._get_element(locator=locator, timeout_elem=timeout)  # Получаем элемент по локатору
+        element = self._get_element(locator=locator, timeout_elem=timeout, contains=contains)  # Получаем элемент по локатору
         if element is None:
             return False
         if not element.get_attribute('displayed') == 'true':

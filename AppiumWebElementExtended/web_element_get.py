@@ -26,7 +26,6 @@ class WebElementGet(WebElement):
         self.driver = driver
         self.logger = logger
         self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
-        self.image = self.helper
         self.terminal = self.helper.terminal
 
     def _get_element(self,

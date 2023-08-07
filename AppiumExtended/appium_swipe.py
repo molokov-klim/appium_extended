@@ -13,7 +13,6 @@ class AppiumSwipe(AppiumGet):
 
     def __init__(self, logger: logging.Logger):
         super().__init__(logger=logger)
-        self.helper = None
 
     def _swipe(self,    # TODO +direction and distance
                start_x: int,

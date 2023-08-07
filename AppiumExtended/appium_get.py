@@ -25,7 +25,6 @@ class AppiumGet(AppiumBase):
 
     def __init__(self, logger: logging.Logger):
         super().__init__(logger=logger)
-        self.helper = None
 
     def _get_element(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -237,14 +236,14 @@ class AppiumGet(AppiumBase):
                                full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
                                threshold: float = 0.7,
                                ) -> Union[Tuple[int, int, int, int], None]:
-        return self.image.get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
+        return self.helper.get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
 
     def _get_inner_image_coordinates(self,
                                      outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      threshold: float = 0.9) -> \
             Union[Tuple[int, int, int, int], None]:
-        return self.image.get_inner_image_coordinates(outer_image_path=outer_image_path,
+        return self.helper.get_inner_image_coordinates(outer_image_path=outer_image_path,
                                                       inner_image_path=inner_image_path,
                                                       threshold=threshold)
 
@@ -252,7 +251,7 @@ class AppiumGet(AppiumBase):
                               text: str,
                               language: str = 'rus',
                               image: Union[bytes, str, Image.Image, np.ndarray] = None, ) -> Tuple[int, int, int, int]:
-        return self.image.get_text_coordinates(text=text, language=language, image=image)
+        return self.helper.get_text_coordinates(text=text, language=language, image=image)
 
     def _get_screenshot_as_base64_decoded(self):
-        return self.image.get_screenshot_as_base64_decoded()
+        return self.helper.get_screenshot_as_base64_decoded()

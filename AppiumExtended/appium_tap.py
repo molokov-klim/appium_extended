@@ -15,7 +15,6 @@ class AppiumTap(AppiumGet):
 
     def __init__(self, logger: logging.Logger):
         super().__init__(logger=logger)
-        self.helper = None
 
     def _tap(self,
              x: int,

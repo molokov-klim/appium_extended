@@ -202,7 +202,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.image.is_image_on_the_screen(image=locator):
+                    if self.helper.is_image_on_the_screen(image=locator):
                         return True
                 element = self._get_element(locator=locator, timeout_elem=1)
                 if element is not None:
@@ -219,7 +219,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.image.is_image_on_the_screen(image=locator):
+                    if self.helper.is_image_on_the_screen(image=locator):
                         return True
                 element = self._get_element(locator=locator, timeout_elem=1)
                 if element is not None:
@@ -265,7 +265,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.image.is_image_on_the_screen(image=locator):
+                    if self.helper.is_image_on_the_screen(image=locator):
                         return self._get_element(locator=locator, timeout_elem=1)
                 element = self._get_element(locator=locator, timeout_elem=1)
                 if element is not None:
@@ -282,7 +282,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.image.is_image_on_the_screen(image=locator):
+                    if self.helper.is_image_on_the_screen(image=locator):
                         return self._get_element(locator=locator, timeout_elem=1)
                 element = self._get_element(locator=locator, timeout_elem=1)
                 if element is not None:

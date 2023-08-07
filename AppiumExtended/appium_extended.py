@@ -27,6 +27,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     Класс работы с Appium.
     Обеспечивает работу с устройством
     """
+
     def __init__(self, logger: logging.Logger = None, log_level: int = logging.INFO, log_path: str = ''):
         if logger is None:
             logger = logging.getLogger(__name__)
@@ -151,7 +152,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                       cv_threshold: Optional[float] = 0.7,
                                       coord_threshold: Optional[int] = 5,
                                       ) -> Union[List[Tuple], None]:
-        return self.image.get_many_coordinates_of_image(full_image=full_image,
+        return self.helper.get_many_coordinates_of_image(full_image=full_image,
                                                         image=image,
                                                         cv_threshold=cv_threshold,
                                                         coord_threshold=coord_threshold)
@@ -229,6 +230,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                           text: str,
                           language: str = 'rus',
                           ocr: bool = True,
+                          contains: bool = True
                           ) -> bool:
         """
         Проверяет, присутствует ли заданный текст на экране.
@@ -241,20 +243,21 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - text (str): Текст, который нужно найти на экране.
         - ocr (bool): Производить поиск по изображению или DOM.
         - language (str): Язык распознавания текста. Значение по умолчанию: 'rus'.
+        - contains (bool): Только для ocr=False. Допускает фрагмент текста
 
         Возвращает:
         - bool: True, если заданный текст найден на экране. False в противном случае.
         """
         if ocr:
-            return self.image.is_text_on_ocr_screen(text=text, language=language)
-        return self._is_element_within_screen(locator={'text': text})
+            return self.helper.is_text_on_ocr_screen(text=text, language=language)
+        return self._is_element_within_screen(locator={'text': text}, contains=contains)
 
     def is_image_on_the_screen(self,
                                image: Union[bytes, np.ndarray, Image.Image, str],
                                threshold: float = 0.9,
                                ) -> bool:
-        return self.image.is_image_on_the_screen(image=image,
-                                                 threshold=threshold)
+        return self.helper.is_image_on_the_screen(image=image,
+                                                  threshold=threshold)
 
     def tap(self,
             locator: Union[Tuple[str, str], WebElementExtended, WebElement, Dict[str, str], str] = None,
@@ -430,7 +433,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                             bottom_right: Tuple[int, int] = None,
                             path: str = None,
                             ) -> 'AppiumExtended':
-        assert self.image.draw_by_coordinates(image=image,
+        assert self.helper.draw_by_coordinates(image=image,
                                               coordinates=coordinates,
                                               top_left=top_left,
                                               bottom_right=bottom_right,

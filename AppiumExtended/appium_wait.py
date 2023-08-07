@@ -18,7 +18,6 @@ class AppiumWait(AppiumGet):
 
     def __init__(self, logger: logging.Logger):
         super().__init__(logger=logger)
-        self.helper = None
 
     def _wait_for(self,
                   locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
@@ -70,9 +69,9 @@ class AppiumWait(AppiumGet):
             # Loop through each image
             for i in image:
                 # Check if the image is on the screen within the timeout period
-                while not self.image.is_image_on_the_screen(image=i) and time.time() - start_time < timeout:
+                while not self.helper.is_image_on_the_screen(image=i) and time.time() - start_time < timeout:
                     time.sleep(1)
-                if not self.image.is_image_on_the_screen(image=i):
+                if not self.helper.is_image_on_the_screen(image=i):
                     return False
 
         # Return True if all conditions are met
@@ -136,7 +135,7 @@ class AppiumWait(AppiumGet):
                 images_present = False
                 for i in image:
                     # Check if the image is on the screen within the timeout period
-                    if self.image.is_image_on_the_screen(image=i):
+                    if self.helper.is_image_on_the_screen(image=i):
                         images_present = True
                 if not images_present:
                     return True

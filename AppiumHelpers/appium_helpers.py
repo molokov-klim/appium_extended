@@ -11,7 +11,7 @@ from AppiumHelpers.appium_image import AppiumImage
 
 class AppiumHelpers(AppiumImage):
 
-    def __init__(self, driver, logger: logging.Logger):
+    def __init__(self, driver, logger: logging.Logger = None):
         super().__init__(driver=driver, logger=logger)
 
     @staticmethod
