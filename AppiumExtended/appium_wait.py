@@ -151,7 +151,7 @@ class AppiumWait(AppiumGet):
             timeout: таймаут на ожидание
         """
         start_time = time.time()
-        while time.time() - start_time > timeout:
+        while time.time() - start_time < timeout:
             if method():
                 return True
             time.sleep(1)
