@@ -175,29 +175,44 @@ class AppiumImage:
         Returns:
             Логическое значение, указывающее, было ли частичное изображение найдено на экране.
         """
-        screenshot = self.get_screenshot_as_base64_decoded()
+        try:
+            screenshot = self.get_screenshot_as_base64_decoded()
 
-        # Чтение снимка экрана и частичного изображения
-        full_image = self.to_ndarray(image=screenshot, grayscale=True)
-        small_image = self.to_ndarray(image=image, grayscale=True)
+            # Чтение снимка экрана и частичного изображения
+            full_image = self.to_ndarray(image=screenshot, grayscale=True)
+            small_image = self.to_ndarray(image=image, grayscale=True)
 
-        # Сопоставление частичного изображения и снимка экрана
-        result = cv2.matchTemplate(full_image, small_image, cv2.TM_CCOEFF_NORMED)
+            # Проверка размеров изображений
+            if small_image.shape[0] > full_image.shape[0] or small_image.shape[1] > full_image.shape[1]:
+                self.logger.error("Частичное изображение больше снимка экрана.")
+                return False
 
-        # Извлечение коэффициента схожести и координат схожего участка
-        _, max_val, _, _ = cv2.minMaxLoc(result)
+            # Сопоставление частичного изображения и снимка экрана
+            result = cv2.matchTemplate(full_image, small_image, cv2.TM_CCOEFF_NORMED)
 
-        # Логирование
-        self.logger.debug(f"Коэффициент схожести изображения: {max_val}")
+            # Извлечение коэффициента схожести и координат схожего участка
+            _, max_val, _, _ = cv2.minMaxLoc(result)
 
-        # Сравнение коэффициента схожести и порогового значения
-        return max_val >= threshold
+            # Логирование
+            self.logger.debug(f"Коэффициент схожести изображения: {max_val}")
+
+            # Сравнение коэффициента схожести и порогового значения
+            return max_val >= threshold
+
+        except cv2.error as e:
+            self.logger.error(f"is_image_on_the_screen(): {e}")
+            return False
+        except AssertionError as e:
+            self.logger.error(f"is_image_on_the_screen(): {e}")
+            return False
+        except Exception as e:
+            self.logger.error(f"is_image_on_the_screen(): {e}")
+            return False
 
     def is_text_on_ocr_screen(self,
                               text: str,
                               screen: Union[bytes, np.ndarray, Image.Image, str] = None,
-                              language: str = 'rus'
-                              ) -> bool:
+                              language: str = 'rus') -> bool:
         """
         Проверяет, присутствует ли заданный текст на экране.
         Распознавание текста производит с помощью библиотеки pytesseract.
@@ -210,21 +225,35 @@ class AppiumImage:
         Возвращает:
         - bool: True, если заданный текст найден на экране. False в противном случае.
         """
-        if screen is None:
-            screenshot = self.get_screenshot_as_base64_decoded()
-            image = self.to_ndarray(screenshot)
-        else:
-            image = self.to_ndarray(screen)
+        try:
+            if screen is None:
+                screenshot = self.get_screenshot_as_base64_decoded()
+                image = self.to_ndarray(screenshot)
+            else:
+                image = self.to_ndarray(screen)
 
-        # Бинаризация изображения
-        _, image_bin = cv2.threshold(image, 0, 255,
-                                     cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
+            # Бинаризация изображения
+            _, image_bin = cv2.threshold(image, 0, 255,
+                                         cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
 
-        # Преобразование двоичного изображения в текст
-        ocr_text = pytesseract.image_to_string(image_bin, lang=language)
+            # Преобразование двоичного изображения в текст
+            ocr_text = pytesseract.image_to_string(image_bin, lang=language)
 
-        # Проверка наличия заданного текста в распознанном тексте
-        return text.lower() in ocr_text.lower()
+            # Проверка наличия заданного текста в распознанном тексте
+            return text.lower() in ocr_text.lower()
+
+        except cv2.error as e:
+            self.logger.error(f"is_text_on_ocr_screen(): {e}")
+            return False
+        except pytesseract.TesseractError as e:
+            self.logger.error(f"is_text_on_ocr_screen(): {e}")
+            return False
+        except AssertionError as e:
+            self.logger.error(f"is_text_on_ocr_screen(): {e}")
+            return False
+        except Exception as e:
+            self.logger.error(f"is_text_on_ocr_screen(): {e}")
+            return False
 
     @helpers_decorators.retry
     def get_many_coordinates_of_image(self,

@@ -288,7 +288,7 @@ def step_info(my_str):
             try:
                 # Выполняем исходную функцию
                 result = func(self, *args, **kwargs)
-            except AssertionError as error:
+            except Exception as error:
                 # Если произошло исключение, прикрепляем скриншот до вызова метода к отчету
                 allure.attach(screenshot,
                               name=screenshot_name_begin,

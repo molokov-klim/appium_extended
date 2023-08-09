@@ -4,3 +4,4 @@
 /pylintrc
 /.idea/pylint.xml
 /requirements.txt
+/terminal/unit_test/logs/appium_log.txt
