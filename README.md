@@ -39,6 +39,8 @@ appium plugin install --source=npm appium-dashboard
     python setup.py install
     ```
 
+---
+
 # Содержание
 
 ### [class `AppiumExtended`](https://github.com/molokov-klim/appium_extended#class-appiumextended)
@@ -71,6 +73,8 @@ appium plugin install --source=npm appium-dashboard
 - [draw_by_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-draw_by_coordinates)
 - [input_by_virtual_keyboard](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_by_virtual_keyboard)
 
+---
+
 ### [class `WebElementExtended`](https://github.com/molokov-klim/appium_extended#class-webelementextended)
 
 - [get_element](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_element-1)
@@ -102,12 +106,16 @@ appium plugin install --source=npm appium-dashboard
 - [get_center](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_center)
 - [get_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_coordinates)
 
+---
+
 ### [class `AppiumServer`](https://github.com/molokov-klim/appium_extended#class-appiumserver)
 
 - [start](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-start)
 - [is_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_alive)
 - [stop](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop)
 - [wait_until_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-wait_until_alive)
+
+---
 
 ### [class `AppiumNavigator`](https://github.com/molokov-klim/appium_extended#class-appiumnavigator)
 
@@ -116,10 +124,14 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
+---
+
 ### [class `Aapt`](https://github.com/molokov-klim/appium_extended#class-aapt)
 
 - [get_package_name](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_package_name)
 - [get_launchable_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_launchable_activity)
+
+---
 
 ### [class `Terminal`](https://github.com/molokov-klim/appium_extended#class-terminal)
 
@@ -155,6 +167,7 @@ appium plugin install --source=npm appium-dashboard
 - [reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot)
 - [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution)
 
+---
 
 ### [class `Adb`](https://github.com/molokov-klim/appium_extended#class-adb)
 
@@ -193,69 +206,90 @@ appium plugin install --source=npm appium-dashboard
 34. [reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot-1)
 35. [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution-1)
 
-# class AppiumExtended
-Основной класс расширяющий Appium-Python-Client.  
+---
+
+# class AppiumExtended()
+Класс работы с Appium, предоставляющий базовые методы для взаимодействия с устройством. 
+
+## Инициализация: `__init__()`
+
+### Параметры
+- `logger`: Журнал для записи сообщений (по умолчанию `None`).
+- `log_level`: Уровень логирования (по умолчанию `logging.INFO`).
+- `log_path`: Путь для сохранения журнала (по умолчанию пустая строка).
 
 ## Метод: `connect()`
 
-Метод `connect` выполняет подключение к устройству на основе заданных возможностей или свойств, передаваемых в формате словаря.
-
 ### Параметры
 
-`capabilities`: Словарь, который содержит набор возможностей устройства, к которому производится подключение. Этот словарь может включать такие параметры, как имя устройства, версию операционной системы, путь к приложению и пр.
+- `capabilities`: Словарь, содержащий набор возможностей устройства для подключения.
+- `server_ip`: IP-адрес сервера Appium (по умолчанию `'127.0.0.1'`).
+- `server_port`: Порт сервера Appium (по умолчанию `4723`).
+- `server_log_level`: Уровень логирования сервера (по умолчанию `'error'`).
+- `remote`: Флаг, указывающий на удаленное подключение к серверу (по умолчанию `False`).
+- `keep_alive_server`: Флаг, указывающий на сохранение соединения с сервером (по умолчанию `True`).
 
 ### Пример использования
-
 ```python
 app = AppiumExtended()
 
-capabilities_with_install = {  
-"platformName": "android",  
-"appium:automationName": "uiautomator2",  
-"appium:deviceName": device_model,  
-"appium:udid": device_uuid,  
-"appium:app": path_to_apk,  
-"appium:appPackage": package,  
-"appium:appWaitActivity": activity_launchable,  
-"appium: autoGrantPermissions": True,  
+capabilities = {  
+    "platformName": "android",  
+    "appium:automationName": "uiautomator2",  
+    ...
 }
 
-capabilities_without_install = {  
-"platformName": "android",  
-"appium:automationName": "uiautomator2",  
-"appium:deviceName": device_model,  
-"appium:udid": device_uuid,  
-"appium:noReset": True,  
-"appium: autoGrantPermissions": True,  
-}
+app.connect(capabilities=capabilities)
+```
 
-app.connect(capabilities=self.capabilities_without_install)
+```python
+logger = logging.getLogger(__name__)
+log_level = logging.INFO
+log_path = os.path.join('path', 'to', 'log')
+
+app = AppiumExtended(logger=logger,
+					log_level=log_level,
+					log_path=log_path)
+
+capabilities = {  
+    "platformName": "android",  
+    "appium:automationName": "uiautomator2",  
+    ...
+}
+server_ip='10.77.124.78',  
+server_port=4723,  
+server_log_level='error',  
+remote=True,  
+keep_alive_server=True
+
+app.connect(capabilities=capabilities,  
+			server_ip=server_ip,  
+			server_port=server_port,  
+			server_log_level=server_log_level,  
+			remote=remote,  
+			keep_alive_server=keep_alive_server) 
 ```
 
 ### Детали реализации
 
 Метод включает следующие основные этапы:
 
-1. Сохранение переданных возможностей в свойстве объекта `self.capabilities`.
-2. Запуск локального сервера Appium, если не используется прокси и сервер ещё не запущен. Для запуска сервера используется задержка в 10 секунд, чтобы дать ему время для инициализации.
-3. Инициализация драйвера `webdriver.Remote` с заданными возможностями и адресом сервера. Сохранение драйвера в свойстве объекта `self.driver`.
-4. Инициализация объекта `AppiumImage` с созданным драйвером.
+1. Сохранение настроек сервера в соответствующих свойствах объекта.
+2. Инициализация и, при необходимости, запуск локального сервера Appium.
+3. Подключение к серверу Appium и инициализация драйвера `webdriver.Remote`.
+4. Инициализация дополнительных объектов (`Terminal` и `AppiumHelpers`) с созданным драйвером.
 5. Запись в лог информации о подключении и номере сессии драйвера.
-
-### Исключения
-
-Метод не генерирует исключения напрямую, но может пробросить исключения, сгенерированные внутренними вызовами, такими как ошибка запуска сервера Appium или ошибки, связанные с `webdriver.Remote`.
 
 ### Дополнительная информация
 
 В связи с использованием appium-device-farm указывать device udid необязательно.
 ```python
 capabilities = {  
-"platformName": "android",  
-"appium:automationName": "uiautomator2",   
+    "platformName": "android",  
+    "appium:automationName": "uiautomator2",   
 }
 ```
-	
+
 
 ## Метод: `disconnect()`
 
