@@ -248,14 +248,23 @@ log_level = logging.INFO
 log_path = os.path.join('path', 'to', 'log')
 
 app = AppiumExtended(logger=logger,
-	log_level=log_level,
-	log_path=log_path)
+		log_level=log_level,
+		log_path=log_path)
 
-capabilities = {  
-    "platformName": "android",  
-    "appium:automationName": "uiautomator2",  
-    ...
-}
+path_to_apk = os.path.join('path', 'to', 'apk')
+
+capabilities = {
+            "platformName": "android",
+            "appium:automationName": "uiautomator2",
+            "appium:deviceName": app.adb.get_device_model(),
+            "appium:udid": app.adb.get_device_uuid(),
+            "appium:app": path_to_apk,
+            "appium:appPackage": app.aapt.get_package_name(path_to_apk) 
+            "appium:appWaitActivity": app.aapt.get_launchable_activity(path_to_apk)
+            "appium: autoGrantPermissions": True,
+            "appium: newCommandTimeout": 99999,
+        }
+        
 server_ip='10.77.124.78',  
 server_port=4723,  
 server_log_level='error',  
@@ -263,11 +272,11 @@ remote=True,
 keep_alive_server=True
 
 app.connect(capabilities=capabilities,  
-	server_ip=server_ip,  
-	server_port=server_port,  
-	server_log_level=server_log_level,  
-	remote=remote,  
-	keep_alive_server=keep_alive_server) 
+		server_ip=server_ip,  
+		server_port=server_port,  
+		server_log_level=server_log_level,  
+		remote=remote,  
+		keep_alive_server=keep_alive_server) 
 ```
 
 ### Детали реализации
