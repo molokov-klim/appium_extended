@@ -248,8 +248,8 @@ log_level = logging.INFO
 log_path = os.path.join('path', 'to', 'log')
 
 app = AppiumExtended(logger=logger,
-					log_level=log_level,
-					log_path=log_path)
+	log_level=log_level,
+	log_path=log_path)
 
 capabilities = {  
     "platformName": "android",  
@@ -263,11 +263,11 @@ remote=True,
 keep_alive_server=True
 
 app.connect(capabilities=capabilities,  
-			server_ip=server_ip,  
-			server_port=server_port,  
-			server_log_level=server_log_level,  
-			remote=remote,  
-			keep_alive_server=keep_alive_server) 
+	server_ip=server_ip,  
+	server_port=server_port,  
+	server_log_level=server_log_level,  
+	remote=remote,  
+	keep_alive_server=keep_alive_server) 
 ```
 
 ### Детали реализации
