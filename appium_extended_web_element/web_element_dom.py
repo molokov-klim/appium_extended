@@ -6,7 +6,7 @@ from typing import Union, List, Dict
 from appium.webdriver import WebElement
 from selenium.common.exceptions import NoSuchElementException
 
-from AppiumWebElementExtended.web_element_get import WebElementGet
+from appium_extended_web_element.web_element_get import WebElementGet
 
 
 class WebElementDOM(WebElementGet):

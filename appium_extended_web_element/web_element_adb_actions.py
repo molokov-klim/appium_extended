@@ -3,9 +3,9 @@ import logging
 
 from appium.webdriver import WebElement
 
-from AppiumWebElementExtended.web_element_get import WebElementGet
-from AppiumHelpers import helpers_decorators
-from utils.utils import find_coordinates_by_vector
+from appium_extended_web_element.web_element_get import WebElementGet
+from appium_extended_helpers import helpers_decorators
+from appium_extended_utils.utils import find_coordinates_by_vector
 
 
 class WebElementAdbActions(WebElementGet):

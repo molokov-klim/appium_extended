@@ -3,9 +3,9 @@ import logging
 from collections import deque
 from typing import Any, Optional, List
 
-from AppiumExtended.appium_extended import AppiumExtended
-from AppiumGraph.appium_graph import AppiumGraph
-from AppiumHelpers.appium_image import AppiumImage
+from appium_extended.appium_extended import AppiumExtended
+from appium_extended_graph.appium_graph import AppiumGraph
+from appium_extended_helpers.appium_image import AppiumImage
 
 
 class AppiumNavigator:

@@ -8,10 +8,10 @@ from selenium.webdriver.common.actions import interaction
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
-from AppiumWebElementExtended.web_element_get import WebElementGet
+from appium_extended_web_element.web_element_get import WebElementGet
 
-from AppiumHelpers.helpers_decorators import wait_for_window_change
-from utils.utils import find_coordinates_by_vector
+from appium_extended_helpers.helpers_decorators import wait_for_window_change
+from appium_extended_utils.utils import find_coordinates_by_vector
 
 
 class WebElementTap(WebElementGet):

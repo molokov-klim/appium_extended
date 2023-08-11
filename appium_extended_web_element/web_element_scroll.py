@@ -6,7 +6,7 @@ from typing import Union, Tuple, Dict, Optional
 from appium.webdriver import WebElement
 from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 
-from AppiumWebElementExtended.web_element_get import WebElementGet
+from appium_extended_web_element.web_element_get import WebElementGet
 
 
 # TODO add scroll_and_get() - возвращает найденный элемент

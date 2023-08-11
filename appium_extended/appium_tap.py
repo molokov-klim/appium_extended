@@ -4,7 +4,7 @@ from typing import Optional
 
 from selenium.common.exceptions import WebDriverException
 
-from AppiumExtended.appium_get import AppiumGet
+from appium_extended.appium_get import AppiumGet
 
 
 class AppiumTap(AppiumGet):

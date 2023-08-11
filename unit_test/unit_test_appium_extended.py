@@ -8,10 +8,10 @@ import logging
 import numpy as np
 from PIL import Image
 
-from AppiumExtended.appium_extended import AppiumExtended
-from AppiumWebElementExtended.web_element_extended import WebElementExtended
-from AppiumHelpers.helpers_decorators import time_it
-from utils import utils
+from appium_extended.appium_extended import AppiumExtended
+from appium_extended_web_element.web_element_extended import WebElementExtended
+from appium_extended_helpers.helpers_decorators import time_it
+from appium_extended_utils import utils
 
 # logging.basicConfig(level=logging.DEBUG)
 

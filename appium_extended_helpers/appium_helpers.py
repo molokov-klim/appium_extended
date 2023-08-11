@@ -6,7 +6,7 @@ from typing import Tuple, Dict, Union, List, Optional, Any
 from appium.webdriver import WebElement
 from selenium.common.exceptions import WebDriverException
 
-from AppiumHelpers.appium_image import AppiumImage
+from appium_extended_helpers.appium_image import AppiumImage
 
 
 class AppiumHelpers(AppiumImage):

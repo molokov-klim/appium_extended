@@ -4,11 +4,11 @@ from setuptools import setup, find_packages
 long_description = '''
 An extension library for adding ease of use to Appium-Python-Client.
 
-AppiumExtended is a collection of utilities and convenience functions designed to enhance the usage of Appium-Python-Client for mobile app automation testing. It provides additional functionalities and abstractions to simplify the testing process.
+appium_extended is a collection of utilities and convenience functions designed to enhance the usage of Appium-Python-Client for mobile app automation testing. It provides additional functionalities and abstractions to simplify the testing process.
 '''
 
 setup(
-    name='AppiumExtended',
+    name='appium_extended',
     version='0.1.22',
     description='An extension library for adding ease of use Appium-Python-Client',
     author='molokov-klim',

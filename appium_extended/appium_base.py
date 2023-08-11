@@ -5,12 +5,11 @@ import time
 
 from appium import webdriver
 
-from AppiumHelpers.appium_helpers import AppiumHelpers
-from AppiumServer.appium_server import AppiumServer
-from AppiumHelpers.appium_image import AppiumImage
-from terminal.terminal import Terminal
-from terminal.aapt import Aapt
-from terminal.adb import Adb
+from appium_extended_helpers.appium_helpers import AppiumHelpers
+from appium_extended_server.appium_server import AppiumServer
+from appium_extended_terminal.terminal import Terminal
+from appium_extended_terminal.aapt import Aapt
+from appium_extended_terminal.adb import Adb
 
 
 class AppiumBase:

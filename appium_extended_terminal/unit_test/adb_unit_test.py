@@ -3,7 +3,7 @@ import subprocess
 import time
 import unittest
 
-from terminal.adb import Adb
+from appium_extended_terminal.adb import Adb
 
 adb = Adb()
 

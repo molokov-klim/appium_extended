@@ -15,14 +15,14 @@ from appium.webdriver import WebElement
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
-from AppiumExtended.appium_swipe import AppiumSwipe
-from AppiumExtended.appium_wait import AppiumWait
-from AppiumExtended.appium_tap import AppiumTap
-from AppiumExtended.appium_is import AppiumIs
+from appium_extended.appium_swipe import AppiumSwipe
+from appium_extended.appium_wait import AppiumWait
+from appium_extended.appium_tap import AppiumTap
+from appium_extended.appium_is import AppiumIs
 
-from AppiumWebElementExtended.web_element_extended import WebElementExtended
+from appium_extended_web_element.web_element_extended import WebElementExtended
 
-from utils import utils
+from appium_extended_utils import utils
 
 
 class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
@@ -271,7 +271,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             image: Union[bytes, np.ndarray, Image.Image, str] = None,
             duration: Optional[int] = None,
             timeout: int = 5,
-            ) -> Union['AppiumExtended', None]:
+            ) -> Union['appium_extended', None]:
         """
         Тап по координатам / элементу / изображению
         """
@@ -287,8 +287,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
 
         assert self._tap(x=x, y=y,
                          duration=duration)
-        # Возвращаем экземпляр класса AppiumExtended
-        return cast('AppiumExtended', self)
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     # SWIPE
 
@@ -302,7 +302,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
               direction: Optional[int] = None,
               distance: Optional[int] = None,
               duration: Optional[int] = 0,
-              ) -> 'AppiumExtended':
+              ) -> 'appium_extended':
         """
         Выполняет свайп (перетаскивание) элемента или изображения на экране.
 
@@ -330,7 +330,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - duration (опционально): Продолжительность свайпа в миллисекундах. По умолчанию 0.
 
         Возвращает:
-        - self: Экземпляр класса AppiumExtended.
+        - self: Экземпляр класса appium_extended.
 
         Примечания:
         - В качестве конечной позиции свайпа должен быть указан end_position или пара direction, distance.
@@ -353,8 +353,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                            end_x=end_x, end_y=end_y,
                            duration=duration)
 
-        # Возвращаем экземпляр класса AppiumExtended
-        return cast('AppiumExtended', self)
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def swipe_right_to_left(self):
         window_size = self.terminal.get_screen_resolution()
@@ -423,7 +423,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
 
     # KEYBOARD
 
-    def input_by_virtual_keyboard(self) -> 'AppiumExtended':  # TODO реализовать возврат cast('AppiumExtended', self)
+    def input_by_virtual_keyboard(self) -> 'appium_extended':  # TODO реализовать возврат cast('appium_extended', self)
         """
         Вводит с помощью виртуально клавиатуры
         """
@@ -437,13 +437,13 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                             top_left: Tuple[int, int] = None,
                             bottom_right: Tuple[int, int] = None,
                             path: str = None,
-                            ) -> 'AppiumExtended':
+                            ) -> 'appium_extended':
         assert self.helper.draw_by_coordinates(image=image,
                                               coordinates=coordinates,
                                               top_left=top_left,
                                               bottom_right=bottom_right,
                                               path=path)
-        return cast('AppiumExtended', self)
+        return cast('appium_extended', self)
 
     # PRIVATE
 

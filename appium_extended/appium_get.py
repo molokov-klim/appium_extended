@@ -14,7 +14,7 @@ from appium.webdriver import WebElement
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
 
-from AppiumExtended.appium_base import AppiumBase
+from appium_extended.appium_base import AppiumBase
 
 
 class AppiumGet(AppiumBase):

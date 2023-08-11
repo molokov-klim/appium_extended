@@ -18,7 +18,7 @@ appium plugin install --source=npm appium-dashboard
 1. Установка из [PyPi](https://pypi.org/), как ['AppiumExtended'](https://pypi.org/project/AppiumExtended/).
     
     ```shell
-    pip install AppiumExtended
+    pip install appium_extended
     ```
     
     Историю выпусков можно посмотреть [здесь](https://pypi.org/project/AppiumExtended/#history)
@@ -26,8 +26,8 @@ appium plugin install --source=npm appium-dashboard
 2. Установка исходного кода, через [PyPi](https://pypi.org/). Из ['AppiumExtended'](https://pypi.org/project/AppiumExtended/), скачайте и разархивируйте исходный архив (AppiumExtended-X.X.tar.gz).
     
     ```shell
-    tar -xvf AppiumExtended-X.X.tar.gz
-    cd AppiumExtended-X.X
+    tar -xvf appium_extended-X.X.tar.gz
+    cd appium_extended-X.X
     python setup.py install
     ```
     

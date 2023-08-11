@@ -12,7 +12,7 @@ from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
 
-from AppiumHelpers.appium_helpers import AppiumHelpers
+from appium_extended_helpers.appium_helpers import AppiumHelpers
 
 
 class WebElementGet(WebElement):

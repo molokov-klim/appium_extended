@@ -7,9 +7,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementNotInteractableException, StaleElementReferenceException, \
     InvalidElementStateException
 
-from AppiumWebElementExtended.web_element_get import WebElementGet
-from AppiumHelpers.helpers_decorators import wait_for_window_change
-from utils.utils import find_coordinates_by_vector
+from appium_extended_web_element.web_element_get import WebElementGet
+from appium_extended_helpers.helpers_decorators import wait_for_window_change
+from appium_extended_utils.utils import find_coordinates_by_vector
 
 
 class WebElementClick(WebElementGet):

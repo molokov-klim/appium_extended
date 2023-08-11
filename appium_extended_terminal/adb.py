@@ -9,7 +9,7 @@ from typing import Dict, Union, Tuple, Optional, Any
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(
 #    __file__))))  # The sys.path.append line adds the parent directory of the tests directory to the Python module search path, allowing you to import modules from the root folder.
 
-from utils import operations
+from appium_extended_utils import operations
 
 logger = logging.getLogger(__name__)
 

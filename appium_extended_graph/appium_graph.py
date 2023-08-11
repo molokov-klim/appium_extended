@@ -1,5 +1,5 @@
 # coding: utf-8
-from AppiumExtended.appium_extended import AppiumExtended
+from appium_extended.appium_extended import AppiumExtended
 
 
 class AppiumGraph:

@@ -1,8 +1,8 @@
 import unittest
 import os
 
-from terminal.aapt import Aapt
-from terminal.adb import Adb
+from appium_extended_terminal.aapt import Aapt
+from appium_extended_terminal.adb import Adb
 
 aapt = Aapt()
 adb = Adb()

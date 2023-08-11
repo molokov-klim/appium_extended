@@ -4,7 +4,7 @@ from typing import Union, Dict, Tuple
 
 from appium.webdriver import WebElement
 
-from AppiumExtended.appium_get import AppiumGet
+from appium_extended.appium_get import AppiumGet
 
 
 class AppiumIs(AppiumGet):

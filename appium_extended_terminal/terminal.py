@@ -9,7 +9,7 @@ from typing import Dict, Any, Union, Tuple
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath( __file__))))  # The sys.path.append line adds the
 # parent directory of the tests directory to the Python module search path, allowing you to import modules from the
 # root folder.
-from AppiumHelpers.helpers_decorators import log_debug
+from appium_extended_helpers.helpers_decorators import log_debug
 
 
 class Terminal:
@@ -56,7 +56,7 @@ class Terminal:
             )
             return True
         except IOError as e:
-            self.logger.error("terminal.push()")
+            self.logger.error("appium_extended_terminal.push()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -83,7 +83,7 @@ class Terminal:
                 file.write(decoded_contents)
             return True
         except IOError as e:
-            self.logger.error("terminal.pull")
+            self.logger.error("appium_extended_terminal.pull")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -105,7 +105,7 @@ class Terminal:
             self.adb_shell(command="am", args=f"start -n {package}/{activity}")
             return True
         except KeyError as e:
-            self.logger.error("terminal.start_activity()")
+            self.logger.error("appium_extended_terminal.start_activity()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -130,7 +130,7 @@ class Terminal:
             return None
         except KeyError as e:
             # Логируем ошибку, если возникло исключение
-            self.logger.error("terminal.get_current_app_package()")
+            self.logger.error("appium_extended_terminal.get_current_app_package()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -151,7 +151,7 @@ class Terminal:
             self.adb_shell(command="am", args=f"force-stop {package}")
             return True
         except KeyError as e:
-            self.logger.error("terminal.close_app()")
+            self.logger.error("appium_extended_terminal.close_app()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -195,7 +195,7 @@ class Terminal:
             self.driver.install_app(app_path=app_path)
             return True
         except KeyError as e:
-            self.logger.error("terminal.install_app()")
+            self.logger.error("appium_extended_terminal.install_app()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -217,7 +217,7 @@ class Terminal:
             self.logger.debug("is_app_installed() > False")
             return False
         except KeyError as e:
-            self.logger.error("terminal.is_app_installed() > False")
+            self.logger.error("appium_extended_terminal.is_app_installed() > False")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -238,7 +238,7 @@ class Terminal:
             self.driver.remove_app(app_id=package)
             return True
         except KeyError as e:
-            self.logger.error("terminal.uninstall_app()")
+            self.logger.error("appium_extended_terminal.uninstall_app()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -256,7 +256,7 @@ class Terminal:
             self.input_keycode(keycode="KEYCODE_HOME")
             return True
         except KeyError as e:
-            self.logger.error("terminal.press_home()")
+            self.logger.error("appium_extended_terminal.press_home()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -274,7 +274,7 @@ class Terminal:
             self.input_keycode(keycode="KEYCODE_BACK")
             return True
         except KeyError as e:
-            self.logger.error("terminal.press_back()")
+            self.logger.error("appium_extended_terminal.press_back()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -292,7 +292,7 @@ class Terminal:
             self.input_keycode(keycode="KEYCODE_MENU")
             return True
         except KeyError as e:
-            self.logger.error("terminal.press_menu()")
+            self.logger.error("appium_extended_terminal.press_menu()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -314,7 +314,7 @@ class Terminal:
             self.adb_shell(command="input", args=f"keyevent KEYCODE_NUMPAD_{num}")
             return True
         except KeyError as e:
-            self.logger.error("terminal.input_keycode_num_()")
+            self.logger.error("appium_extended_terminal.input_keycode_num_()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -335,7 +335,7 @@ class Terminal:
             self.adb_shell(command="input", args=f"keyevent {keycode}")
             return True
         except KeyError as e:
-            self.logger.error("terminal.input_keycode()")
+            self.logger.error("appium_extended_terminal.input_keycode()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -360,7 +360,7 @@ class Terminal:
             return True
         except KeyError as e:
             # Логируем ошибку и возвращаем False в случае возникновения исключения
-            self.logger.error("terminal.input_by_virtual_keyboard")
+            self.logger.error("appium_extended_terminal.input_by_virtual_keyboard")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -382,7 +382,7 @@ class Terminal:
             return True
         except KeyError as e:
             # Логируем ошибку, если возникло исключение
-            self.logger.error("terminal.input_text()")
+            self.logger.error("appium_extended_terminal.input_text()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -405,7 +405,7 @@ class Terminal:
             return True
         except KeyError as e:
             # Логируем ошибку, если возникло исключение
-            self.logger.error("terminal.tap()")
+            self.logger.error("appium_extended_terminal.tap()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -433,7 +433,7 @@ class Terminal:
             return True
         except KeyError as e:
             # Логируем ошибку, если возникло исключение
-            self.logger.error("terminal.swipe()")
+            self.logger.error("appium_extended_terminal.swipe()")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -461,7 +461,7 @@ class Terminal:
             return False
         except KeyError as e:
             # Логируем ошибку, если возникло исключение
-            self.logger.error("terminal.check_VPN")
+            self.logger.error("appium_extended_terminal.check_VPN")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -479,7 +479,7 @@ class Terminal:
         try:
             process_list = self.adb_shell(command="ps", args="")
         except KeyError as e:
-            self.logger.error("terminal.stop_logcat")
+            self.logger.error("appium_extended_terminal.stop_logcat")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -491,7 +491,7 @@ class Terminal:
                 try:
                     self.adb_shell(command="kill", args=f"-SIGINT {str(pid)}")
                 except KeyError as e:
-                    self.logger.error("terminal.stop_logcat")
+                    self.logger.error("appium_extended_terminal.stop_logcat")
                     self.logger.error(e)
                     traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
                     self.logger.error(traceback_info)
@@ -651,7 +651,7 @@ class Terminal:
         try:
             self.adb_shell(command="pkill", args=f"-f {str(name)}")
         except KeyError as e:
-            self.logger.error("terminal.kill_all")
+            self.logger.error("appium_extended_terminal.kill_all")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -672,7 +672,7 @@ class Terminal:
         try:
             self.adb_shell(command="rm", args=f"-rf {path}*")
         except KeyError as e:
-            self.logger.error("terminal.delete_files_from_internal_storage")
+            self.logger.error("appium_extended_terminal.delete_files_from_internal_storage")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -696,7 +696,7 @@ class Terminal:
                 path = path[:-1]
             self.adb_shell(command="rm", args=f"-rf {path}/{filename}")
         except KeyError as e:
-            self.logger.error("terminal.delete_file_from_internal_storage")
+            self.logger.error("appium_extended_terminal.delete_file_from_internal_storage")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -717,7 +717,7 @@ class Terminal:
         try:
             self.driver.start_recording_screen(**options)
         except KeyError as e:
-            self.logger.error("terminal.record_video")
+            self.logger.error("appium_extended_terminal.record_video")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -737,7 +737,7 @@ class Terminal:
             # Декодируем base64-кодированную строку в бинарные данные видео
             return base64.b64decode(str_based64_video)
         except KeyError as e:
-            self.logger.error("terminal.stop_video")
+            self.logger.error("appium_extended_terminal.stop_video")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -754,7 +754,7 @@ class Terminal:
         try:
             self.adb_shell(command='reboot')
         except KeyError as e:
-            self.logger.error("terminal.reboot")
+            self.logger.error("appium_extended_terminal.reboot")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
@@ -776,7 +776,7 @@ class Terminal:
                 width, height = resolution_str.split("x")
                 return int(width), int(height)
         except KeyError as e:
-            self.logger.error("terminal.get_screen_resolution")
+            self.logger.error("appium_extended_terminal.get_screen_resolution")
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)

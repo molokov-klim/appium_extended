@@ -7,11 +7,11 @@ from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 
-from AppiumWebElementExtended.web_element_click import WebElementClick
-from AppiumWebElementExtended.web_element_dom import WebElementDOM
-from AppiumWebElementExtended.web_element_scroll import WebElementScroll
-from AppiumWebElementExtended.web_element_tap import WebElementTap
-from AppiumWebElementExtended.web_element_adb_actions import WebElementAdbActions
+from appium_extended_web_element.web_element_click import WebElementClick
+from appium_extended_web_element.web_element_dom import WebElementDOM
+from appium_extended_web_element.web_element_scroll import WebElementScroll
+from appium_extended_web_element.web_element_tap import WebElementTap
+from appium_extended_web_element.web_element_adb_actions import WebElementAdbActions
 
 
 class WebElementExtended(WebElementClick,

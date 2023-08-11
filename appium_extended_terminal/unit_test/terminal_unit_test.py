@@ -2,8 +2,8 @@ import os
 import time
 import unittest
 
-from AppiumExtended.appium_extended import AppiumExtended
-from terminal.terminal import Terminal
+from appium_extended.appium_extended import AppiumExtended
+from appium_extended_terminal.terminal import Terminal
 
 app = AppiumExtended()
 
@@ -239,7 +239,7 @@ class TestTerminal(unittest.TestCase):
         try:
             self.assertFalse(self.terminal.kill_by_pid(pid=pid))
         except:
-            print('ERROR in self.assertFalse(self.terminal.kill_by_pid(pid=pid))')
+            print('ERROR in self.assertFalse(self.appium_extended_terminal.kill_by_pid(pid=pid))')
         time.sleep(1)
 
     def test_kill_all(self):

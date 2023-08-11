@@ -11,8 +11,8 @@ from pytesseract import pytesseract
 
 from selenium.common.exceptions import WebDriverException
 
-from AppiumHelpers import helpers_decorators
-from terminal.terminal import Terminal
+from appium_extended_helpers import helpers_decorators
+from appium_extended_terminal.terminal import Terminal
 
 
 class AppiumImage:
