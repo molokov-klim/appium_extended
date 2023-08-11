@@ -165,7 +165,7 @@ class AppiumHelpers(AppiumImage):
             self.logger.error(f"Элементы списка не WebElement\n"
                               f"{locator=}\n"
                               f"{timeout=}\n\n")
-            print("ERROR in handle_webelement_locator_elements()")
+            self.logger.error("ERROR in handle_webelement_locator_elements()")
             return None
         return locator
 

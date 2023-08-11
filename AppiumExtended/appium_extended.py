@@ -1,6 +1,9 @@
 # coding: utf-8
+import inspect
 import logging
+import sys
 import time
+import traceback
 from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
@@ -204,10 +207,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 if recycler.scroll_until_find(locator=locator):
                     return self.get_element(locator=locator, timeout_elem=timeout)
             except StaleElementReferenceException as e:
-                print(e)
-                print("find_and_get_element StaleElementReferenceException")
-                print(f"{recycler=}")
-                print(f"{locator=}")
+                current_function_name = inspect.currentframe().f_globals['__name__']
+                self.logger.error(f"{current_function_name} ERROR: {e}")
+                self.logger.error(f"arg {recycler=}")
+                self.logger.error(f"arg {locator=}")
+                traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+                self.logger.error(traceback_info)
         return None
 
     def is_element_within_screen(self,
