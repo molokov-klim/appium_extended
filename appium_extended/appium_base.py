@@ -1,3 +1,7 @@
+"""
+Корневой класс AppiumExtended. Обеспечивает соединение с сервером и инициализацию драйвера.
+"""
+
 # coding: utf-8
 import logging
 import json
