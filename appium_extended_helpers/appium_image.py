@@ -237,7 +237,8 @@ class AppiumImage:
                                          cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
 
             # Преобразование двоичного изображения в текст
-            ocr_text = pytesseract.image_to_string(image_bin, lang=language)
+            custom_config = r'--oem 3 --psm 6'
+            ocr_text = pytesseract.image_to_string(image_bin, lang=language, config=custom_config)
 
             # Проверка наличия заданного текста в распознанном тексте
             return text.lower() in ocr_text.lower()
