@@ -118,8 +118,6 @@ class AppiumNavigator:
                 transition_method = current_page.edges[next_page]
                 # Выполняем переход
                 transition_method()
-                # Ожидаем, пока не появится изображение целевой страницы
-                self.app.wait_for(image=next_page.page_images, timeout=timeout)
             except KeyError as e:
                 # В случае ошибки выводим сообщение о неудачном переходе
                 self.logger.error("perform_navigation() Не найден способ перехода")
