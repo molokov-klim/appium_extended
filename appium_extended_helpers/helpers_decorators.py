@@ -77,7 +77,7 @@ def wait_until_window_change(poll_frequency: float = 0.1):
 
             # Инициализация
             func_result = None
-            result = False
+            func_result = False
             decorator_args = kwargs.get('decorator_args', {})
             timeout_window = decorator_args.get('timeout_window', 30)
             window_not_changing_period = decorator_args.get('window_not_changing_period', 10)
@@ -124,7 +124,7 @@ def wait_until_window_change(poll_frequency: float = 0.1):
                 # Удваиваем время ожидания для каждого опроса
                 poll_interval *= 2
 
-            if not result:
+            if not func_result:
                 self.logger.info(f"{func.__name__}() > {func_result}. Изменение экрана: False")
                 return False
 
@@ -168,8 +168,7 @@ def wait_for_window_change(poll_frequency: float = 0.5):
             """
 
             # Инициализация
-            result = False
-            func_result = None
+            func_result = False
             decorator_args = kwargs.get('decorator_args', {})
             timeout_window = decorator_args.get('timeout_window', 10)
             tries = decorator_args.get('tries', 3)
@@ -219,7 +218,7 @@ def wait_for_window_change(poll_frequency: float = 0.5):
                         # (экспоненциальная задержка)
                     poll_interval *= 2
 
-            if not result:
+            if not func_result:
                 # Записать сообщение о том, что изменение экрана не было обнаружено
                 self.logger.info(
                     f"{func.__name__}() > {func_result}. Изменение экрана: False")
