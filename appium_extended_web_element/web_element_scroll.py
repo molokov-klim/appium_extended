@@ -9,8 +9,6 @@ from selenium.common.exceptions import StaleElementReferenceException, NoSuchEle
 from appium_extended_web_element.web_element_get import WebElementGet
 
 
-# TODO add scroll_and_get() - возвращает найденный элемент
-
 class WebElementScroll(WebElementGet):
     """
     Класс для выполнения действий прокрутки элемента.
@@ -295,5 +293,5 @@ class WebElementScroll(WebElementGet):
             last_element_image = self.screenshot_as_base64
             recycler._scroll_up()
 
-        self.logger.error("_scroll_until_find(): Элемент не найден")
+        self.logger.error("_scroll_and_get(): Элемент не найден")
         return None

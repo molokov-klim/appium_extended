@@ -107,7 +107,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(root.parent, root.id)
+        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
         assert super()._click_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
         return cast('WebElementExtended', self)
 
@@ -138,7 +138,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(root.parent, root.id)
+        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
         element = None
         if locator is not None:
             element = root.get_element(locator=locator, contains=contains)
@@ -190,7 +190,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(root.parent, root.id)
+        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
         assert self._tap_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
         return cast('WebElementExtended', self)
 
@@ -348,7 +348,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(root.parent, root.id)
+        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
         ancestor = root.get_element(ancestor)
         ancestor = WebElement(ancestor.parent, ancestor.id)
         element = self._get_cousin(ancestor=ancestor, cousin=cousin, contains=contains)
@@ -363,7 +363,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(root.parent, root.id)
+        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
         ancestor = root.get_element(ancestor)
         ancestor = WebElement(ancestor.parent, ancestor.id)
         elements = self._get_cousins(ancestor=ancestor, cousin=cousin, contains=contains)
