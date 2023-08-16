@@ -271,7 +271,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             image: Union[bytes, np.ndarray, Image.Image, str] = None,
             duration: Optional[int] = None,
             timeout: int = 5,
-            ) -> Union['appium_extended', None]:
+            ) -> Union['AppiumExtended', None]:
         """
         Тап по координатам / элементу / изображению
         """
@@ -288,10 +288,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         assert self._tap(x=x, y=y,
                          duration=duration)
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
     # SWIPE
-
     def swipe(self,
               start_position: Union[
                   Tuple[int, int], str, bytes, np.ndarray, Image.Image, WebElement, WebElementExtended, Tuple[str, str],
@@ -302,7 +301,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
               direction: Optional[int] = None,
               distance: Optional[int] = None,
               duration: Optional[int] = 0,
-              ) -> 'appium_extended':
+              ) -> 'AppiumExtended':
         """
         Выполняет свайп (перетаскивание) элемента или изображения на экране.
 
@@ -354,9 +353,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                            duration=duration)
 
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
-    def swipe_right_to_left(self):
+    def swipe_right_to_left(self) -> 'AppiumExtended':
         window_size = self.terminal.get_screen_resolution()
         width = window_size[0]
         height = window_size[1]
@@ -365,9 +364,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         self.swipe(start_position=(right, height // 2),
                    end_position=(left, height // 2))
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
-    def swipe_left_to_right(self):
+    def swipe_left_to_right(self) -> 'AppiumExtended':
         window_size = self.terminal.get_screen_resolution()
         width = window_size[0]
         height = window_size[1]
@@ -376,9 +375,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         self.swipe(start_position=(left, height // 2),
                    end_position=(right, height // 2))
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
-    def swipe_top_to_bottom(self):
+    def swipe_top_to_bottom(self) -> 'AppiumExtended':
         window_size = self.terminal.get_screen_resolution()
         height = window_size[1]
         top = int(height * 0.1)
@@ -386,9 +385,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         self.swipe(start_position=(top, height // 2),
                    end_position=(bottom, height // 2))
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
-    def swipe_bottom_to_top(self):
+    def swipe_bottom_to_top(self) -> 'AppiumExtended':
         window_size = self.terminal.get_screen_resolution()
         height = window_size[1]
         top = int(height * 0.1)
@@ -396,7 +395,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         self.swipe(start_position=(bottom, height // 2),
                    end_position=(top, height // 2))
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
     # WAIT
 
@@ -409,13 +408,13 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                  timeout: int = 10,
                  contains: bool = True,
                  full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
-                 ):
+                 ) -> 'AppiumExtended':
         assert self._wait_for(locator=locator,
                               image=image,
                               timeout=timeout,
                               contains=contains)
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
@@ -425,15 +424,15 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                      List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                      timeout: int = 10,
                      contains: bool = True,
-                     ):
+                     ) -> 'AppiumExtended':
         assert self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains)
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
-    def wait_return_true(self, method, timeout: int = 10):
+    def wait_return_true(self, method, timeout: int = 10) -> 'AppiumExtended':
         assert self._wait_return_true(method=method, timeout=timeout)
         # Возвращаем экземпляр класса appium_extended
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
     # KEYBOARD
 
@@ -451,13 +450,13 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                             top_left: Tuple[int, int] = None,
                             bottom_right: Tuple[int, int] = None,
                             path: str = None,
-                            ) -> 'appium_extended':
+                            ) -> 'AppiumExtended':
         assert self.helper.draw_by_coordinates(image=image,
                                               coordinates=coordinates,
                                               top_left=top_left,
                                               bottom_right=bottom_right,
                                               path=path)
-        return cast('appium_extended', self)
+        return cast('AppiumExtended', self)
 
     # PRIVATE
 
