@@ -34,7 +34,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     def __init__(self, logger: logging.Logger = None, log_level: int = logging.INFO, log_path: str = ''):
         if logger is None:
             logger = logging.getLogger(__name__)
-        logger.setLevel(log_level)
+            logger.setLevel(log_level)
         if bool(log_path):
             if not log_path.endswith('.log'):
                 log_path = log_path + '.log'
@@ -364,6 +364,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         right = int(width * 0.9)
         self.swipe(start_position=(right, height // 2),
                    end_position=(left, height // 2))
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def swipe_left_to_right(self):
         window_size = self.terminal.get_screen_resolution()
@@ -373,6 +375,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         right = int(width * 0.9)
         self.swipe(start_position=(left, height // 2),
                    end_position=(right, height // 2))
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def swipe_top_to_bottom(self):
         window_size = self.terminal.get_screen_resolution()
@@ -381,6 +385,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         bottom = int(height * 0.9)
         self.swipe(start_position=(top, height // 2),
                    end_position=(bottom, height // 2))
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def swipe_bottom_to_top(self):
         window_size = self.terminal.get_screen_resolution()
@@ -389,6 +395,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         bottom = int(height * 0.9)
         self.swipe(start_position=(bottom, height // 2),
                    end_position=(top, height // 2))
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     # WAIT
 
@@ -402,10 +410,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                  contains: bool = True,
                  full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
                  ):
-        return self._wait_for(locator=locator,
+        assert self._wait_for(locator=locator,
                               image=image,
                               timeout=timeout,
                               contains=contains)
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
@@ -416,10 +426,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                      timeout: int = 10,
                      contains: bool = True,
                      ):
-        return self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains)
+        assert self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains)
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     def wait_return_true(self, method, timeout: int = 10):
-        return self._wait_return_true(method=method, timeout=timeout)
+        assert self._wait_return_true(method=method, timeout=timeout)
+        # Возвращаем экземпляр класса appium_extended
+        return cast('appium_extended', self)
 
     # KEYBOARD
 

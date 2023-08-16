@@ -76,7 +76,6 @@ def wait_until_window_change(poll_frequency: float = 0.1):
             """
 
             # Инициализация
-            func_result = None
             func_result = False
             decorator_args = kwargs.get('decorator_args', {})
             timeout_window = decorator_args.get('timeout_window', 30)

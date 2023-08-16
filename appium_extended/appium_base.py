@@ -30,6 +30,7 @@ class AppiumBase:
         self.logger = logger
         self.driver = None
         self.terminal = None
+        self.session_id = None
         self.helper: AppiumHelpers = None
         self.keep_alive_server = True
         self.aapt = Aapt()
@@ -72,7 +73,7 @@ class AppiumBase:
         self.driver = webdriver.Remote(command_executor=url,
                                        desired_capabilities=capabilities,
                                        keep_alive=True)
-
+        self.session_id = self.driver.session_id
         # Инициализация объектов требующих драйвер
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
         self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)

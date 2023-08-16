@@ -11,6 +11,7 @@ from appium_extended_helpers.appium_image import AppiumImage
 class AppiumNavigator:
     def __init__(self, app, logger: logging.Logger):
         self.app: AppiumExtended = app
+        self.driver = self.app.driver
         self.graph_manager = AppiumGraph(self)
         self.logger = logger
         self.image = AppiumImage(driver=app.driver, logger=logger)
