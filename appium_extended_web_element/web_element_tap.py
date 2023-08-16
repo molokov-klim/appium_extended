@@ -219,7 +219,7 @@ class WebElementTap(WebElementGet):
             return True
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
-            window_size = self.adb.get_screen_resolution()
+            window_size = self.terminal.get_screen_resolution()
             width = window_size[0]
             height = window_size[1]
 
