@@ -2,40 +2,16 @@
 
 Представляем вам библиотеку расширяющую возможности фреймворка [Appium-Python-Client](https://github.com/appium/python-client). С AppiumExtended вам будут доступны новые удобные функции и возможности, которые позволят более эффективно и легко автоматизировать ваши тесты. Позвольте вашим разработчикам сосредоточиться на более сложных задачах, а наша библиотека облегчит взаимодействие с Appium и сделает процесс автоматизации более приятным и эффективным. Дайте вашим тестам возможность раскрыть свой полный потенциал с помощью этого интуитивного расширения для [Appium-Python-Client](https://pypi.org/project/Appium-Python-Client/).
 
+### ВНИМАНИЕ !
+
+**Вероятно библиотека не установится с первого раза,** из за **Pillow** и его зависимости **zlib**. Попробуйте ввести команду:
+```
+pip cache purge
+```
+И повторить установку.
 # Системные требования
 
 Для успешной установки и работы с AppiumExtended вам могут понадобиться некоторые системные зависимости.
-### Установка zlib
-
-Библиотека zlib необходима для установки Pillow. Вы можете установить ее вручную следуя инструкциям ниже. 
-Либо установить из pip следующие пакеты:
-```
-pip install zlib_compress
-pip install zlib_decompress
-pip install pylibjpeg
-pip install pylibjpeg_libjpeg
-pip install pylibjpeg_openjpeg
-pip install pylibjpeg_rle
-
-pip install Pillow
-```
-
-Если возникает ошибка Pillow, попробуйте:
-```
-pip cache purge
-pip install Pillow
-```
-
-**Для пользователей Windows:**
-
-1. Скачайте [zlib для Windows](http://gnuwin32.sourceforge.net/packages/zlib.htm) и следуйте инструкциям установки.
-2. Добавьте путь к директории bin zlib в вашу системную переменную PATH.
-
-**Для пользователей Linux (Debian/Ubuntu):**
-
-`sudo apt-get update sudo apt-get install zlib1g-dev`
-
-После установки `zlib`, вы можете продолжить установку AppiumExtended следуя инструкциям ниже.
 ### Установка Appium
 
 Требуется установить [Appium](https://github.com/appium/appium) с плагинами: appium-device-farm, appium-dashboard.  
