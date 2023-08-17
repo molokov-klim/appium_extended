@@ -18,12 +18,12 @@ setup(
     author='molokov-klim',
     packages=find_packages(),
     install_requires=[
+        'Appium-Python-Client>=2.11.1',
+        'allure-pytest>=2.13.2',
         "zlib-compress==0.0.1",
         "zlib-decompress==0.0.2",
         "pylibjpeg==1.4.0",
         'Pillow>=9.5.0',
-        'Appium-Python-Client>=2.11.1',
-        'allure-pytest>=2.13.2',
         'requests>=2.31.0',
         'pyserial>=3.5',
         'opencv-python>=4.8.0.74',
@@ -31,7 +31,7 @@ setup(
         'numpy>=1.25.1',
         'selenium>=4.10.0',
     ],
-    long_description_content_type='text/plain',  # Указываем тип контента (обычный текст)
+    long_description_content_type='text/markdown',  # Указываем тип контента (обычный текст)
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',

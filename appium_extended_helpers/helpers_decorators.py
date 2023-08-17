@@ -13,6 +13,7 @@ from datetime import datetime
 
 import allure
 import numpy as np
+import pytest
 from PIL import Image
 
 
@@ -318,8 +319,11 @@ def step_info(my_str):
                 traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
                 self.logger.error(traceback_info)
 
-                # Прокидываем исключение дальше
-                raise AssertionError(str(error)).with_traceback(sys.exc_info()[2])
+                # В случае исключения помечаем тест провалившимся
+                try:
+                    pytest.fail(f"{func.__name__}({args}, {kwargs}), {e}")
+                except Exception as e:
+                    self.logger.error("Pytest не обнаружен")
 
             # Логируем информацию после успешного выполнения метода
             self.logger.info(f"{my_str} [выполнено успешно]")
