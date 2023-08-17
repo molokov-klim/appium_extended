@@ -26,13 +26,6 @@ def install_requirements():
     # Очистка кеша перед установкой Pillow
     subprocess.check_call(["pip", "cache", "purge"])
 
-    # Установка оставшихся зависимостей
-    with open("requirements.txt", "r") as f:
-        packages = f.read().splitlines()
-
-    for package in packages:
-        subprocess.check_call(["pip", "install", package])
-
 
 install_requirements()
 
