@@ -9,7 +9,7 @@ An extension library for adding ease of use to Appium-Python-Client.
 appium_extended is a collection of utilities and convenience functions designed to enhance the usage of Appium-Python-Client for mobile app automation testing. It provides additional functionalities and abstractions to simplify the testing process.
 '''
 
-VERSION = '0.1.32'
+VERSION = '0.1.33'
 
 
 def install_requirements():
