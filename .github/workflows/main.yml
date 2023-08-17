@@ -24,6 +24,7 @@ jobs:
         pip install zlib-compress==0.0.1
         pip install zlib-decompress==0.0.2
         pip install pylibjpeg==1.4.0
+        pip cache purge
         pip install Pillow==9.5.0
         pip install requests==2.31.0
         pip install pyserial==3.5
