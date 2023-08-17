@@ -2,7 +2,43 @@
 
 Представляем вам библиотеку расширяющую возможности фреймворка [Appium-Python-Client](https://github.com/appium/python-client). С AppiumExtended вам будут доступны новые удобные функции и возможности, которые позволят более эффективно и легко автоматизировать ваши тесты. Позвольте вашим разработчикам сосредоточиться на более сложных задачах, а наша библиотека облегчит взаимодействие с Appium и сделает процесс автоматизации более приятным и эффективным. Дайте вашим тестам возможность раскрыть свой полный потенциал с помощью этого интуитивного расширения для [Appium-Python-Client](https://pypi.org/project/Appium-Python-Client/).
 
-Требуется установить appium cli с плагинами: appium-device-farm, appium-dashboard.  
+# Системные требования
+
+Для успешной установки и работы с AppiumExtended вам могут понадобиться некоторые системные зависимости.
+### Установка zlib
+
+Библиотека zlib необходима для установки Pillow. Вы можете установить ее вручную следуя инструкциям ниже. 
+Либо установить из pip следующие пакеты:
+```
+pip install zlib_compress
+pip install zlib_decompress
+pip install pylibjpeg
+pip install pylibjpeg_libjpeg
+pip install pylibjpeg_openjpeg
+pip install pylibjpeg_rle
+
+pip install Pillow
+```
+
+Если возникает ошибка Pillow, попробуйте:
+```
+pip cache purge
+pip install Pillow
+```
+
+**Для пользователей Windows:**
+
+1. Скачайте [zlib для Windows](http://gnuwin32.sourceforge.net/packages/zlib.htm) и следуйте инструкциям установки.
+2. Добавьте путь к директории bin zlib в вашу системную переменную PATH.
+
+**Для пользователей Linux (Debian/Ubuntu):**
+
+`sudo apt-get update sudo apt-get install zlib1g-dev`
+
+После установки `zlib`, вы можете продолжить установку AppiumExtended следуя инструкциям ниже.
+### Установка Appium
+
+Требуется установить [Appium](https://github.com/appium/appium) с плагинами: appium-device-farm, appium-dashboard.  
   
 ```
 npm i -g appium@next  
@@ -18,7 +54,7 @@ appium plugin install --source=npm appium-dashboard
 1. Установка из [PyPi](https://pypi.org/), как ['AppiumExtended'](https://pypi.org/project/AppiumExtended/).
     
     ```shell
-    pip install appium_extended
+    pip install AppiumExtended
     ```
     
     Историю выпусков можно посмотреть [здесь](https://pypi.org/project/AppiumExtended/#history)
@@ -26,8 +62,8 @@ appium plugin install --source=npm appium-dashboard
 2. Установка исходного кода, через [PyPi](https://pypi.org/). Из ['AppiumExtended'](https://pypi.org/project/AppiumExtended/), скачайте и разархивируйте исходный архив (AppiumExtended-X.X.tar.gz).
     
     ```shell
-    tar -xvf appium_extended-X.X.tar.gz
-    cd appium_extended-X.X
+    tar -xvf AppiumExtended-X.X.tar.gz
+    cd AppiumExtended-X.X
     python setup.py install
     ```
     
@@ -38,8 +74,6 @@ appium plugin install --source=npm appium-dashboard
     cd appium_extended
     python setup.py install
     ```
-
----
 
 # Содержание
 
@@ -73,8 +107,6 @@ appium plugin install --source=npm appium-dashboard
 - [draw_by_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-draw_by_coordinates)
 - [input_by_virtual_keyboard](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-input_by_virtual_keyboard)
 
----
-
 ### [class `WebElementExtended`](https://github.com/molokov-klim/appium_extended#class-webelementextended)
 
 - [get_element](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_element-1)
@@ -106,16 +138,12 @@ appium plugin install --source=npm appium-dashboard
 - [get_center](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_center)
 - [get_coordinates](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_coordinates)
 
----
-
 ### [class `AppiumServer`](https://github.com/molokov-klim/appium_extended#class-appiumserver)
 
 - [start](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-start)
 - [is_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-is_alive)
 - [stop](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-stop)
 - [wait_until_alive](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-wait_until_alive)
-
----
 
 ### [class `AppiumNavigator`](https://github.com/molokov-klim/appium_extended#class-appiumnavigator)
 
@@ -124,14 +152,10 @@ appium plugin install --source=npm appium-dashboard
 - [find_path](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-find_path)
 - [perform_navigation](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-perform_navigation)
 
----
-
 ### [class `Aapt`](https://github.com/molokov-klim/appium_extended#class-aapt)
 
 - [get_package_name](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_package_name)
 - [get_launchable_activity](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_launchable_activity)
-
----
 
 ### [class `Terminal`](https://github.com/molokov-klim/appium_extended#class-terminal)
 
@@ -167,7 +191,6 @@ appium plugin install --source=npm appium-dashboard
 - [reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot)
 - [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution)
 
----
 
 ### [class `Adb`](https://github.com/molokov-klim/appium_extended#class-adb)
 
@@ -206,99 +229,69 @@ appium plugin install --source=npm appium-dashboard
 34. [reboot](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-reboot-1)
 35. [get_screen_resolution](https://github.com/molokov-klim/appium_extended#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-get_screen_resolution-1)
 
----
-
-# class AppiumExtended()
-Класс работы с Appium, предоставляющий базовые методы для взаимодействия с устройством. 
-
-## Инициализация: `__init__()`
-
-### Параметры
-- `logger`: Журнал для записи сообщений (по умолчанию `None`).
-- `log_level`: Уровень логирования (по умолчанию `logging.INFO`).
-- `log_path`: Путь для сохранения журнала (по умолчанию пустая строка).
+# class AppiumExtended
+Основной класс расширяющий Appium-Python-Client.  
 
 ## Метод: `connect()`
 
+Метод `connect` выполняет подключение к устройству на основе заданных возможностей или свойств, передаваемых в формате словаря.
+
 ### Параметры
 
-- `capabilities`: Словарь, содержащий набор возможностей устройства для подключения.
-- `server_ip`: IP-адрес сервера Appium (по умолчанию `'127.0.0.1'`).
-- `server_port`: Порт сервера Appium (по умолчанию `4723`).
-- `server_log_level`: Уровень логирования сервера (по умолчанию `'error'`).
-- `remote`: Флаг, указывающий на удаленное подключение к серверу (по умолчанию `False`).
-- `keep_alive_server`: Флаг, указывающий оставлять ли сервер включенным после дисконнекта (по умолчанию `True`).
+`capabilities`: Словарь, который содержит набор возможностей устройства, к которому производится подключение. Этот словарь может включать такие параметры, как имя устройства, версию операционной системы, путь к приложению и пр.
 
 ### Пример использования
+
 ```python
 app = AppiumExtended()
 
-capabilities = {  
-    "platformName": "android",  
-    "appium:automationName": "uiautomator2",  
-    ...
+capabilities_with_install = {  
+"platformName": "android",  
+"appium:automationName": "uiautomator2",  
+"appium:deviceName": device_model,  
+"appium:udid": device_uuid,  
+"appium:app": path_to_apk,  
+"appium:appPackage": package,  
+"appium:appWaitActivity": activity_launchable,  
+"appium: autoGrantPermissions": True,  
 }
 
-app.connect(capabilities=capabilities)
-```
+capabilities_without_install = {  
+"platformName": "android",  
+"appium:automationName": "uiautomator2",  
+"appium:deviceName": device_model,  
+"appium:udid": device_uuid,  
+"appium:noReset": True,  
+"appium: autoGrantPermissions": True,  
+}
 
-```python
-logger = logging.getLogger(__name__)
-log_level = logging.INFO
-log_path = os.path.join('path', 'to', 'log')
-
-app = AppiumExtended(logger=logger,
-		log_level=log_level,
-		log_path=log_path)
-
-path_to_apk = os.path.join('path', 'to', 'apk')
-
-capabilities = {
-            "platformName": "android",
-            "appium:automationName": "uiautomator2",
-            "appium:deviceName": app.adb.get_device_model(),
-            "appium:udid": app.adb.get_device_uuid(),
-            "appium:app": path_to_apk,
-            "appium:appPackage": app.aapt.get_package_name(path_to_apk) 
-            "appium:appWaitActivity": app.aapt.get_launchable_activity(path_to_apk)
-            "appium: autoGrantPermissions": True,
-            "appium: newCommandTimeout": 99999,
-        }
-        
-server_ip='10.77.124.78',  
-server_port=4723,  
-server_log_level='error',  
-remote=True,  
-keep_alive_server=True
-
-app.connect(capabilities=capabilities,  
-		server_ip=server_ip,  
-		server_port=server_port,  
-		server_log_level=server_log_level,  
-		remote=remote,  
-		keep_alive_server=keep_alive_server) 
+app.connect(capabilities=self.capabilities_without_install)
 ```
 
 ### Детали реализации
 
 Метод включает следующие основные этапы:
 
-1. Сохранение настроек сервера в соответствующих свойствах объекта.
-2. Инициализация и, при необходимости, запуск локального сервера Appium.
-3. Подключение к серверу Appium и инициализация драйвера `webdriver.Remote`.
-4. Инициализация дополнительных объектов (`Terminal` и `AppiumHelpers`) с созданным драйвером.
+1. Сохранение переданных возможностей в свойстве объекта `self.capabilities`.
+2. Запуск локального сервера Appium, если не используется прокси и сервер ещё не запущен. Для запуска сервера используется задержка в 10 секунд, чтобы дать ему время для инициализации.
+3. Инициализация драйвера `webdriver.Remote` с заданными возможностями и адресом сервера. Сохранение драйвера в свойстве объекта `self.driver`.
+4. Инициализация объекта `AppiumImage` с созданным драйвером.
 5. Запись в лог информации о подключении и номере сессии драйвера.
+
+### Исключения
+
+Метод не генерирует исключения напрямую, но может пробросить исключения, сгенерированные внутренними вызовами, такими как ошибка запуска сервера Appium или ошибки, связанные с `webdriver.Remote`.
 
 ### Дополнительная информация
 
 В связи с использованием appium-device-farm указывать device udid необязательно.
 ```python
 capabilities = {  
-    "platformName": "android",  
-    "appium:automationName": "uiautomator2",   
+"platformName": "android",  
+"appium:automationName": "uiautomator2",   
 }
 ```
-
+	
 
 ## Метод: `disconnect()`
 
@@ -349,14 +342,14 @@ else:
 ### Параметры
 
 `locator`: Определяет локатор элемента. Это может быть:
-- кортеж - локатор в виде ('атрибут', 'значение')
+- кортеж - локатор в виде ('стратегия поиска', 'значение')
 - объект WebElement
-- словарь, содержащий пары атрибут: значение
+- словарь, содержащий пары атрибут: значение искомого элемента
 - строка - путь до файла с изображением элемента.
 
 `by`: Тип локатора для поиска элемента (всегда в связке с `value`). Может быть типом MobileBy, AppiumBy, By, или строкой.
 
-`value`: Значение локатора или словарь аргументов, если используется AppiumBy.XPATH. Может быть строкой, словарём или `None`.
+`value`: Значение локатора, если используется AppiumBy.XPATH. Может быть строкой, словарём или `None`.
 
 `timeout_elem`: Время ожидания элемента в секундах.
 
@@ -2073,26 +2066,42 @@ from pages.page_2 import page_2
 from pages.page_3 import page_3
 class ExampleAppMap(AppiumExtended):
 
-	def __init__(self):  
-		super().__init__()  
-		self.page_1 = None
-		self.page_2 = None
-		self.page_3 = None
+	def __init__(self, logger: logging.Logger):  
+		super().__init__(logger=logger) 
+
+		# Инициализация страниц (PageObjects)
+	    self.page_1 = Page1(self)
+	    self.page_2 = Page2(self)
+	    self.page_3 = Page3(self)
+	    
 		self.driver = None  
 		self.navigator: AppiumNavigator = None  
+		self.image: AppiumImage = None  
+		self.keyboard: KeyboardMain = None  
 		self.current_path = os.path.dirname(os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))  
 		self.page_images_path = os.path.join(self.current_path, ConstMapPath.FOLDER_TRANSACTION_IMAGES)  
 		self.pages_ndarray_images = None
 			  
-	def connect(self, capabilities: dict):  
-	    super().connect(capabilities=capabilities)    
-	    # LOGIC  
-	    self.navigator = AppiumNavigator(app=self)    
-	    # PAGES  
-	    self.page_1 = Page1(self)
-	    self.page_2 = Page2(self)
-	    self.page_3 = Page3(self)
-		# EDGES    
+	def connect(self,  
+		capabilities: dict,  
+		server_ip: str = '0.0.0.0',  
+		server_port: int = 4723,  
+		server_log_level: str = 'error',  
+		remote: bool = False,  
+		keep_alive_server: bool = True) -> None:
+		super().connect(capabilities=capabilities,  
+						server_ip=server_ip,  
+						server_port=server_port,  
+						server_log_level=server_log_level,  
+						remote=remote,  
+						keep_alive_server=keep_alive_server)   
+						
+		# Инициализация необходимых объектов 
+		self.navigator = AppiumNavigator(app=self, logger=self.logger)  
+		self.keyboard = KeyboardMain(app=self, logger=self.logger)  
+		self.image = self.helper
+
+		# Установка граней   
 		self.page_1.edges = {  
 		    self.page_2: self.go_1_2,  
 		}  
@@ -2103,7 +2112,7 @@ class ExampleAppMap(AppiumExtended):
 		self.page_3.edges = {
 			self.page_2 = self.go_3_2
 		}
-		# INIT PAGES  
+		# Добавление страниц и граней в граф  
 		self.navigator.add_page(page=self.page_1,  
 		                        edges=self.page_1.edges)  
 		self.navigator.add_page(page=self.page_2,  

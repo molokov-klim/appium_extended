@@ -23,7 +23,7 @@ setup(
         "zlib-compress==0.0.1",
         "zlib-decompress==0.0.2",
         "pylibjpeg==1.4.0",
-        'Pillow>=9.5.0',
+        'Pillow==9.5.0',
         'requests>=2.31.0',
         'pyserial>=3.5',
         'opencv-python>=4.8.0.74',
