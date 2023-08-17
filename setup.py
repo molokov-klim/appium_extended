@@ -1,3 +1,5 @@
+import subprocess
+
 from setuptools import setup, find_packages
 
 # Общее описание пакета
@@ -7,19 +9,43 @@ An extension library for adding ease of use to Appium-Python-Client.
 appium_extended is a collection of utilities and convenience functions designed to enhance the usage of Appium-Python-Client for mobile app automation testing. It provides additional functionalities and abstractions to simplify the testing process.
 '''
 
+VERSION = '0.1.32'
+
+
+def install_requirements():
+    # Первые зависимости, которые должны быть установлены перед Pillow
+    pre_pillow_dependencies = [
+        "zlib-compress==0.0.1",
+        "zlib-decompress==0.0.2",
+        "pylibjpeg==1.4.0"
+    ]
+
+    for package in pre_pillow_dependencies:
+        subprocess.check_call(["pip", "install", package])
+
+    # Очистка кеша перед установкой Pillow
+    subprocess.check_call(["pip", "cache", "purge"])
+
+    # Установка оставшихся зависимостей
+    with open("requirements.txt", "r") as f:
+        packages = f.read().splitlines()
+
+    for package in packages:
+        subprocess.check_call(["pip", "install", package])
+
+
+install_requirements()
+
 setup(
     name='AppiumExtended',
-    version='0.1.31',
+    version=VERSION,
     description='An extension library for adding ease of use Appium-Python-Client',
     author='molokov-klim',
     packages=find_packages(),
     install_requires=[
+        'Pillow>=9.5.0',
         'Appium-Python-Client>=2.11.1',
         'allure-pytest>=2.13.2',
-        'zlib-compress>=0.0.1',
-        'zlib-decompress>=0.0.2',
-        'pylibjpeg>=1.4.0',
-        'Pillow>=9.5.0',
         'requests>=2.31.0',
         'pyserial>=3.5',
         'opencv-python>=4.8.0.74',
