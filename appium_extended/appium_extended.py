@@ -83,7 +83,24 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                     timeout_method=timeout_method,
                                     elements_range=elements_range,
                                     contains=contains)
-        return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
+        try:
+            return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
+        except AttributeError as e:
+            traceback_msg = traceback.format_exc()
+            error_msg = f"""Ошибка, элемент не найден. get_element(
+                                {locator=}, 
+                                {by=}, 
+                                {value=}, 
+                                {timeout_elem=}, 
+                                {timeout_method=}, 
+                                {elements_range=}, 
+                                {contains=},
+                            )
+            Traceback:
+            {traceback_msg=}
+                """
+            self.logger.error(error_msg)
+            raise AttributeError from e
 
     def get_elements(self,
                      locator: Union[Tuple, List[WebElement], Dict[str, str], str] = None,
@@ -124,9 +141,26 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                          elements_range=elements_range,
                                          contains=contains)
         elements_ext = []
-        for element in elements:
-            elements_ext.append(WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
-        return elements_ext
+        try:
+            for element in elements:
+                elements_ext.append(WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
+            return elements_ext
+        except AttributeError as e:
+            traceback_msg = traceback.format_exc()
+            error_msg = f"""Ошибка, элемент не найден. get_elements(
+                     {locator=},
+                     {by=},
+                     {value=},
+                     {timeout_elements=},
+                     {timeout_method=},
+                     {elements_range=},
+                     {contains=},
+                     )
+            Traceback:
+            {traceback_msg=}
+                """
+            self.logger.error(error_msg)
+            raise AttributeError from e
 
     def get_image_coordinates(self,
                               image: Union[bytes, np.ndarray, Image.Image, str],
