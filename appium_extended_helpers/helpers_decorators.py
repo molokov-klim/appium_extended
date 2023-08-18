@@ -310,14 +310,20 @@ def step_info(my_str):
 
                 # Прикрепляем информацию об ошибке AssertionError к отчету
                 allure.attach(str(error),
-                              name="AssertionError",
+                              name=str(error),
                               attachment_type=allure.attachment_type.TEXT)
 
                 # Выводим информацию в лог
                 self.logger.error(f"{my_str} [не выполнено]")
-                self.logger.error("AssertionError:")
                 traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-                self.logger.error(traceback_info)
+                error_msg = f"""Ошибка, элемент не найден. get_element(
+                                                {args=},
+                                                {kwargs=}
+                                            )
+                            Traceback:
+                            {traceback_info=}
+                                """
+                self.logger.error(error_msg)
 
                 # В случае исключения помечаем тест провалившимся
                 try:

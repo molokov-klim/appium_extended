@@ -278,7 +278,7 @@ class WebElementExtended(WebElementClick,
 
     def scroll_until_find(self,
                           locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
-                          timeout_method: int = 120,
+                          timeout_method: int = 120
                           ) -> Union['WebElementExtended', None]:
         """
         # TODO fill

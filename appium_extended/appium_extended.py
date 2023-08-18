@@ -229,6 +229,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     def find_and_get_element(self,
                              locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
                              timeout: int = 10,
+                             tries: int = 3
                              ) -> Union[WebElementExtended, None]:
         """
         Ищет элемент на странице, если нет то скроллит все что скроллится и ищет там
@@ -236,17 +237,18 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         if self.is_element_within_screen(locator=locator, timeout=1):
             return self.get_element(locator=locator, timeout_elem=timeout)
         recyclers = self.get_elements(locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
-        for recycler in recyclers:
-            try:
-                if recycler.scroll_until_find(locator=locator):
-                    return self.get_element(locator=locator, timeout_elem=timeout)
-            except StaleElementReferenceException as e:
-                current_function_name = inspect.currentframe().f_globals['__name__']
-                self.logger.error(f"{current_function_name} ERROR: {e}")
-                self.logger.error(f"arg {recycler=}")
-                self.logger.error(f"arg {locator=}")
-                traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-                self.logger.error(traceback_info)
+        for i in range(tries):
+            for recycler in recyclers:
+                try:
+                    if recycler.scroll_until_find(locator=locator):
+                        return self.get_element(locator=locator, timeout_elem=timeout)
+                except StaleElementReferenceException as e:
+                    current_function_name = inspect.currentframe().f_globals['__name__']
+                    self.logger.error(f"{current_function_name} ERROR: {e}")
+                    self.logger.error(f"arg {recycler=}")
+                    self.logger.error(f"arg {locator=}")
+                    traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
+                    self.logger.error(traceback_info)
         return None
 
     def is_element_within_screen(self,
