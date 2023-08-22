@@ -40,6 +40,7 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        git remote set-url origin https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/molokov-klim/appium_extended.git
         git checkout --orphan gh-pages  # Создание новой ветки, если она не существует
         git rm -rf .  # Удаление всех файлов из предыдущего коммита
         cp -r docs/_build/html/* .  # Копирование сгенерированных HTML-файлов в корневой каталог
