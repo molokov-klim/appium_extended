@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -21,9 +20,8 @@ jobs:
     - name: Install dependencies
       run: pip install sphinx
 
-    - name: Generate and Build documentation
+    - name: Build API documentation
       run: |
-        sphinx-quickstart -q -p "AppiumExtended" -a "Molokov Klim" docs
         cd docs
         sphinx-apidoc -o ./source/AppiumExtended ../appium_extended
         sphinx-apidoc -o ./source/AppiumGraph ../appium_extended_graph
@@ -33,17 +31,10 @@ jobs:
         sphinx-apidoc -o ./source/Terminal ../appium_extended_terminal
         sphinx-apidoc -o ./source/Utils ../appium_extended_utils
         sphinx-apidoc -o ./source/AppiumWebElementExtended ../appium_extended_web_element
-        make html  # Или `sphinx-build -b html . _build/html`
+        make html
 
     - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git remote set-url origin https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/molokov-klim/appium_extended.git
-        git checkout --orphan gh-pages  # Создание новой ветки, если она не существует
-        git rm -rf .  # Удаление всех файлов из предыдущего коммита
-        cp -r docs/_build/html/* .  # Копирование сгенерированных HTML-файлов в корневой каталог
-        git add .
-        git commit -m "Update documentation"
-        git push origin gh-pages  # Замените на имя вашей ветки GitHub Pages, если она называется не `gh-pages`
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
