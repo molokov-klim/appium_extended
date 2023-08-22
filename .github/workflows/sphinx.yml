@@ -33,7 +33,7 @@ jobs:
         sphinx-apidoc -o ./source/AppiumWebElementExtended ../appium_extended_web_element
         make html
 
-    - name: Deploy to GitHub Pages
+    - name: Deploy to GitHub Page
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
