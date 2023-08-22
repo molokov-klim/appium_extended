@@ -26,7 +26,6 @@ class AppiumImage:
         self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
 
-
     def get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
         screenshot = base64.b64decode(screenshot)
@@ -62,10 +61,14 @@ class AppiumImage:
 
         small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
-        result = cv2.matchTemplate(big_image, small_image, cv2.TM_CCOEFF_NORMED)  # Поиск совпадений методом шаблона
+        # result = cv2.matchTemplate(big_image, small_image, cv2.TM_CCOEFF_NORMED)  # Поиск совпадений методом шаблона
+        #
+        # _, max_val, _, max_loc = cv2.minMaxLoc(
+        #     result)  # Получение наименьшего и наибольшего значения, а также соответствующих координат
 
-        _, max_val, _, max_loc = cv2.minMaxLoc(
-            result)  # Получение наименьшего и наибольшего значения, а также соответствующих координат
+        # Сопоставление частичного изображения и снимка экрана
+        max_val, max_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
+                                                      threshold=threshold)
 
         if not max_val >= threshold:  # Если наибольшее значение совпадения не превышает порога, возвращаем None
             self.logger.error("find_coordinates_by_image(): Совпадений не найдено")
@@ -188,7 +191,10 @@ class AppiumImage:
                 return False
 
             # Сопоставление частичного изображения и снимка экрана
-            return self._multi_scale_matching(full_image=full_image, template_image=small_image, threshold=threshold)
+            max_val, max_loc = self._multi_scale_matching(full_image=full_image, template_image=small_image,
+                                                          threshold=threshold)
+
+            return max_val > threshold
 
         except cv2.error as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
@@ -219,9 +225,9 @@ class AppiumImage:
             _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
             if max_val > threshold:
-                return True
+                return max_val, max_loc
 
-        return False
+        return 0, 0
 
     def is_text_on_ocr_screen(self,
                               text: str,
