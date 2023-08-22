@@ -25,15 +25,14 @@ jobs:
       run: |
         sphinx-quickstart -q -p "AppiumExtended" -a "Molokov Klim" docs
         cd docs
-        sphinx-apidoc -o ./source/AppiumExtended ../AppiumExtended
-        sphinx-apidoc -o ./source/AppiumGraph ../AppiumGraph
-        sphinx-apidoc -o ./source/AppiumHelpers ../AppiumHelpers
-        sphinx-apidoc -o ./source/AppiumNavigator ../AppiumNavigator
-        sphinx-apidoc -o ./source/AppiumServer ../AppiumServer
-        sphinx-apidoc -o ./source/AppiumWebElementExtended ../AppiumWebElementExtended
-        sphinx-apidoc -o ./source/AppiumWebElementsExtended ../AppiumWebElementsExtended
-        sphinx-apidoc -o ./source/terminal ../terminal
-        sphinx-apidoc -o ./source/utils ../utils
+        sphinx-apidoc -o ./source/AppiumExtended ../appium_extended
+        sphinx-apidoc -o ./source/AppiumGraph ../appium_extended_graph
+        sphinx-apidoc -o ./source/AppiumHelpers ../appium_extended_helpers
+        sphinx-apidoc -o ./source/AppiumNavigator ../appium_extended_navigator
+        sphinx-apidoc -o ./source/AppiumServer ../appium_extended_server
+        sphinx-apidoc -o ./source/Terminal ../appium_extended_terminal
+        sphinx-apidoc -o ./source/Utils ../appium_extended_utils
+        sphinx-apidoc -o ./source/AppiumWebElementExtended ../appium_extended_web_element
         make html  # Или `sphinx-build -b html . _build/html`
 
     - name: Deploy to GitHub Pages
