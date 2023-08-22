@@ -188,16 +188,7 @@ class AppiumImage:
                 return False
 
             # Сопоставление частичного изображения и снимка экрана
-            result = cv2.matchTemplate(full_image, small_image, cv2.TM_CCOEFF_NORMED)
-
-            # Извлечение коэффициента схожести и координат схожего участка
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-
-            # Логирование
-            self.logger.debug(f"Коэффициент схожести изображения: {max_val}")
-
-            # Сравнение коэффициента схожести и порогового значения
-            return max_val >= threshold
+            return self._multi_scale_matching(full_image=full_image, template_image=small_image, threshold=threshold)
 
         except cv2.error as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
@@ -208,6 +199,29 @@ class AppiumImage:
         except Exception as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
+
+    @staticmethod
+    def _multi_scale_matching(full_image: np.ndarray, template_image: np.ndarray, threshold: float = 0.8):
+        w, h = template_image.shape[::-1]  # Исходный размер шаблона
+
+        # Цикл по различным масштабам, включая масштабы больше 1.0 для "растягивания"
+        for scale in np.concatenate([np.linspace(0.2, 1.0, 10)[::-1], np.linspace(1.1, 2.0, 10)]):
+
+            # Изменение размера изображения и сохранение масштаба
+            resized = cv2.resize(full_image, (int(full_image.shape[1] * scale), int(full_image.shape[0] * scale)))
+
+            # Если измененный размер становится меньше шаблона, прерываем цикл
+            if resized.shape[0] < h or resized.shape[1] < w:
+                continue
+
+            # Сопоставление шаблона
+            result = cv2.matchTemplate(resized, template_image, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+
+            if max_val > threshold:
+                return True
+
+        return False
 
     def is_text_on_ocr_screen(self,
                               text: str,
