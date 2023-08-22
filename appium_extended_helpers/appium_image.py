@@ -26,11 +26,6 @@ class AppiumImage:
         self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
 
-    def get_screenshot_as_base64_decoded(self):
-        screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
-        screenshot = base64.b64decode(screenshot)
-        return screenshot
-
     @helpers_decorators.retry
     def get_image_coordinates(self,
                               image: Union[bytes, np.ndarray, Image.Image, str],
@@ -54,17 +49,12 @@ class AppiumImage:
             :param full_image:
         """
         if full_image is None:
-            screenshot = self.get_screenshot_as_base64_decoded()
+            screenshot = self._get_screenshot_as_base64_decoded()
             big_image = self.to_ndarray(image=screenshot, grayscale=True)
         else:
             big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
         small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
-
-        # result = cv2.matchTemplate(big_image, small_image, cv2.TM_CCOEFF_NORMED)  # Поиск совпадений методом шаблона
-        #
-        # _, max_val, _, max_loc = cv2.minMaxLoc(
-        #     result)  # Получение наименьшего и наибольшего значения, а также соответствующих координат
 
         # Сопоставление частичного изображения и снимка экрана
         max_val, max_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
@@ -126,11 +116,8 @@ class AppiumImage:
         inner_image = cv2.resize(inner_image, None, fx=width_ratio, fy=height_ratio)
         outer_image = cv2.resize(outer_image, None, fx=width_ratio, fy=height_ratio)
 
-        # Применить шаблонное сопоставление для поиска внешнего изображения
-        outer_result = cv2.matchTemplate(full_image, outer_image, cv2.TM_CCOEFF_NORMED)
-
-        # Найти максимальное значение сходства и его положение для внешнего изображения
-        _, outer_max_val, _, outer_max_loc = cv2.minMaxLoc(outer_result)
+        outer_max_val, outer_max_loc = self._multi_scale_matching(full_image=full_image, template_image=outer_image,
+                                                                  threshold=threshold)
 
         # Проверить, превышает ли максимальное значение сходства для внешнего изображения пороговое значение
         if outer_max_val >= threshold:
@@ -144,11 +131,8 @@ class AppiumImage:
             # Извлечь область интереса (ROI), содержащую внешнее изображение
             outer_roi = full_image[outer_top_left[1]:outer_bottom_right[1], outer_top_left[0]:outer_bottom_right[0]]
 
-            # Применить шаблонное сопоставление для поиска внутреннего изображения внутри ROI
-            inner_result = cv2.matchTemplate(outer_roi, inner_image, cv2.TM_CCOEFF_NORMED)
-
-            # Найти максимальное значение сходства и его положение для внутреннего изображения внутри ROI
-            _, inner_max_val, _, inner_max_loc = cv2.minMaxLoc(inner_result)
+            inner_max_val, inner_max_loc = self._multi_scale_matching(full_image=outer_roi, template_image=inner_image,
+                                                                      threshold=threshold)
 
             # Проверить, превышает ли максимальное значение сходства для внутреннего изображения пороговое значение
             if inner_max_val >= threshold:
@@ -179,7 +163,7 @@ class AppiumImage:
             Логическое значение, указывающее, было ли частичное изображение найдено на экране.
         """
         try:
-            screenshot = self.get_screenshot_as_base64_decoded()
+            screenshot = self._get_screenshot_as_base64_decoded()
 
             # Чтение снимка экрана и частичного изображения
             full_image = self.to_ndarray(image=screenshot, grayscale=True)
@@ -207,7 +191,10 @@ class AppiumImage:
             return False
 
     @staticmethod
-    def _multi_scale_matching(full_image: np.ndarray, template_image: np.ndarray, threshold: float = 0.8):
+    def _multi_scale_matching(full_image: np.ndarray,
+                              template_image: np.ndarray,
+                              threshold: float = 0.8,
+                              return_raw: bool = False):
         w, h = template_image.shape[::-1]  # Исходный размер шаблона
 
         # Цикл по различным масштабам, включая масштабы больше 1.0 для "растягивания"
@@ -222,12 +209,17 @@ class AppiumImage:
 
             # Сопоставление шаблона
             result = cv2.matchTemplate(resized, template_image, cv2.TM_CCOEFF_NORMED)
+
             _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
             if max_val > threshold:
+                if return_raw:
+                    return result
                 return max_val, max_loc
 
-        return 0, 0
+        if return_raw:
+            return None
+        return 0, (0, 0)
 
     def is_text_on_ocr_screen(self,
                               text: str,
@@ -247,7 +239,7 @@ class AppiumImage:
         """
         try:
             if screen is None:
-                screenshot = self.get_screenshot_as_base64_decoded()
+                screenshot = self._get_screenshot_as_base64_decoded()
                 image = self.to_ndarray(screenshot)
             else:
                 image = self.to_ndarray(screen)
@@ -299,15 +291,15 @@ class AppiumImage:
         """
 
         if full_image is None:
-            screenshot = self.get_screenshot_as_base64_decoded()
+            screenshot = self._get_screenshot_as_base64_decoded()
             big_image = self.to_ndarray(image=screenshot, grayscale=True)
         else:
             big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
         small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
-        # Найти частичное изображение в полном изображении
-        result = cv2.matchTemplate(big_image, small_image, cv2.TM_CCOEFF_NORMED)  # Поиск совпадений методом шаблона
+        result = self._multi_scale_matching(full_image=big_image, template_image=small_image,
+                                            return_raw=True, threshold=cv_threshold)
 
         # Получить все совпадения выше порога
         locations = np.where(result >= cv_threshold)  # Нахождение всех совпадений выше порога
@@ -365,7 +357,7 @@ class AppiumImage:
 
         if not image:
             # Получаем снимок экрана, если изображение не предоставлено
-            screenshot = self.get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
+            screenshot = self._get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
             image = self.to_ndarray(image=screenshot,
                                     grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
@@ -452,7 +444,7 @@ class AppiumImage:
         try:
             if image is None:
                 # Если изображение не предоставлено, получаем снимок экрана с помощью драйвера
-                screenshot = self.get_screenshot_as_base64_decoded()
+                screenshot = self._get_screenshot_as_base64_decoded()
                 image = self.to_ndarray(screenshot)
             else:
                 image = self.to_ndarray(image)
@@ -555,3 +547,8 @@ class AppiumImage:
         if grayscale:
             return self.to_grayscale(image=image)
         return image
+
+    def _get_screenshot_as_base64_decoded(self):
+        screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
+        screenshot = base64.b64decode(screenshot)
+        return screenshot

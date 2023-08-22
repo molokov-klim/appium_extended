@@ -254,4 +254,4 @@ class AppiumGet(AppiumBase):
         return self.helper.get_text_coordinates(text=text, language=language, image=image)
 
     def _get_screenshot_as_base64_decoded(self):
-        return self.helper.get_screenshot_as_base64_decoded()
+        return self.helper._get_screenshot_as_base64_decoded()
