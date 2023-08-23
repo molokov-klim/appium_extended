@@ -440,6 +440,56 @@ class Terminal:
             return False
 
     @log_debug()
+    def swipe_right_to_left(self, duration: int = 300) -> bool:
+        window_size = self.get_screen_resolution()
+        width = window_size[0]
+        height = window_size[1]
+        left = int(width * 0.1)
+        right = int(width * 0.9)
+        return self.swipe(start_x=right,
+                          start_y=height // 2,
+                          end_x=left,
+                          end_y=height // 2,
+                          duration=duration)
+
+    @log_debug()
+    def swipe_left_to_right(self, duration: int = 300) -> bool:
+        window_size = self.get_screen_resolution()
+        width = window_size[0]
+        height = window_size[1]
+        left = int(width * 0.1)
+        right = int(width * 0.9)
+        return self.swipe(start_x=left,
+                          start_y=height // 2,
+                          end_x=right,
+                          end_y=height // 2,
+                          duration=duration)
+
+    @log_debug()
+    def swipe_top_to_bottom(self, duration: int = 300) -> bool:
+        window_size = self.get_screen_resolution()
+        height = window_size[1]
+        top = int(height * 0.1)
+        bottom = int(height * 0.9)
+        return self.swipe(start_x=top,
+                          start_y=height // 2,
+                          end_x=bottom,
+                          end_y=height // 2,
+                          duration=duration)
+
+    @log_debug()
+    def swipe_bottom_to_top(self, duration: int = 300) -> bool:
+        window_size = self.get_screen_resolution()
+        height = window_size[1]
+        top = int(height * 0.1)
+        bottom = int(height * 0.9)
+        return self.swipe(start_x=bottom,
+                          start_y=height // 2,
+                          end_x=top,
+                          end_y=height // 2,
+                          duration=duration)
+
+    @log_debug()
     def check_vpn(self, ip_address: str = '') -> bool:
         """
         Проверяет, активно ли VPN-соединение на устройстве с помощью ADB.
