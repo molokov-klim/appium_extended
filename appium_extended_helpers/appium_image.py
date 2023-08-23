@@ -548,6 +548,18 @@ class AppiumImage:
             return self.to_grayscale(image=image)
         return image
 
+    def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
+        try:
+            screenshot = self._get_screenshot_as_base64_decoded()
+            path_to_file = os.path.join(path, filename)
+            with open(path_to_file, "wb") as f:
+                f.write(screenshot)
+            return True
+        except Exception as error:
+            self.logger.error(f"Не удалось сохранить скриншот: {error=}")
+            return False
+
+
     def _get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
         screenshot = base64.b64decode(screenshot)

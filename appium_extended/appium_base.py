@@ -29,7 +29,7 @@ class AppiumBase:
         self.server = None
         self.logger = logger
         self.driver = None
-        self.terminal = None
+        self.terminal: Terminal = None
         self.session_id = None
         self.helper: AppiumHelpers = None
         self.keep_alive_server = True

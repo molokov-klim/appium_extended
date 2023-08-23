@@ -143,7 +143,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         elements_ext = []
         try:
             for element in elements:
-                elements_ext.append(WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
+                elements_ext.append(
+                    WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
             return elements_ext
         except AttributeError as e:
             traceback_msg = traceback.format_exc()
@@ -190,9 +191,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                       coord_threshold: Optional[int] = 5,
                                       ) -> Union[List[Tuple], None]:
         return self.helper.get_many_coordinates_of_image(full_image=full_image,
-                                                        image=image,
-                                                        cv_threshold=cv_threshold,
-                                                        coord_threshold=coord_threshold)
+                                                         image=image,
+                                                         cv_threshold=cv_threshold,
+                                                         coord_threshold=coord_threshold)
 
     def get_text_coordinates(self,
                              text: str,
@@ -488,10 +489,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                             path: str = None,
                             ) -> 'AppiumExtended':
         assert self.helper.draw_by_coordinates(image=image,
-                                              coordinates=coordinates,
-                                              top_left=top_left,
-                                              bottom_right=bottom_right,
-                                              path=path)
+                                               coordinates=coordinates,
+                                               top_left=top_left,
+                                               bottom_right=bottom_right,
+                                               path=path)
+        return cast('AppiumExtended', self)
+
+    def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> 'AppiumExtended':
+        assert self.helper.save_screenshot(path=path)
         return cast('AppiumExtended', self)
 
     # PRIVATE
