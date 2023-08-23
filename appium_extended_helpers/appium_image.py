@@ -389,14 +389,14 @@ class AppiumImage:
                                      'coordinates': coordinates}  # Сохранение информации о слове и его координатах
 
         # Разбить искомый текст на отдельные слова
-        words = text.split(' ')  # Разделение искомого текста на отдельные слова
+        words = text.lower().split(' ')  # Разделение искомого текста на отдельные слова
 
         # Инициализировать переменные для последовательности слов и соответствующих координат
         current_sequence = []  # Текущая последовательность слов
         result_coordinates = []  # Координаты текущей последовательности слов
 
         for word_data in formatted_data.values():
-            word = word_data['text']  # Текущее слово
+            word = word_data['text'].lower()  # Текущее слово
             coordinates = word_data['coordinates']  # Координаты слова
 
             if word in words:
@@ -558,7 +558,6 @@ class AppiumImage:
         except Exception as error:
             self.logger.error(f"Не удалось сохранить скриншот: {error=}")
             return False
-
 
     def _get_screenshot_as_base64_decoded(self):
         screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')

@@ -49,7 +49,48 @@ class AppiumBase:
                 remote: bool = False,
                 keep_alive_server: bool = True) -> None:
         """
-        Подключение к устройству
+        Подключение к устройству через сервер Appium.
+
+        Args:
+            capabilities (dict): Словарь с возможностями для подключения к устройству.
+            server_ip (str, optional): IP-адрес сервера Appium. По умолчанию '127.0.0.1'.
+            server_port (int, optional): Порт сервера Appium. По умолчанию 4723.
+            server_log_level (str, optional): Уровень логирования сервера. По умолчанию 'error'.
+            remote (bool, optional): Флаг для удаленного подключения. По умолчанию False.
+            keep_alive_server (bool, optional): Флаг, оставлять ли сервер работающим после отключения
+                (только при remote=False). По умолчанию True.
+
+        Usages:
+            app = AppiumExtended(logger=logger, log_level=logging.INFO)
+
+            capabilities = {
+                "platformName": "android",
+                "appium:automationName": "uiautomator2",
+                "appium:deviceName": app.adb.get_device_model(),
+                "appium:udid": app.adb.get_device_uuid(),
+                }
+
+            app.connect(capabilities=capabilities,
+                        server_ip='127.0.0.1',
+                        server_port=4723,
+                        server_log_level='info',
+                        remote=False,
+                        keep_alive_server=True)
+
+            # ИЛИ ЕСЛИ СЕРВЕР УДАЛЕННЫЙ:
+            app.connect(capabilities=capabilities,
+                        server_ip='15.78.145.11',
+                        server_port=4723,
+                        server_log_level='error',
+                        remote=True,
+                        keep_alive_server=True)
+
+        Raises:
+            AppiumServerNotAliveException: Если сервер Appium не запущен или не отвечает.
+            WebDriverException: Если не удается установить соединение с WebDriver.
+
+        Returns:
+            None: Функция не возвращает ничего, но инициализирует драйвер и другие компоненты.
         """
         self.server_ip = server_ip
         self.server_port = server_port
@@ -84,7 +125,18 @@ class AppiumBase:
 
     def disconnect(self) -> None:
         """
-        Отключение от устройства
+        Отключение от устройства.
+        А также остановка сервера Appium, если флаг `keep_alive_server` установлен в False.
+
+        Usages:
+            app.disconnect()
+
+        Raises:
+            AppiumServerNotAliveException: Если сервер Appium не запущен или не отвечает.
+            WebDriverException: Если не удается завершить соединение с WebDriver.
+
+        Returns:
+            None: Функция не возвращает ничего, но завершает текущую сессию и останавливает сервер, если необходимо.
         """
         if self.driver:
             self.logger.debug(f"Отключение от сессии №: {self.driver.session_id}")
@@ -95,6 +147,15 @@ class AppiumBase:
 
     def is_running(self) -> bool:
         """
-        Проверяет, запущен сервер или нет
+        Проверяет, запущен ли сервер Appium и активна ли текущая сессия.
+
+        Usages:
+            app.is_running()
+
+        Raises:
+            WebDriverException: Если не удается проверить статус сервера или сессии.
+
+        Returns:
+            bool: Возвращает True, если сервер и сессия активны, иначе False.
         """
         return self.driver.is_running()
