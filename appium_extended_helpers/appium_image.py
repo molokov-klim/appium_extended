@@ -34,19 +34,23 @@ class AppiumImage:
                               ) -> Union[Tuple[int, int, int, int], None]:
         """
         Находит координаты наиболее вероятного совпадения частичного изображения в полном изображении.
-        Предназначен для поиска координат наиболее вероятного совпадения частичного изображения в полном изображении.
 
         Args:
-            image (Union[bytes, np.ndarray, Image.Image, str]): путь к файлу частичного изображения, которое
-            нужно найти внутри полного изображения.
-            full_image (Union[bytes, np.ndarray, Image.Image, str]): путь к файлу полного изображения.
-            threshold (float, optional): минимальный порог совпадения, необходимый для считывания совпадения допустимым.
-                По умолчанию равно 0.7.
+            image (Union[bytes, np.ndarray, Image.Image, str]):
+                Частичное изображение или путь к файлу, которое нужно найти внутри полного изображения.
+            full_image (Union[bytes, np.ndarray, Image.Image, str], optional):
+                Полное изображение или путь к файлу. По умолчанию None, в этом случае используется скриншот экрана.
+            threshold (float, optional):
+                Минимальный порог совпадения для считывания совпадения допустимым. По умолчанию 0.7.
+
+        Usages:
+            app.get_image_coordinates('path/to/partial_image.png', 'path/to/full_image.png')
+            app.get_image_coordinates('path/to/partial_image.png', threshold=0.8)
 
         Returns:
-            tuple or None: кортеж с координатами наиболее вероятного совпадения (x1, y1, x2, y2) или None, если совпадение не найдено.
-            :param threshold:
-            :param full_image:
+            Union[Tuple[int, int, int, int], None]:
+                Кортеж с координатами наиболее вероятного совпадения (x1, y1, x2, y2)
+                или None, если совпадение не найдено.
         """
         if full_image is None:
             screenshot = self._get_screenshot_as_base64_decoded()
@@ -81,17 +85,26 @@ class AppiumImage:
                                     threshold: float = 0.9) -> Union[Tuple[int, int, int, int], None]:
         """
         Находит изображение на экране и внутри него находит другое изображение (внутреннее).
-        Предназначен для поиска изображения на экране и затем нахождения другого изображения (внутреннего)
-        внутри этого обнаруженного изображения.
 
-        Параметры:
-            outer_image_path (str): Путь к файлу с изображением, которое нужно найти на экране.
-            inner_image_path (str): Путь к файлу с изображением, которое нужно найти внутри внешнего изображения.
-            threshold (float, optional): Пороговое значение сходства для шаблонного сопоставления. По умолчанию 0.9.
+        Args:
+            outer_image_path (Union[bytes, np.ndarray, Image.Image, str]):
+                Внешнее изображение или путь к файлу, которое нужно найти на экране.
+            inner_image_path (Union[bytes, np.ndarray, Image.Image, str]):
+                Внутреннее изображение или путь к файлу, которое нужно найти внутри внешнего изображения.
+            threshold (float, optional):
+                Пороговое значение сходства для шаблонного сопоставления. По умолчанию 0.9.
 
-        Возвращает:
-            tuple: Координаты внутреннего изображения относительно экрана в формате ((x1, y1), (x2, y2)).
-                   Если внутреннее изображение не найдено, возвращает None.
+        Usages:
+            app.get_inner_image_coordinates('path/to/outer_image.png', 'path/to/inner_image.png')
+            app.get_inner_image_coordinates('path/to/outer_image.png', 'path/to/inner_image.png', threshold=0.8)
+
+        Returns:
+            Union[Tuple[int, int, int, int], None]:
+                Координаты внутреннего изображения относительно экрана в формате (x1, y1, x2, y2).
+                Если внутреннее изображение не найдено, возвращает None.
+
+        Note:
+            Повторяет выполнение 3 раза при неудаче.
         """
         # Получаем разрешение экрана
         screen_width, screen_height = self.terminal.get_screen_resolution()
@@ -156,11 +169,17 @@ class AppiumImage:
         Сравнивает, присутствует ли заданное изображение на экране.
 
         Args:
-            image: Строка, содержащая имя файла частичного изображения для поиска.
-            threshold: Пороговое значение схожести части изображения со снимком экрана
+            image (Union[bytes, np.ndarray, Image.Image, str]): Изображение для поиска на экране.
+                Может быть в формате байтов, массива numpy, объекта Image.Image или строки с путем до файла.
+            threshold (float): Пороговое значение схожести части изображения со снимком экрана.
 
         Returns:
-            Логическое значение, указывающее, было ли частичное изображение найдено на экране.
+            bool: Возвращает `True`, если изображение найдено на экране, иначе `False`.
+
+        Raises:
+            cv2.error: Ошибки, связанные с OpenCV.
+            AssertionError: Ошибки, связанные с неверными размерами изображений.
+            Exception: Остальные исключения.
         """
         try:
             screenshot = self._get_screenshot_as_base64_decoded()
@@ -278,16 +297,27 @@ class AppiumImage:
         Находит все вхождения частичного изображения внутри полного изображения.
 
         Args:
-            full_image (str): путь к файлу полного изображения.
-            image (str): путь к файлу частичного изображения, которое нужно найти внутри полного изображения.
-            cv_threshold (float, optional): минимальный порог совпадения, необходимый для считывания совпадения допустимым.
-                По умолчанию равно 0.7.
-            coord_threshold (int, optional): целое число, представляющее максимальное различие между значениями x и y двух
-                кортежей, чтобы они считались слишком близкими друг к другу. По умолчанию равно 5.
+            image (Union[bytes, np.ndarray, Image.Image, str]):
+                Частичное изображение или путь к файлу, которое нужно найти внутри полного изображения.
+            full_image (Union[bytes, np.ndarray, Image.Image, str], optional):
+                Полное изображение или путь к файлу. По умолчанию None, в этом случае используется скриншот экрана.
+            cv_threshold (float, optional):
+                Минимальный порог совпадения для считывания совпадения допустимым. По умолчанию 0.7.
+            coord_threshold (int, optional):
+                Максимальное различие между значениями x и y двух кортежей, чтобы они считались слишком близкими друг к другу.
+                По умолчанию 5 пикселей.
+
+        Usages:
+            app.et_many_coordinates_of_image('path/to/partial_image.png', 'path/to/full_image.png')
+            app.get_many_coordinates_of_image('path/to/partial_image.png', cv_threshold=0.8, coord_threshold=10)
 
         Returns:
-            list of tuples or None: список кортежей, содержащий расположение каждого найденного совпадения.
-                Если совпадений не найдено, возвращается None.
+            Union[List[Tuple], None]:
+                Список кортежей, содержащий расположение каждого найденного совпадения в формате (x1, y1, x2, y2).
+                Если совпадений не найдено, возвращает None.
+
+        Note:
+            При неудаче повторяет выполнение, до трёх раз.
         """
 
         if full_image is None:
@@ -345,13 +375,18 @@ class AppiumImage:
         """
         Возвращает координаты области с указанным текстом на предоставленном изображении или снимке экрана.
 
-        Аргументы:
+        Args:
         - text (str): Искомый текст.
         - image (bytes, str, Image.Image, np.ndarray, опционально): Изображение, на котором осуществляется поиск текста.
           Если не указано, будет использован снимок экрана. По умолчанию None.
         - language (str, опционально): Язык для распознавания текста. По умолчанию 'rus'.
 
-        Возвращает:
+        Usages:
+            app.get_text_coordinates("Hello, world!")
+            app.get_text_coordinates("Привет, мир!", language='rus')
+            app.get_text_coordinates("Hello, world!", image='path/to/image.png')
+
+        Returns:
         - Union[Tuple[int, int, int, int], None]: Координаты области с текстом или None, если текст не найден.
         """
 
@@ -421,25 +456,28 @@ class AppiumImage:
                             path: str = None) -> bool:
         """
         Рисует прямоугольник на предоставленном изображении или снимке экрана с помощью драйвера.
-        Прямоугольник определяется либо координатами, либо верхней левой и нижней правой точками.
-        Результирующее изображение с нарисованным прямоугольником сохраняется по указанному пути.
 
-        Аргументы:
-            image (Union[bytes, str, Image.Image], опционально): Изображение, на котором будет рисоваться.
-                Может быть представлено в виде bytes, str (путь до файла) или PIL Image.
-                Если не указано, используется снимок экрана. По умолчанию None.
-            coordinates (Tuple[int, int, int, int], опционально): Координаты прямоугольника (x1, y1, x2, y2).
-                По умолчанию None.
-            top_left (Tuple[int, int], опционально): Верхняя левая точка прямоугольника (x, y). По умолчанию None.
-            bottom_right (Tuple[int, int], опционально): Нижняя правая точка прямоугольника (x, y). По умолчанию None.
-            path (str, опционально): Путь для сохранения результирующего изображения. По умолчанию None.
+        Args:
+            image (Union[bytes, str, Image.Image, np.ndarray], optional): Изображение для рисования. По умолчанию None.
+            coordinates (Tuple[int, int, int, int], optional): Координаты прямоугольника (x1, y1, x2, y2). По умолчанию None.
+            top_left (Tuple[int, int], optional): Верхняя левая точка прямоугольника. По умолчанию None.
+            bottom_right (Tuple[int, int], optional): Нижняя правая точка прямоугольника. По умолчанию None.
+            path (str, optional): Путь для сохранения изображения. По умолчанию None.
 
-        Usage:
-            image = self.driver.get_screenshot_as_base64().encode('utf-8')
-            draw_by_coordinates(image=image, coordinates=(123, 123, 123, 123), path='pictures')
+        Usages:
+            draw_by_coordinates(image=image_bytes, coordinates=(10, 20, 30, 40), path='path/to/save/image.png')
+            draw_by_coordinates(top_left=(10, 20), bottom_right=(30, 40))
 
-        Возвращает:
-            bool: True, если операция выполнена успешно, False в противном случае.
+        Returns:
+            bool: True, если операция выполнена успешно, иначе False.
+
+        Raises:
+            WebDriverException: Если возникают проблемы с WebDriver.
+            cv2.error: Если возникают проблемы с OpenCV.
+
+        Notes:
+            - Если изображение не предоставлено, будет использован текущий снимок экрана.
+            - Если не указаны верхняя левая и нижняя правая точки, будут использованы координаты.
         """
         try:
             if image is None:
@@ -549,6 +587,28 @@ class AppiumImage:
         return image
 
     def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
+        """
+        Сохраняет скриншот экрана в указанный файл.
+
+        Args:
+            path (str, optional): Путь к директории, где будет сохранен скриншот. По умолчанию пустая строка, что означает текущую директорию.
+            filename (str, optional): Имя файла, в который будет сохранен скриншот. По умолчанию 'screenshot.png'.
+
+        Usages:
+            save_screenshot(path='/path/to/save', filename='my_screenshot.png')
+            save_screenshot(filename='another_screenshot.png')
+            save_screenshot()
+
+        Returns:
+            bool: True, если скриншот успешно сохранен, иначе False.
+
+        Raises:
+            Exception: В случае, если возникают проблемы при сохранении скриншота.
+
+        Notes:
+            - Если путь не указан, скриншот будет сохранен в текущей директории.
+            - Если имя файла не указано, будет использовано имя 'screenshot.png'.
+        """
         try:
             screenshot = self._get_screenshot_as_base64_decoded()
             path_to_file = os.path.join(path, filename)
@@ -559,7 +619,31 @@ class AppiumImage:
             self.logger.error(f"Не удалось сохранить скриншот: {error=}")
             return False
 
-    def _get_screenshot_as_base64_decoded(self):
-        screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
-        screenshot = base64.b64decode(screenshot)
-        return screenshot
+    def _get_screenshot_as_base64_decoded(self) -> bytes:
+        """
+        Получает скриншот экрана, кодирует его в формате Base64, а затем декодирует в байты.
+
+        Args:
+            Метод не принимает аргументов.
+
+        Usages:
+            screenshot_bytes = self._get_screenshot_as_base64_decoded()
+
+        Returns:
+            bytes: Декодированные байты скриншота, обычно в формате PNG.
+
+        Raises:
+            WebDriverException: Если не удается получить скриншот.
+
+        Notes:
+            - Этот метод предназначен для внутреннего использования и может быть вызван другими методами класса.
+            - Скриншот возвращается в формате PNG.
+            - Исходный скриншот получается в формате Base64, который затем кодируется в UTF-8 и декодируется обратно в байты.
+        """
+        try:
+            screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
+            screenshot = base64.b64decode(screenshot)
+            return screenshot
+        except WebDriverException as e:
+            self.logger.error(f"Failed to get screenshot: {e}")
+            raise

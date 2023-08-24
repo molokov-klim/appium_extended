@@ -14,6 +14,7 @@ from appium_extended_server.appium_server import AppiumServer
 from appium_extended_terminal.terminal import Terminal
 from appium_extended_terminal.aapt import Aapt
 from appium_extended_terminal.adb import Adb
+from appium.webdriver.webdriver import WebDriver
 
 
 class AppiumBase:
@@ -23,16 +24,16 @@ class AppiumBase:
     """
 
     def __init__(self, logger: logging.Logger = None):
-        self.server_log_level = None
-        self.server_port = None
-        self.server_ip = None
-        self.server = None
+        self.server_log_level: str = None
+        self.server_port: int = None
+        self.server_ip: str = None
+        self.server: AppiumServer = None
         self.logger = logger
-        self.driver = None
+        self.driver: WebDriver = None
         self.terminal: Terminal = None
-        self.session_id = None
+        self.session_id: str = None
         self.helper: AppiumHelpers = None
-        self.keep_alive_server = True
+        self.keep_alive_server: bool = True
         self.aapt = Aapt()
         self.adb = Adb()
 

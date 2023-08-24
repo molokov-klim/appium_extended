@@ -278,13 +278,15 @@ class WebElementExtended(WebElementClick,
 
     def scroll_until_find(self,
                           locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
-                          timeout_method: int = 120
+                          timeout_method: int = 120,
+                          contains: bool = True
                           ) -> Union['WebElementExtended', None]:
         """
         # TODO fill
         """
         if not self._scroll_until_find(locator=locator,
-                                       timeout_method=timeout_method):
+                                       timeout_method=timeout_method,
+                                       contains=contains):
             return None
         return cast('WebElementExtended', self)
 

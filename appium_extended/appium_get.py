@@ -1,7 +1,7 @@
 # coding: utf-8
 import logging
 import time
-from typing import Union, Dict, List, Tuple
+from typing import Union, Dict, List, Tuple, Optional, Any
 
 import numpy as np
 from PIL import Image
@@ -33,40 +33,54 @@ class AppiumGet(AppiumBase):
                      timeout_elem: int = 10,
                      timeout_method: int = 600,
                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
-                     contains: bool = False
+                     contains: bool = True
                      ) -> \
             Union[WebElement, None]:
         """
         Метод обеспечивает поиск элемента в текущей DOM структуре.
         Должен принимать либо локатор, либо значения by и value.
 
-        Usage:
-            element = app._get_element(locator=("id", "foo")).
-            element = app._get_element(element).
-            element = app._get_element(locator={'text': 'foo'}).
-            element = app._get_element(locator='/path/to/file/pay_agent.png').
-            element = app._get_element(locator=part_image, elements_range={'class':'android.widget.FrameLayout', 'package':'ru.app.debug'}).
-            element = app._get_element(by="id", value="ru.sigma.app.debug:id/backButton").
-            element = app._get_element(by=MobileBy.ID, value="ru.sigma.app.debug:id/backButton").
-            element = app._get_element(by=AppiumBy.ID, value="ru.sigma.app.debug:id/backButton").
-            element = app._get_element(by=By.ID, value="ru.sigma.app.debug:id/backButton").
-
         Args:
-            locator: tuple / WebElement / dict / str, определяет локатор элемента.
-                tuple - локатор в виде ('атрибут', 'значение')
-                WebElement - объект веб элемента
-                dict - словарь, содержащий пары атрибут: значение
-                str - путь до файла с изображением элемента.
-            by: MobileBy, AppiumBy, By, str, тип локатора для поиска элемента (всегда в связке с value)
-            value: str, dict, None, значение локатора или словарь аргументов, если используется AppiumBy.XPATH.
-            timeout_elem: int, время ожидания элемента.
-            timeout_method: int, время ожидания метода поиска элемента.
-            elements_range: tuple, list, dict, None, ограничивает поиск элемента в указанном диапазоне
-            (для поиска по изображению).
-            contains: для поиска по dict, ищет элемент содержащий фрагмент значения
+            locator (Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str], optional):
+                Определяет локатор элемента.
+                Tuple - локатор в виде кортежа из двух строковых элементов,
+                    где первый это стратегия поиска, а второй это селектор,
+                    например ("id", "android.widget.ProgressBar").
+                Dict - локатор в виде словаря атрибутов и их значений искомого элемента,
+                    например {'text': 'foo', 'displayed' : 'true', 'enabled': 'true'}.
+
+            by (Union[MobileBy, AppiumBy, By, str], optional):
+                Тип локатора для поиска элемента (всегда в связке с value).
+                Как в стандартном методе driver.find_element.
+            value (Union[str, Dict, None], optional):
+                Значение локатора или словарь аргументов, если используется AppiumBy.XPATH.
+            timeout_elem (int, optional):
+                Время ожидания элемента. По умолчанию 10 секунд.
+            timeout_method (int, optional):
+                Время ожидания метода поиска элемента. По умолчанию 600 секунд.
+            elements_range (Union[Tuple, List[WebElement], Dict[str, str], None], optional):
+                Ограничивает поиск элемента в указанном диапазоне (для поиска по изображению).
+            contains (bool, optional):
+                Для поиска по dict и атрибуту 'text',
+                ищет элемент содержащий фрагмент значения если True
+                и по строгому соответствию если False.
+                По умолчанию True.
+
+        Usages:
+            element = app._get_element(locator=("id", "foo"))
+            element = app._get_element(element)
+            element = app._get_element(locator={'text': 'foo'}, contains=True)
+            element = app._get_element(locator='/path/to/file/image.png')
+            element = app._get_element(by="id", value="backButton")
+            element = app._get_element(by=MobileBy.ID, value="backButton")
+
+        Raises:
+            NoSuchElementException: Если элемент не найден.
+            TimeoutException: Если время ожидания истекло.
+            WebDriverException: Если произошла ошибка при взаимодействии с WebDriver.
 
         Returns:
-            WebElement или None, если элемент не был найден.
+            Union[WebElement, None]: Возвращает WebElement, если элемент найден, иначе None.
         """
         # Проверка и подготовка аргументов
         if (not locator) and (not by or not value):
@@ -106,19 +120,19 @@ class AppiumGet(AppiumBase):
                     return element
                 except NoSuchElementException:
                     return None
-                except TimeoutException:
-                    # self.logger.error(f"Элемент не обнаружен!\n"
-                    #                   f"{locator=}\n"
-                    #                   f"{timeout_elem=}\n\n" +
-                    #                   "{}\n".format(e))
-                    # self.logger.error("page source ", self.driver.page_source)
+                except TimeoutException as error:
+                    self.logger.debug(f"Элемент не обнаружен!\n"
+                                      f"{locator=}\n"
+                                      f"{timeout_elem=}\n\n" +
+                                      "{}\n".format(error))
+                    self.logger.debug("page source ", self.driver.page_source)
                     return None
-                except WebDriverException:
-                    # self.logger.error(f"Элемент не обнаружен!\n"
-                    #                   f"{locator=}\n"
-                    #                   f"{timeout_elem=}\n\n" +
-                    #                   "{}\n".format(e))
-                    # self.logger.error("page source ", self.driver.page_source)
+                except WebDriverException as error:
+                    self.logger.debug(f"Элемент не обнаружен!\n"
+                                      f"{locator=}\n"
+                                      f"{timeout_elem=}\n\n" +
+                                      "{}\n".format(error))
+                    self.logger.debug("page source ", self.driver.page_source)
                     return None
             # Выполнение подготовки локатора
             handler = locator_handler.get(locator_type)
@@ -148,27 +162,44 @@ class AppiumGet(AppiumBase):
         """
         Метод обеспечивает поиск элементов в текущей DOM структуре.
         Должен принять либо локатор, либо by и value.
-        При locator:str настоятельно рекомендуется использовать диапазон поиска elements_range.
-
-        Usage:
-            elements = app.get_elements(locator=("id", "foo")).
-            elements = app.get_elements(locator={'text': 'foo'}).
-            elements = app.get_elements(locator='/path/to/file/pay_agent.png').
-            elements = app.get_elements(by="id", value="ru.sigma.app.debug:id/backButton").
-            elements = app.get_elements(by=MobileBy.ID, value="ru.sigma.app.debug:id/backButton").
-            elements = app.get_elements(by=AppiumBy.ID, value="ru.sigma.app.debug:id/backButton").
-            elements = app.get_elements(by=By.ID, value="ru.sigma.app.debug:id/backButton").
 
         Args:
-            locator: tuple or WebElement or Dict[str, str], str, локатор tuple или Веб Элемент или словарь {'атрибут': 'значение'} или str как путь до файла с изображением элемента.
-            by:[MobileBy, AppiumBy, By, str], тип локатора для поиска элемента (всегда в связке с value)
-            value: Union[str, Dict, None], значение локатора или словарь аргументов, если используется AppiumBy.XPATH
-            timeout_elements: #TODO fill me
-            timeout_method: #TODO fill me
-            elements_range: #TODO fill me
+            locator (Union[Tuple, List[WebElement], Dict[str, str], str], optional):
+                Определяет локатор элементов.
+                Tuple - локатор в виде кортежа из двух строковых элементов,
+                    где первый это стратегия поиска, а второй это селектор,
+                    например ("id", "android.widget.ProgressBar").
+                Dict - локатор в виде словаря атрибутов и их значений искомого элемента,
+                    например {'text': 'foo', 'displayed' : 'true', 'enabled': 'true'}.
+            by (Union[MobileBy, AppiumBy, By, str], optional):
+                Тип локатора для поиска элементов (всегда в связке с value).
+                Как в стандартном методе driver.find_element.
+            value (Union[str, Dict, None], optional):
+                Значение локатора или словарь аргументов, если используется XPATH.
+            timeout_elements (int, optional):
+                Время ожидания элементов. По умолчанию 10 секунд.
+            timeout_method (int, optional):
+                Время ожидания метода поиска элементов. По умолчанию 600 секунд.
+            elements_range (Union[Tuple, List[WebElement], Dict[str, str], None], optional):
+                Ограничивает поиск элементов в указанном диапазоне.
+            contains (bool, optional):
+                Для поиска по dict и атрибуту 'text',
+                True - ищет элемент содержащий фрагмент значения,
+                False - по строгому соответствию.
+                По умолчанию True.
+
+        Usages:
+            elements = app._get_elements(locator=("id", "foo"))
+            elements = app._get_elements(locator={'text': 'foo'})
+            elements = app._get_elements(locator='/path/to/file/pay_agent.png')
+            elements = app._get_elements(by="id", value="ru.sigma.app.debug:id/backButton")
+            elements = app._get_elements(by=MobileBy.ID, value="ru.sigma.app.debug:id/backButton")
+
+        Raises:
+            WebDriverException: Если произошла ошибка при взаимодействии с WebDriver.
 
         Returns:
-            Список WebElement'ов, или пустой список в случае их отсутствия.
+            Union[List[WebElement], None]: Возвращает список WebElement'ов, если элементы найдены, иначе None.
         """
         # Проверка и подготовка аргументов
         if not locator and (not by or not value):
@@ -205,14 +236,14 @@ class AppiumGet(AppiumBase):
                 try:
                     element = wait.until(EC.presence_of_all_elements_located(locator))
                     return element
-                except WebDriverException:
-                    # self.logger.error(f"Элемент не обнаружен!\n"
-                    #                   f"{locator=}\n"
-                    #                   f"{by=}\n"
-                    #                   f"{value=}\n"
-                    #                   f"{timeout_elements=}\n"
-                    #                   f"{timeout_method=}\n\n" +
-                    #                   "{}\n".format(e))
+                except WebDriverException as error:
+                    self.logger.debug(f"Элемент не обнаружен!\n"
+                                      f"{locator=}\n"
+                                      f"{by=}\n"
+                                      f"{value=}\n"
+                                      f"{timeout_elements=}\n"
+                                      f"{timeout_method=}\n\n" +
+                                      "{}\n".format(error))
                     return None
             # Выполнение подготовки локатора
             handler = locator_handler.get(locator_type)
@@ -223,7 +254,7 @@ class AppiumGet(AppiumBase):
         # Подбирает результат после поиска по изображению
         if isinstance(locator, list):
             return locator
-        self.logger.error(f"\nЧто-то пошло не так\n"
+        self.logger.debug(f"\nЧто-то пошло не так\n"
                           f"{locator=}\n"
                           f"{by=}\n"
                           f"{value=}\n"
@@ -250,7 +281,7 @@ class AppiumGet(AppiumBase):
     def _get_text_coordinates(self,
                               text: str,
                               language: str = 'rus',
-                              image: Union[bytes, str, Image.Image, np.ndarray] = None, ) -> Tuple[int, int, int, int]:
+                              image: Union[bytes, str, Image.Image, np.ndarray] = None, ) -> Optional[tuple[int, ...]]:
         return self.helper.get_text_coordinates(text=text, language=language, image=image)
 
     def _get_screenshot_as_base64_decoded(self):

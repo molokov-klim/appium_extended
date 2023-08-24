@@ -172,7 +172,8 @@ class WebElementScroll(WebElementGet):
 
     def _scroll_until_find(self,
                            locator: Union[Tuple, WebElement, Dict[str, str], str],
-                           timeout_method: int = 120) -> bool:
+                           timeout_method: int = 120,
+                           contains: bool = True) -> bool:
         """
         Крутит элемент вниз, а затем вверх для поиска элемента по заданному локатору.
 
@@ -202,7 +203,7 @@ class WebElementScroll(WebElementGet):
                 if isinstance(locator, str):
                     if self.helper.is_image_on_the_screen(image=locator):
                         return True
-                element = self._get_element(locator=locator, timeout_elem=1)
+                element = self._get_element(locator=locator, timeout_elem=1, contains=contains)
                 if element is not None:
                     return True
             except NoSuchElementException:
@@ -219,7 +220,7 @@ class WebElementScroll(WebElementGet):
                 if isinstance(locator, str):
                     if self.helper.is_image_on_the_screen(image=locator):
                         return True
-                element = self._get_element(locator=locator, timeout_elem=1)
+                element = self._get_element(locator=locator, timeout_elem=1, contains=contains)
                 if element is not None:
                     return True
             except NoSuchElementException:

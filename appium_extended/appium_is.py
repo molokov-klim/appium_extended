@@ -25,19 +25,29 @@ class AppiumIs(AppiumGet):
         """
         Метод проверяет, находится ли заданный элемент на видимом экране.
 
-        Аргументы:
-        - locator (Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str]):
-            Локатор или элемент, который нужно проверить.
-        - timeout (int): Время ожидания элемента. Значение по умолчанию: 10.
-        - contains (bool): Допускает фрагмент текста.
+        Args:
+            locator (Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str]):
+                    Определяет локатор элемента.
+                    Tuple - локатор в виде кортежа из двух строковых элементов,
+                        где первый это стратегия поиска, а второй это селектор,
+                        например ("id", "android.widget.ProgressBar").
+                    Dict - локатор в виде словаря атрибутов и их значений искомого элемента,
+                        например {'text': 'foo', 'displayed' : 'true', 'enabled': 'true'}.
+                    str - путь до изображения
+            timeout (int): Время ожидания элемента. Значение по умолчанию: 10.
+            contains (bool): Искать строгое соответствие или вхождение текста.
+                Только для поиска по словарю с аргументом 'text'
 
-        Возвращает:
-        - bool: True, если элемент находится на экране, False, если нет.
+        Returns:
+            bool: True, если элемент находится на экране, False, если нет.
+
+        Note:
+            Проверяет атрибут: 'displayed'.
         """
         screen_size = self.terminal.get_screen_resolution()  # Получаем размеры экрана
         screen_width = screen_size[0]  # Ширина экрана
         screen_height = screen_size[1]  # Высота экрана
-        element = self._get_element(locator=locator, timeout_elem=timeout, contains=contains)  # Получаем элемент по локатору
+        element = self._get_element(locator=locator, timeout_elem=timeout, contains=contains)
         if element is None:
             return False
         if not element.get_attribute('displayed') == 'true':
