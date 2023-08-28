@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
@@ -653,7 +654,15 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             AssertionError: Если тап не удался.
         """
         try:
-            # Ваш код здесь
+            if locator is not None:
+                # Извлечение координат
+                x, y = self._extract_point_coordinates_by_typing(locator)
+            if image is not None:
+                start_time = time.time()
+                while not self.is_image_on_the_screen(image=image) and time.time() - start_time < timeout:
+                    time.sleep(1)
+                # Извлечение координат
+                x, y = self._extract_point_coordinates_by_typing(image)
             if not self._tap(x=x, y=y, duration=duration):
                 raise TapError(message="Tap не удался",
                                locator=locator,
@@ -663,7 +672,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                timeout=timeout)
             return cast('AppiumExtended', self)
         except Exception as error:
-            raise TapError(message=f"Ошибка при выполнении тапа: {error}",
+            raise TapError(message=f"Ошибка при выполнении tap: {error}",
                            locator=locator,
                            x=x,
                            y=y,
