@@ -316,10 +316,9 @@ def step_info(my_str):
                 # Выводим информацию в лог
                 self.logger.error(f"{my_str} [не выполнено]")
                 traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-                error_msg = f"""Ошибка, элемент не найден. get_element(
-                                                {args=},
-                                                {kwargs=}
-                                            )
+                error_msg = f"""Ошибка: {error},
+                                        {args=},
+                                        {kwargs=},
                             Traceback:
                             {traceback_info=}
                                 """
@@ -327,9 +326,10 @@ def step_info(my_str):
 
                 # В случае исключения помечаем тест провалившимся
                 try:
-                    pytest.fail(f"{func.__name__}({args}, {kwargs}), {e}")
+                    pytest.fail(f"{func.__name__}({args}, {kwargs}), {error}")
                 except Exception as e:
                     self.logger.error("Pytest не обнаружен")
+                    raise
 
             # Логируем информацию после успешного выполнения метода
             self.logger.info(f"{my_str} [выполнено успешно]")

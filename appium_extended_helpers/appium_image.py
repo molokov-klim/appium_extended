@@ -61,8 +61,12 @@ class AppiumImage:
         small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         # Сопоставление частичного изображения и снимка экрана
-        max_val, max_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
-                                                      threshold=threshold)
+        max_val_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
+                                                 threshold=threshold)
+        if max_val_loc is None:
+            return None
+
+        max_val, max_loc = max_val_loc
 
         if not max_val >= threshold:  # Если наибольшее значение совпадения не превышает порога, возвращаем None
             self.logger.error("find_coordinates_by_image(): Совпадений не найдено")

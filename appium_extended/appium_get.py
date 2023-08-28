@@ -275,8 +275,8 @@ class AppiumGet(AppiumBase):
                                      threshold: float = 0.9) -> \
             Union[Tuple[int, int, int, int], None]:
         return self.helper.get_inner_image_coordinates(outer_image_path=outer_image_path,
-                                                      inner_image_path=inner_image_path,
-                                                      threshold=threshold)
+                                                       inner_image_path=inner_image_path,
+                                                       threshold=threshold)
 
     def _get_text_coordinates(self,
                               text: str,

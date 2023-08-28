@@ -1,10 +1,5 @@
-# coding: utf-8
-import inspect
 import logging
 import os
-import sys
-import time
-import traceback
 from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
@@ -13,13 +8,17 @@ from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
 
-from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from appium_extended.appium_swipe import AppiumSwipe
 from appium_extended.appium_wait import AppiumWait
 from appium_extended.appium_tap import AppiumTap
 from appium_extended.appium_is import AppiumIs
+from appium_extended_exceptions.appium_extended_exceptions import TapError, GetElementError, GetElementsError, \
+    GetImageCoordinatesError, GetInnerImageCoordinatesError, GetManyCoordinatesOfImageError, GetTextCoordinatesError, \
+    FindAndGetElementError, IsElementWithinScreenError, IsTextOnScreenError, IsImageOnScreenError, SaveSourceError, \
+    GetScreenshotError, ExtractPointCoordinatesError, ExtractPointCoordinatesByTypingError, SaveScreenshotError, \
+    DrawByCoordinatesError, WaitReturnTrueError, WaitForNotError, WaitForError, SwipeError
 
 from appium_extended_web_element.web_element_extended import WebElementExtended
 
@@ -94,39 +93,39 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             element = app._get_element(by="id", value="backButton")
             element = app._get_element(by=MobileBy.ID, value="backButton")
 
-        Raises:
-            AttributeError: Если элемент не найден.
-
         Returns:
             Union[WebElementExtended, None]: Возвращает WebElementExtended, если элемент найден, иначе None.
         """
-        element = self._get_element(locator=locator,
-                                    by=by,
-                                    value=value,
-                                    timeout_elem=timeout_elem,
-                                    timeout_method=timeout_method,
-                                    elements_range=elements_range,
-                                    contains=contains)
         try:
-            return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
-        except AttributeError as error:
-            traceback_msg = traceback.format_exc()
-            error_msg = f"""Ошибка, элемент не найден. get_element(
-                                {locator=}, 
-                                {by=}, 
-                                {value=}, 
-                                {timeout_elem=}, 
-                                {timeout_method=}, 
-                                {elements_range=}, 
-                                {contains=},
-                            )
-            Error:
-            {error=}
-            Traceback:
-            {traceback_msg=}
-                """
-            self.logger.error(error_msg)
-            raise AttributeError from error
+            element = self._get_element(locator=locator,
+                                        by=by,
+                                        value=value,
+                                        timeout_elem=timeout_elem,
+                                        timeout_method=timeout_method,
+                                        elements_range=elements_range,
+                                        contains=contains)
+        except Exception as error:
+            raise GetElementError(message=f"Ошибка при попытке извлечь элемент {error}",
+                                  locator=locator,
+                                  by=by,
+                                  value=value,
+                                  timeout_elem=timeout_elem,
+                                  timeout_method=timeout_method,
+                                  elements_range=elements_range,
+                                  contains=contains,
+                                  original_exception=error
+                                  ) from error
+        if element is None:
+            raise GetElementError(message="Элемент не найден",
+                                  locator=locator,
+                                  by=by,
+                                  value=value,
+                                  timeout_elem=timeout_elem,
+                                  timeout_method=timeout_method,
+                                  elements_range=elements_range,
+                                  contains=contains
+                                  )
+        return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
 
     def get_elements(self,
                      locator: Union[Tuple, List[WebElement], Dict[str, str], str] = None,
@@ -173,42 +172,42 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             elements = app._get_elements(by="id", value="ru.sigma.app.debug:id/backButton")
             elements = app._get_elements(by=MobileBy.ID, value="ru.sigma.app.debug:id/backButton")
 
-        Raises:
-            AttributeError: Если произошла ошибка при взаимодействии с WebDriver.
-
         Returns:
             Union[List[WebElementExtended], List]: Возвращает список объектов WebElementExtended,
             если элементы найдены, иначе пустой список.
         """
-        elements = super()._get_elements(locator=locator,
-                                         by=by,
-                                         value=value,
-                                         timeout_elements=timeout_elements,
-                                         timeout_method=timeout_method,
-                                         elements_range=elements_range,
-                                         contains=contains)
-        elements_ext = []
         try:
-            for element in elements:
-                elements_ext.append(
-                    WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
-            return elements_ext
-        except AttributeError as e:
-            traceback_msg = traceback.format_exc()
-            error_msg = f"""Ошибка, элемент не найден. get_elements(
-                     {locator=},
-                     {by=},
-                     {value=},
-                     {timeout_elements=},
-                     {timeout_method=},
-                     {elements_range=},
-                     {contains=},
-                     )
-            Traceback:
-            {traceback_msg=}
-                """
-            self.logger.error(error_msg)
-            raise AttributeError from e
+            elements = super()._get_elements(locator=locator,
+                                             by=by,
+                                             value=value,
+                                             timeout_elements=timeout_elements,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
+                                             contains=contains)
+        except Exception as error:
+            raise GetElementsError(message=f"Ошибка при попытке извлечь элементы: {error}",
+                                   by=by,
+                                   value=value,
+                                   timeout_elements=timeout_elements,
+                                   timeout_method=timeout_method,
+                                   elements_range=elements_range,
+                                   contains=contains,
+                                   original_exception=error,
+                                   ) from error
+        if elements is None:
+            raise GetElementsError(message="Элементы не найдены",
+                                   by=by,
+                                   value=value,
+                                   timeout_elements=timeout_elements,
+                                   timeout_method=timeout_method,
+                                   elements_range=elements_range,
+                                   contains=contains
+                                   )
+        elements_ext = []
+        for element in elements:
+            elements_ext.append(
+                WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger))
+        return elements_ext
 
     def get_image_coordinates(self,
                               image: Union[bytes, np.ndarray, Image.Image, str],
@@ -238,9 +237,24 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
-        return self._get_image_coordinates(full_image=full_image,
+        try:
+            coordinates = self._get_image_coordinates(full_image=full_image,
+                                                      image=image,
+                                                      threshold=threshold)
+        except Exception as error:
+            raise GetImageCoordinatesError(message=f"Ошибка при попытке извлечения координат изображения: {error}",
+                                           full_image=full_image,
                                            image=image,
-                                           threshold=threshold)
+                                           threshold=threshold,
+                                           original_exception=error
+                                           ) from error
+        if coordinates is None:
+            raise GetImageCoordinatesError(message="Изображение не найдено",
+                                           full_image=full_image,
+                                           image=image,
+                                           threshold=threshold
+                                           )
+        return coordinates
 
     def get_inner_image_coordinates(self,
                                     outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
@@ -271,9 +285,24 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
-        return self._get_inner_image_coordinates(outer_image_path=outer_image_path,
-                                                 inner_image_path=inner_image_path,
-                                                 threshold=threshold)
+        try:
+            inner_image_coordinates = self._get_inner_image_coordinates(outer_image_path=outer_image_path,
+                                                                        inner_image_path=inner_image_path,
+                                                                        threshold=threshold)
+        except Exception as error:
+            raise GetInnerImageCoordinatesError(message=f"Ошибка при попытке извлечь внутреннее изображение: {error}",
+                                                outer_image_path=outer_image_path,
+                                                inner_image_path=inner_image_path,
+                                                threshold=threshold,
+                                                original_exception=error
+                                                ) from error
+        if inner_image_coordinates is None:
+            raise GetInnerImageCoordinatesError(message="Внутреннее изображение не найдено",
+                                                outer_image_path=outer_image_path,
+                                                inner_image_path=inner_image_path,
+                                                threshold=threshold
+                                                )
+        return inner_image_coordinates
 
     def get_many_coordinates_of_image(self,
                                       image: Union[bytes, np.ndarray, Image.Image, str],
@@ -308,10 +337,26 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
-        return self.helper.get_many_coordinates_of_image(full_image=full_image,
-                                                         image=image,
-                                                         cv_threshold=cv_threshold,
-                                                         coord_threshold=coord_threshold)
+        try:
+            coordinates = self.helper.get_many_coordinates_of_image(full_image=full_image,
+                                                                    image=image,
+                                                                    cv_threshold=cv_threshold,
+                                                                    coord_threshold=coord_threshold)
+        except Exception as error:
+            raise GetManyCoordinatesOfImageError(
+                message=f"Ошибка при попытке извлечения координат изображений: {error}",
+                image=image,
+                full_image=full_image,
+                cv_threshold=cv_threshold,
+                coord_threshold=coord_threshold,
+                original_exception=error) from error
+        if coordinates is None:
+            raise GetManyCoordinatesOfImageError(message="Совпадения не найдены",
+                                                 image=image,
+                                                 full_image=full_image,
+                                                 cv_threshold=cv_threshold,
+                                                 coord_threshold=coord_threshold)
+        return coordinates
 
     def get_text_coordinates(self,
                              text: str,
@@ -319,7 +364,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                              image: Union[bytes, str, Image.Image, np.ndarray] = None,
                              ocr: Optional[bool] = True,
                              contains: bool = True
-                             ) -> Union[Tuple[int, int, int, int], None]:  # TODO реализовать None
+                             ) -> Union[tuple[int, ...], tuple[int, int, int, int], None]:
         """
         Возвращает координаты области с указанным текстом на предоставленном изображении или снимке экрана.
         Метод может работать в двух режимах: с использованием OCR (оптического распознавания символов) или
@@ -346,9 +391,34 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
           Если ocr=False, возвращаются координаты, полученные с помощью метода get_element.
         """
         if ocr:
-            return self._get_text_coordinates(text=text, language=language, image=image)
-        return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'}, contains=contains). \
-            get_coordinates()
+            try:
+                coordinates = self._get_text_coordinates(text=text, language=language, image=image)
+            except Exception as error:
+                raise GetTextCoordinatesError(message=f"Ошибка при попытке найти координаты изображения "
+                                                      f"с использованием OCR: {error}",
+                                              text=text,
+                                              language=language,
+                                              image=image,
+                                              ocr=True,
+                                              original_exception=error) from error
+            if coordinates is None:
+                raise GetTextCoordinatesError(message="Текст не найден при использовании OCR",
+                                              text=text,
+                                              language=language,
+                                              image=image,
+                                              ocr=True)
+            return coordinates
+        else:
+            try:
+                return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'},
+                                        contains=contains).get_coordinates()
+            except Exception as error:
+                raise GetTextCoordinatesError(message=f"Ошибка при попытке найти координаты изображения "
+                                                      f"с использованием поиска по DOM: {error}",
+                                              text=text,
+                                              contains=contains,
+                                              ocr=False,
+                                              original_exception=error) from error
 
     # DOM
 
@@ -358,7 +428,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Возвращает элемент содержащий определенный элемент.
         Не реализован.
         """
-        raise NotImplementedError("This method is not implemented yet.")  # TODO implement
+        raise NotImplementedError("Метод еще не реализован.")  # TODO implement
 
     def get_elements_contains(self,
                               ) -> Any:
@@ -366,7 +436,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Возвращает элементы содержащие определенный(е) элемент(ы).
         Не реализован.
         """
-        raise NotImplementedError("This method is not implemented yet.")  # TODO implement
+        raise NotImplementedError("Метод еще не реализован.")  # TODO implement
 
     # FIXME отладить, работает недостаточно стабильно в боевых условиях
     def find_and_get_element(self,
@@ -401,22 +471,45 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Raises:
             ValueError: Возникает, если элемент не найден. Исключение вызывается внутренним методом get_element.
         """
-        if self.is_element_within_screen(locator=locator, timeout=1, contains=contains):
-            return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
-        recyclers = self.get_elements(locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
-        for i in range(tries):
-            for recycler in recyclers:
+        try:
+            if self.is_element_within_screen(locator=locator, timeout=1, contains=contains):
                 try:
-                    if recycler.scroll_until_find(locator=locator, contains=contains):
-                        return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
-                except StaleElementReferenceException as e:
-                    current_function_name = inspect.currentframe().f_globals['__name__']
-                    self.logger.error(f"{current_function_name} ERROR: {e}")
-                    self.logger.error(f"arg {recycler=}")
-                    self.logger.error(f"arg {locator=}")
-                    traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
-                    self.logger.error(traceback_info)
-        return None
+                    return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
+                except GetElementError as error:
+                    raise FindAndGetElementError(message="Не удалось получить элемент "
+                                                         "(несмотря на то, что он обнаружен на экране)",
+                                                 locator=locator,
+                                                 timeout=timeout,
+                                                 tries=tries,
+                                                 contains=contains,
+                                                 original_exception=error) from error
+            recyclers = self.get_elements(locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
+            if recyclers is None:
+                raise FindAndGetElementError(message="Не удалось обнаружить прокручиваемые элементы на экране",
+                                             locator=locator,
+                                             timeout=timeout,
+                                             tries=tries,
+                                             contains=contains)
+            for i in range(tries):
+                for recycler in recyclers:
+                    if recycler.scroll_until_find(locator=locator, contains=contains) is not None:
+                        try:
+                            return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
+                        except GetElementError as error:
+                            raise FindAndGetElementError(message="Не удалось извлечь элемент",
+                                                         locator=locator,
+                                                         timeout=timeout,
+                                                         tries=tries,
+                                                         contains=contains,
+                                                         original_exception=error) from error
+            return None
+        except Exception as error:
+            raise FindAndGetElementError(message=f"Ошибка при попытке найти и извлечь элемент: {error}",
+                                         locator=locator,
+                                         timeout=timeout,
+                                         tries=tries,
+                                         contains=contains,
+                                         original_exception=error) from error
 
     def is_element_within_screen(self,
                                  locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -446,7 +539,15 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             Проверяет атрибут: 'displayed'.
         """
-        return self._is_element_within_screen(locator=locator, timeout=timeout, contains=contains)
+        try:
+            return self._is_element_within_screen(locator=locator, timeout=timeout, contains=contains)
+        except Exception as error:
+            raise IsElementWithinScreenError(message=f"Ошибка при проверке, "
+                                                     f"находится ли элемент на видимом экране: {error}",
+                                             locator=locator,
+                                             timeout=timeout,
+                                             contains=contains,
+                                             original_exception=error) from error
 
     def is_text_on_screen(self,
                           text: str,
@@ -470,9 +571,18 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Возвращает:
         - bool: True, если заданный текст найден на экране. False в противном случае.
         """
-        if ocr:
-            return self.helper.is_text_on_ocr_screen(text=text, language=language)
-        return self._is_element_within_screen(locator={'text': text}, contains=contains)
+        try:
+            if ocr:
+                return self.helper.is_text_on_ocr_screen(text=text, language=language)
+            return self._is_element_within_screen(locator={'text': text}, contains=contains)
+        except Exception as error:
+            raise IsTextOnScreenError(message=f"Ошибка при проверке, "
+                                              f"присутствует ли заданный текст на экране: {error}",
+                                      text=text,
+                                      language=language,
+                                      ocr=ocr,
+                                      contains=contains,
+                                      original_exception=error) from error
 
     def is_image_on_the_screen(self,
                                image: Union[bytes, np.ndarray, Image.Image, str],
@@ -494,8 +604,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             AssertionError: Ошибки, связанные с неверными размерами изображений.
             Exception: Остальные исключения.
         """
-        return self.helper.is_image_on_the_screen(image=image,
-                                                  threshold=threshold)
+        try:
+            return self.helper.is_image_on_the_screen(image=image, threshold=threshold)
+        except Exception as error:
+            raise IsImageOnScreenError(message="Ошибка при проверке, "
+                                               f"присутствует ли заданное изображение на экране: {error}",
+                                       image=image,
+                                       threshold=threshold,
+                                       original_exception=error) from error
 
     def tap(self,
             locator: Union[Tuple[str, str], WebElementExtended, WebElement, Dict[str, str], str] = None,
@@ -536,20 +652,25 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Raises:
             AssertionError: Если тап не удался.
         """
-        if locator is not None:
-            # Извлечение координат
-            x, y = self._extract_point_coordinates_by_typing(locator)
-        if image is not None:
-            start_time = time.time()
-            while not self.is_image_on_the_screen(image=image) and time.time() - start_time < timeout:
-                time.sleep(1)
-            # Извлечение координат
-            x, y = self._extract_point_coordinates_by_typing(image)
-
-        assert self._tap(x=x, y=y,
-                         duration=duration)
-        # Возвращаем экземпляр класса appium_extended
-        return cast('AppiumExtended', self)
+        try:
+            # Ваш код здесь
+            if not self._tap(x=x, y=y, duration=duration):
+                raise TapError(message="Tap не удался",
+                               locator=locator,
+                               x=x, y=y,
+                               image=image,
+                               duration=duration,
+                               timeout=timeout)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise TapError(message=f"Ошибка при выполнении тапа: {error}",
+                           locator=locator,
+                           x=x,
+                           y=y,
+                           image=image,
+                           duration=duration,
+                           timeout=timeout,
+                           original_exception=error) from error
 
     # SWIPE
     def swipe(self,
@@ -597,24 +718,39 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - В качестве конечной позиции свайпа должен быть указан end_position или пара direction, distance.
             - str принимается как путь к изображению на экране и вычисляется его центр, а не как локатор элемента.
         """
-        # Извлечение координат начальной точки свайпа
-        start_x, start_y = self._extract_point_coordinates_by_typing(start_position)
+        try:
+            # Извлечение координат начальной точки свайпа
+            start_x, start_y = self._extract_point_coordinates_by_typing(start_position)
 
-        if end_position is not None:
-            # Извлечение координат конечной точки свайпа
-            end_x, end_y = self._extract_point_coordinates_by_typing(end_position)
-        else:
-            # Извлечение координат конечной точки свайпа на основе направления и расстояния
-            end_x, end_y = self._extract_point_coordinates_by_direction(direction, distance, start_x, start_y,
-                                                                        screen_resolution=self.terminal.get_screen_resolution())
+            if end_position is not None:
+                # Извлечение координат конечной точки свайпа
+                end_x, end_y = self._extract_point_coordinates_by_typing(end_position)
+            else:
+                # Извлечение координат конечной точки свайпа на основе направления и расстояния
+                end_x, end_y = self._extract_point_coordinates_by_direction(direction, distance, start_x, start_y,
+                                                                            screen_resolution=self.terminal.get_screen_resolution())
 
-        # Выполнение свайпа
-        assert self._swipe(start_x=start_x, start_y=start_y,
-                           end_x=end_x, end_y=end_y,
-                           duration=duration)
+            # Выполнение свайпа
+            if not self._swipe(start_x=start_x, start_y=start_y,
+                               end_x=end_x, end_y=end_y,
+                               duration=duration):
+                raise SwipeError(message=f"Не удалось выполнить свайп",
+                                 start_position=start_position,
+                                 end_position=end_position,
+                                 direction=duration,
+                                 distance=distance,
+                                 duration=duration)
 
-        # Возвращаем экземпляр класса appium_extended
-        return cast('AppiumExtended', self)
+            # Возвращаем экземпляр класса appium_extended
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise SwipeError(message=f"Ошибка при попытке выполнения свайпа: {error}",
+                             start_position=start_position,
+                             end_position=end_position,
+                             direction=duration,
+                             distance=distance,
+                             duration=duration,
+                             original_exception=error) from error
 
     def swipe_right_to_left(self) -> 'AppiumExtended':
         """
@@ -783,19 +919,29 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Метод использует внутренние функции для поиска элементов и изображений.
             - Параметр `contains` используется только при поиске по локатору.
         """
-        assert self._wait_for(locator=locator,
-                              image=image,
-                              timeout=timeout,
-                              contains=contains)
-        # Возвращаем экземпляр класса appium_extended
-        return cast('AppiumExtended', self)
+        try:
+            if not self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains):
+                raise WaitForError(message="Элемент или изображение не появились на экране в течение заданного времени",
+                                   locator=locator,
+                                   image=image,
+                                   timeout=timeout,
+                                   contains=contains)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise WaitForError(message=f"Ошибка ожидания элемента или изображения на "
+                                       f"экране в течение заданного времени {error}",
+                               locator=locator,
+                               image=image,
+                               timeout=timeout,
+                               contains=contains,
+                               original_exception=error) from error
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
-                     List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
-                         str]] = None,
+                                    List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
+                                    str]] = None,
                      image: Union[bytes, np.ndarray, Image.Image, str,
-                     List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
+                                  List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                      timeout: int = 10,
                      contains: bool = True,
                      ) -> 'AppiumExtended':
@@ -839,23 +985,31 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Метод использует внутренние функции для поиска элементов и изображений.
             - Параметр `contains` используется только при поиске по локатору.
         """
-        assert self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains)
-        # Возвращаем экземпляр класса appium_extended
-        return cast('AppiumExtended', self)
+        try:
+            if not self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains):
+                raise WaitForNotError(message="Элемент или изображение не исчезли в течение заданного времени",
+                                      locator=locator,
+                                      image=image,
+                                      timeout=timeout,
+                                      contains=contains)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise WaitForNotError(message=f"Ошибка при ожидании wait_for_not(): {error}",
+                                  locator=locator,
+                                  image=image,
+                                  timeout=timeout,
+                                  contains=contains,
+                                  original_exception=error) from error
 
     def wait_return_true(self, method, timeout: int = 10) -> 'AppiumExtended':
-        assert self._wait_return_true(method=method, timeout=timeout)
-        # Возвращаем экземпляр класса appium_extended
-        return cast('AppiumExtended', self)
-
-    # KEYBOARD
-
-    def input_by_virtual_keyboard(self) -> 'appium_extended':  # TODO реализовать возврат cast('appium_extended', self)
-        """
-        Вводит с помощью виртуально клавиатуры.
-        Метод не реализован
-        """
-        raise NotImplementedError("This method is not implemented yet.")
+        try:
+            self._wait_return_true(method=method, timeout=timeout)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise WaitReturnTrueError(message=f"Ошибка ожидания возврата True от метода: {error}",
+                                      method=method,
+                                      timeout=timeout,
+                                      original_exception=error) from error
 
     # OTHER
 
@@ -871,7 +1025,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
 
         Args:
             image (Union[bytes, str, Image.Image, np.ndarray], optional): Изображение для рисования. По умолчанию None.
-            coordinates (Tuple[int, int, int, int], optional): Координаты прямоугольника (x1, y1, x2, y2). По умолчанию None.
+            coordinates (Tuple[int, int, int, int], optional): Координаты прямоугольника (x1, y1, x2, y2).
+                                                               По умолчанию None.
             top_left (Tuple[int, int], optional): Верхняя левая точка прямоугольника. По умолчанию None.
             bottom_right (Tuple[int, int], optional): Нижняя правая точка прямоугольника. По умолчанию None.
             path (str, optional): Путь для сохранения изображения. По умолчанию None.
@@ -891,12 +1046,20 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если изображение не предоставлено, будет использован текущий снимок экрана.
             - Если не указаны верхняя левая и нижняя правая точки, будут использованы координаты.
         """
-        assert self.helper.draw_by_coordinates(image=image,
-                                               coordinates=coordinates,
-                                               top_left=top_left,
-                                               bottom_right=bottom_right,
-                                               path=path)
-        return cast('AppiumExtended', self)
+        try:
+            assert self.helper.draw_by_coordinates(image=image,
+                                                   coordinates=coordinates,
+                                                   top_left=top_left,
+                                                   bottom_right=bottom_right,
+                                                   path=path)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise DrawByCoordinatesError(message=f"Не удалось нарисовать прямоугольник на изображении: {error}",
+                                         coordinates=coordinates,
+                                         top_left=top_left,
+                                         bottom_right=bottom_right,
+                                         path=path,
+                                         original_exception=error) from error
 
     def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> 'AppiumExtended':
         """
@@ -921,8 +1084,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если путь не указан, скриншот будет сохранен в текущей директории.
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
-        assert self.helper.save_screenshot(path=path)
-        return cast('AppiumExtended', self)
+        try:
+            assert self.helper.save_screenshot(path=path, filename=filename)
+            return cast('AppiumExtended', self)
+        except Exception as error:
+            raise SaveScreenshotError(message=f"Не удалось сохранить скриншот: {error}",
+                                      path=path,
+                                      filename=filename,
+                                      original_exception=error) from error
 
     # PRIVATE
 
@@ -935,7 +1104,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Извлекает координаты точки на основе типа переданной позиции.
     
         Args:
-            position (Union[Tuple[int, int], str, bytes, np.ndarray, Image.Image, Tuple[str, str], Dict, WebElement, WebElementExtended]):
+            position (Union[Tuple[int, int], str, bytes, np.ndarray, Image.Image, Tuple[str, str], 
+                      Dict, WebElement, WebElementExtended]):
                 - Позиция, для которой нужно извлечь координаты.
                 - Либо локатор элемента, либо изображение, либо кортеж из координат.
     
@@ -947,36 +1117,40 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
     
         Returns:
             Tuple[int, int]: Кортеж координат точки, в формате (x, y).
-    
-        Raises:
-            Метод не вызывает исключений, но внутренние методы, которые он вызывает, могут вызывать исключения.
-    
+        
         Notes:
-            - Метод использует различные внутренние функции для вычисления координат в зависимости от типа входного параметра.
+            - Метод использует различные внутренние функции для вычисления координат в 
+              зависимости от типа входного параметра.
         """
-        x, y = 0, 0
-        # Вычисление позиции начала свайпа
-        if (isinstance(position, Tuple) and
-                isinstance(position[0], int) and
-                isinstance(position[1], int)):
-            # Если position является кортежем с двумя целыми числами, то считаем, что это координаты
-            x, y = position
-        elif (isinstance(position, Tuple) and
-              isinstance(position[0], str) and
-              isinstance(position[1], str)) or \
-                isinstance(position, WebElement) or \
-                isinstance(position, WebElementExtended) or \
-                isinstance(position, Dict):
-            # Если position является кортежем с двумя строковыми элементами или экземпляром WebElement,
-            # WebElementExtended или словарем, то получаем координаты центра элемента
-            x, y = utils.calculate_center_of_coordinates(
-                self.get_element(locator=position).get_coordinates())
-        elif isinstance(position, (bytes, np.ndarray, Image.Image, str)):
-            # Если position является строкой, байтами, массивом NumPy или объектом Image.Image,
-            # то получаем координаты центра изображения
-            x, y = utils.calculate_center_of_coordinates(
-                self.get_image_coordinates(image=position))
-        return x, y
+        try:
+            x, y = 0, 0
+            # Вычисление позиции начала свайпа
+            if (isinstance(position, Tuple) and
+                    isinstance(position[0], int) and
+                    isinstance(position[1], int)):
+                # Если position является кортежем с двумя целыми числами, то считаем, что это координаты
+                x, y = position
+            elif (isinstance(position, Tuple) and
+                  isinstance(position[0], str) and
+                  isinstance(position[1], str)) or \
+                    isinstance(position, WebElement) or \
+                    isinstance(position, WebElementExtended) or \
+                    isinstance(position, Dict):
+                # Если position является кортежем с двумя строковыми элементами или экземпляром WebElement,
+                # WebElementExtended или словарем, то получаем координаты центра элемента
+                x, y = utils.calculate_center_of_coordinates(
+                    self.get_element(locator=position).get_coordinates())
+            elif isinstance(position, (bytes, np.ndarray, Image.Image, str)):
+                # Если position является строкой, байтами, массивом NumPy или объектом Image.Image,
+                # то получаем координаты центра изображения
+                x, y = utils.calculate_center_of_coordinates(
+                    self.get_image_coordinates(image=position))
+            return x, y
+        except Exception as error:
+            raise ExtractPointCoordinatesByTypingError(
+                message=f"Не удалось извлечь координаты точки на основе типа переданной позиции: {error}",
+                position=position,
+                original_exception=error) from error
 
     @staticmethod
     def _extract_point_coordinates_by_direction(direction: int, distance: int,
@@ -995,12 +1169,21 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Возвращает:
             Tuple[int, int]: Координаты конечной точки в формате (x, y).
         """
-        width = screen_resolution[0]
-        height = screen_resolution[1]
-        end_x, end_y = utils.find_coordinates_by_vector(width=width, height=height,
-                                                        direction=direction, distance=distance,
-                                                        start_x=start_x, start_y=start_y)
-        return end_x, end_y
+        try:
+            width = screen_resolution[0]
+            height = screen_resolution[1]
+            end_x, end_y = utils.find_coordinates_by_vector(width=width, height=height,
+                                                            direction=direction, distance=distance,
+                                                            start_x=start_x, start_y=start_y)
+            return end_x, end_y
+        except Exception as error:
+            raise ExtractPointCoordinatesError(message=f"Не удалось извлечь координаты точки: {error}",
+                                               direction=direction,
+                                               distance=distance,
+                                               start_x=start_x,
+                                               start_y=start_y,
+                                               screen_resolution=screen_resolution,
+                                               original_exception=error) from error
 
     def get_screenshot_as_base64_decoded(self) -> bytes:
         """
@@ -1015,17 +1198,18 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Returns:
             bytes: Декодированные байты скриншота.
 
-        Raises:
-            WebDriverException: Если не удается получить скриншот.
-
         Notes:
             - Этот метод предназначен для внутреннего использования и может быть вызван другими методами класса.
             - Скриншот возвращается в формате PNG.
             - Исходный скриншот получается в формате Base64, который затем кодируется в UTF-8 и декодируется обратно в байты.
         """
-        return self._get_screenshot_as_base64_decoded()
+        try:
+            return self._get_screenshot_as_base64_decoded()
+        except Exception as error:
+            raise GetScreenshotError(message=f"Не удалось получить скриншот: {error}",
+                                     original_exception=error) from error
 
-    def save_source(self, path: str = '', filename: str = 'source.xml') -> bool:
+    def save_source(self, path: str = '', filename: str = 'source.xml'):
         """
         Сохраняет исходный код страницы в указанной директории с указанным именем файла.
 
@@ -1042,9 +1226,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Returns:
             bool: True, если исходный код успешно сохранен. False, если произошла ошибка.
 
-        Raises:
-            None: Метод не вызывает исключений, но логирует ошибки, если они произойдут.
-
         Notes:
             - Метод использует встроенный метод драйвера `page_source` для получения исходного кода страницы.
             - Исходный код сохраняется в формате XML.
@@ -1054,8 +1235,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             path_to_file = os.path.join(path, filename)
             with open(path_to_file, "wb") as f:
                 f.write(source.encode('utf-8'))
-            return True
         except Exception as error:
-            self.logger.error(f"Не удалось сохранить страницу: {error=}")
-            return False
-
+            self.logger.error(f"Ошибка при сохранении исходного кода страницы: {error}")
+            raise SaveSourceError(message="Не удалось сохранить исходный код страницы",
+                                  path=path,
+                                  filename=filename,
+                                  original_exception=error) from error

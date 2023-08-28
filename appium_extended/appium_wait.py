@@ -141,6 +141,7 @@ class AppiumWait(AppiumGet):
                 if not locators_present:
                     return True
                 time.sleep(1)
+            raise TimeoutError
 
         if image is not None:
             if not isinstance(image, List):
@@ -157,6 +158,7 @@ class AppiumWait(AppiumGet):
                 if not images_present:
                     return True
                 time.sleep(1)
+            raise TimeoutError
         return False
 
     @staticmethod
@@ -170,6 +172,6 @@ class AppiumWait(AppiumGet):
         start_time = time.time()
         while time.time() - start_time < timeout:
             if method():
-                return True
+                return
             time.sleep(1)
-        return False
+        raise TimeoutError
