@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 
-VERSION = '0.4.46'
+VERSION = '0.5.47-beta'
 
 
 setup(
