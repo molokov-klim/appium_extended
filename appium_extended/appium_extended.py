@@ -395,8 +395,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             try:
                 coordinates = self._get_text_coordinates(text=text, language=language, image=image)
             except Exception as error:
-                raise GetTextCoordinatesError(message=f"Ошибка при попытке найти координаты изображения "
-                                                      f"с использованием OCR: {error}",
+                raise GetTextCoordinatesError(message=f"""
+                Ошибка при попытке найти координаты изображения с использованием OCR: {error}""",
                                               text=text,
                                               language=language,
                                               image=image,
@@ -414,8 +414,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'},
                                         contains=contains).get_coordinates()
             except Exception as error:
-                raise GetTextCoordinatesError(message=f"Ошибка при попытке найти координаты изображения "
-                                                      f"с использованием поиска по DOM: {error}",
+                raise GetTextCoordinatesError(message=f"""
+                Ошибка при попытке найти координаты изображения с использованием поиска по DOM: {error}""",
                                               text=text,
                                               contains=contains,
                                               ocr=False,
@@ -477,8 +477,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 try:
                     return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
                 except GetElementError as error:
-                    raise FindAndGetElementError(message="Не удалось получить элемент "
-                                                         "(несмотря на то, что он обнаружен на экране)",
+                    raise FindAndGetElementError(message="""
+                    Не удалось получить элемент (несмотря на то, что он обнаружен на экране)""",
                                                  locator=locator,
                                                  timeout=timeout,
                                                  tries=tries,
@@ -543,8 +543,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         try:
             return self._is_element_within_screen(locator=locator, timeout=timeout, contains=contains)
         except Exception as error:
-            raise IsElementWithinScreenError(message=f"Ошибка при проверке, "
-                                                     f"находится ли элемент на видимом экране: {error}",
+            raise IsElementWithinScreenError(message=f"""
+            Ошибка при проверке, находится ли элемент на видимом экране: {error}""",
                                              locator=locator,
                                              timeout=timeout,
                                              contains=contains,
@@ -577,8 +577,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 return self.helper.is_text_on_ocr_screen(text=text, language=language)
             return self._is_element_within_screen(locator={'text': text}, contains=contains)
         except Exception as error:
-            raise IsTextOnScreenError(message=f"Ошибка при проверке, "
-                                              f"присутствует ли заданный текст на экране: {error}",
+            raise IsTextOnScreenError(message=f"""
+            Ошибка при проверке, присутствует ли заданный текст на экране: {error}""",
                                       text=text,
                                       language=language,
                                       ocr=ocr,
@@ -608,8 +608,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         try:
             return self.helper.is_image_on_the_screen(image=image, threshold=threshold)
         except Exception as error:
-            raise IsImageOnScreenError(message="Ошибка при проверке, "
-                                               f"присутствует ли заданное изображение на экране: {error}",
+            raise IsImageOnScreenError(message=f"""
+            Ошибка при проверке, присутствует ли заданное изображение на экране: {error}""",
                                        image=image,
                                        threshold=threshold,
                                        original_exception=error) from error
@@ -937,8 +937,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                    contains=contains)
             return cast('AppiumExtended', self)
         except Exception as error:
-            raise WaitForError(message=f"Ошибка ожидания элемента или изображения на "
-                                       f"экране в течение заданного времени {error}",
+            raise WaitForError(message=f"""
+            Ошибка ожидания элемента или изображения на экране в течение заданного времени {error}""",
                                locator=locator,
                                image=image,
                                timeout=timeout,
@@ -1245,7 +1245,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             with open(path_to_file, "wb") as f:
                 f.write(source.encode('utf-8'))
         except Exception as error:
-            self.logger.error(f"Ошибка при сохранении исходного кода страницы: {error}")
             raise SaveSourceError(message="Не удалось сохранить исходный код страницы",
                                   path=path,
                                   filename=filename,
