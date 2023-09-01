@@ -38,8 +38,8 @@ class AppiumTap(AppiumGet):
         try:
             self.driver.tap(positions=[position], duration=duration)  # Выполняем касание на указанных координатах
         except WebDriverException as e:
-            self.logger.error("_tap() Ошибка в методе _tap()"
-                              f"{x=}, {y=}"
+            self.logger.error("_tap() WebDriverException "
+                              f"{x=}, {y=} "
                               f"{duration=}")
             self.logger.error(e)
             return False

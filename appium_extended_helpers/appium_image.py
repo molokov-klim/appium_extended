@@ -213,21 +213,22 @@ class AppiumImage:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
 
-    @staticmethod
-    def _multi_scale_matching(full_image: np.ndarray,
+    def _multi_scale_matching(self,
+                              full_image: np.ndarray,
                               template_image: np.ndarray,
                               threshold: float = 0.8,
                               return_raw: bool = False):
-        w, h = template_image.shape[::-1]  # Исходный размер шаблона
+        origin_width, origin_height = template_image.shape[::-1]  # Исходный размер шаблона
 
         # Цикл по различным масштабам, включая масштабы больше 1.0 для "растягивания"
         for scale in np.concatenate([np.linspace(0.2, 1.0, 10)[::-1], np.linspace(1.1, 2.0, 10)]):
+
 
             # Изменение размера изображения и сохранение масштаба
             resized = cv2.resize(full_image, (int(full_image.shape[1] * scale), int(full_image.shape[0] * scale)))
 
             # Если измененный размер становится меньше шаблона, прерываем цикл
-            if resized.shape[0] < h or resized.shape[1] < w:
+            if resized.shape[0] < origin_height or resized.shape[1] < origin_width:
                 continue
 
             # Сопоставление шаблона
@@ -238,7 +239,9 @@ class AppiumImage:
             if max_val > threshold:
                 if return_raw:
                     return result
-                return max_val, max_loc
+                # Преобразование координат обратно к оригинальному масштабу
+                max_loc_original = (int(max_loc[0] / scale), int(max_loc[1] / scale))
+                return max_val, max_loc_original
 
         if return_raw:
             return None
