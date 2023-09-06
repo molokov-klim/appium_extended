@@ -10,7 +10,12 @@ from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 
 
-class GetElementError(Exception):
+class AppiumExtendedException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class GetElementError(AppiumExtendedException):
     """
     Возникает, когда попытка получить элемент не удалась.
     """
@@ -38,7 +43,7 @@ class GetElementError(Exception):
         self.original_exception = original_exception
 
 
-class GetElementsError(Exception):
+class GetElementsError(AppiumExtendedException):
     """
     Возникает, когда попытка получить элементы не удалась.
     """
@@ -66,7 +71,7 @@ class GetElementsError(Exception):
         self.original_exception = original_exception
 
 
-class GetImageCoordinatesError(Exception):
+class GetImageCoordinatesError(AppiumExtendedException):
     """
     Возникает когда попытка найти изображение не удалась
     """
@@ -86,7 +91,7 @@ class GetImageCoordinatesError(Exception):
         self.original_exception = original_exception
 
 
-class GetManyCoordinatesOfImageError(Exception):
+class GetManyCoordinatesOfImageError(AppiumExtendedException):
     """
     Возникает, когда попытка найти все вхождения частичного изображения внутри полного изображения не удалась.
     """
@@ -108,7 +113,7 @@ class GetManyCoordinatesOfImageError(Exception):
         self.original_exception = original_exception
 
 
-class GetInnerImageCoordinatesError(Exception):
+class GetInnerImageCoordinatesError(AppiumExtendedException):
     """
     Возникает, когда попытка извлечь внутреннее изображение из изображения не удалась.
     """
@@ -128,7 +133,7 @@ class GetInnerImageCoordinatesError(Exception):
         self.original_exception = original_exception
 
 
-class GetTextCoordinatesError(Exception):
+class GetTextCoordinatesError(AppiumExtendedException):
     """
     Возникает, когда попытка найти координаты текста на изображении или экране не удалась.
     """
@@ -152,7 +157,7 @@ class GetTextCoordinatesError(Exception):
         self.original_exception = original_exception
 
 
-class FindAndGetElementError(Exception):
+class FindAndGetElementError(AppiumExtendedException):
     """
     Возникает, когда попытка найти и извлечь элемент не удалась.
     """
@@ -174,7 +179,7 @@ class FindAndGetElementError(Exception):
         self.original_exception = original_exception
 
 
-class IsElementWithinScreenError(Exception):
+class IsElementWithinScreenError(AppiumExtendedException):
     """
     Возникает, когда происходит ошибка при проверке, находится ли элемент на видимом экране.
     """
@@ -194,7 +199,7 @@ class IsElementWithinScreenError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class IsTextOnScreenError(Exception):
+class IsTextOnScreenError(AppiumExtendedException):
     """
     Возникает, когда происходит ошибка при проверке, присутствует ли заданный текст на экране.
     """
@@ -216,7 +221,7 @@ class IsTextOnScreenError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class IsImageOnScreenError(Exception):
+class IsImageOnScreenError(AppiumExtendedException):
     """
     Возникает, когда происходит ошибка при проверке, присутствует ли заданное изображение на экране.
     """
@@ -234,7 +239,7 @@ class IsImageOnScreenError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class TapError(Exception):
+class TapError(AppiumExtendedException):
     """
     Возникает, когда происходит ошибка при выполнении тапа.
     """
@@ -260,7 +265,7 @@ class TapError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class SwipeError(Exception):
+class SwipeError(AppiumExtendedException):
     """
     Возникает, если свайп не может быть выполнен.
     """
@@ -277,7 +282,7 @@ class SwipeError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class WaitForError(Exception):
+class WaitForError(AppiumExtendedException):
     """
     Возникает, когда элемент или изображение не появляются на экране в течение заданного времени.
     """
@@ -293,7 +298,7 @@ class WaitForError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class WaitForNotError(Exception):
+class WaitForNotError(AppiumExtendedException):
     """
     Возникает, когда элемент или изображение не исчезают с экрана в течение заданного времени.
     """
@@ -309,7 +314,7 @@ class WaitForNotError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class WaitReturnTrueError(Exception):
+class WaitReturnTrueError(AppiumExtendedException):
     """
     Возникает, когда метод не возвращает True в течение заданного времени.
     """
@@ -322,7 +327,7 @@ class WaitReturnTrueError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class DrawByCoordinatesError(Exception):
+class DrawByCoordinatesError(AppiumExtendedException):
     """
     Возникает, когда не удается нарисовать прямоугольник на изображении.
     """
@@ -338,7 +343,7 @@ class DrawByCoordinatesError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class ExtractPointCoordinatesByTypingError(Exception):
+class ExtractPointCoordinatesByTypingError(AppiumExtendedException):
     """
     Возникает, когда не удается извлечь координаты точки на основе типа переданной позиции.
     """
@@ -346,7 +351,7 @@ class ExtractPointCoordinatesByTypingError(Exception):
     def __init__(self,
                  message: str,
                  position: Union[Tuple[int, int], str, bytes, 'np.ndarray', 'Image.Image',
-                                 Tuple[str, str], Dict, WebElement, 'WebElementExtended'],
+                 Tuple[str, str], Dict, WebElement, 'WebElementExtended'],
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.position = position
@@ -354,7 +359,7 @@ class ExtractPointCoordinatesByTypingError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class ExtractPointCoordinatesError(Exception):
+class ExtractPointCoordinatesError(AppiumExtendedException):
     """
     Возникает, когда не удается извлечь координаты точки на основе заданных параметров.
     """
@@ -377,7 +382,7 @@ class ExtractPointCoordinatesError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class GetScreenshotError(Exception):
+class GetScreenshotError(AppiumExtendedException):
     """
     Возникает, когда не удается получить скриншот экрана.
     """
@@ -388,7 +393,7 @@ class GetScreenshotError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class SaveScreenshotError(Exception):
+class SaveScreenshotError(AppiumExtendedException):
     """
     Возникает, когда не удается сохранить скриншот.
     """
@@ -401,7 +406,7 @@ class SaveScreenshotError(Exception):
         self.traceback = traceback.format_exc()
 
 
-class SaveSourceError(Exception):
+class SaveSourceError(AppiumExtendedException):
     """
     Возникает, когда не удается сохранить исходный код страницы.
     """
@@ -412,3 +417,4 @@ class SaveSourceError(Exception):
         self.filename = filename
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
+

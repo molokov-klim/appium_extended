@@ -938,7 +938,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitForError(message=f"""
-            Ошибка ожидания элемента или изображения на экране в течение заданного времени {error}""",
+            Ошибка ожидания элемента или изображения на экране в течение заданного времени {locator=}, {image=}""",
                                locator=locator,
                                image=image,
                                timeout=timeout,
