@@ -10,12 +10,12 @@ from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.common.by import By
 
 
-class AppiumExtendedException(Exception):
+class AppiumExtendedError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
 
-class GetElementError(AppiumExtendedException):
+class GetElementError(AppiumExtendedError):
     """
     Возникает, когда попытка получить элемент не удалась.
     """
@@ -43,7 +43,7 @@ class GetElementError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class GetElementsError(AppiumExtendedException):
+class GetElementsError(AppiumExtendedError):
     """
     Возникает, когда попытка получить элементы не удалась.
     """
@@ -71,7 +71,7 @@ class GetElementsError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class GetImageCoordinatesError(AppiumExtendedException):
+class GetImageCoordinatesError(AppiumExtendedError):
     """
     Возникает когда попытка найти изображение не удалась
     """
@@ -91,7 +91,7 @@ class GetImageCoordinatesError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class GetManyCoordinatesOfImageError(AppiumExtendedException):
+class GetManyCoordinatesOfImageError(AppiumExtendedError):
     """
     Возникает, когда попытка найти все вхождения частичного изображения внутри полного изображения не удалась.
     """
@@ -113,7 +113,7 @@ class GetManyCoordinatesOfImageError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class GetInnerImageCoordinatesError(AppiumExtendedException):
+class GetInnerImageCoordinatesError(AppiumExtendedError):
     """
     Возникает, когда попытка извлечь внутреннее изображение из изображения не удалась.
     """
@@ -133,7 +133,7 @@ class GetInnerImageCoordinatesError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class GetTextCoordinatesError(AppiumExtendedException):
+class GetTextCoordinatesError(AppiumExtendedError):
     """
     Возникает, когда попытка найти координаты текста на изображении или экране не удалась.
     """
@@ -157,7 +157,7 @@ class GetTextCoordinatesError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class FindAndGetElementError(AppiumExtendedException):
+class FindAndGetElementError(AppiumExtendedError):
     """
     Возникает, когда попытка найти и извлечь элемент не удалась.
     """
@@ -179,7 +179,7 @@ class FindAndGetElementError(AppiumExtendedException):
         self.original_exception = original_exception
 
 
-class IsElementWithinScreenError(AppiumExtendedException):
+class IsElementWithinScreenError(AppiumExtendedError):
     """
     Возникает, когда происходит ошибка при проверке, находится ли элемент на видимом экране.
     """
@@ -199,7 +199,7 @@ class IsElementWithinScreenError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class IsTextOnScreenError(AppiumExtendedException):
+class IsTextOnScreenError(AppiumExtendedError):
     """
     Возникает, когда происходит ошибка при проверке, присутствует ли заданный текст на экране.
     """
@@ -221,7 +221,7 @@ class IsTextOnScreenError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class IsImageOnScreenError(AppiumExtendedException):
+class IsImageOnScreenError(AppiumExtendedError):
     """
     Возникает, когда происходит ошибка при проверке, присутствует ли заданное изображение на экране.
     """
@@ -239,7 +239,7 @@ class IsImageOnScreenError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class TapError(AppiumExtendedException):
+class TapError(AppiumExtendedError):
     """
     Возникает, когда происходит ошибка при выполнении тапа.
     """
@@ -265,7 +265,7 @@ class TapError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class SwipeError(AppiumExtendedException):
+class SwipeError(AppiumExtendedError):
     """
     Возникает, если свайп не может быть выполнен.
     """
@@ -282,7 +282,7 @@ class SwipeError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class WaitForError(AppiumExtendedException):
+class WaitForError(AppiumExtendedError):
     """
     Возникает, когда элемент или изображение не появляются на экране в течение заданного времени.
     """
@@ -298,7 +298,7 @@ class WaitForError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class WaitForNotError(AppiumExtendedException):
+class WaitForNotError(AppiumExtendedError):
     """
     Возникает, когда элемент или изображение не исчезают с экрана в течение заданного времени.
     """
@@ -314,7 +314,32 @@ class WaitForNotError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class WaitReturnTrueError(AppiumExtendedException):
+class IsWaitForError(AppiumExtendedError):
+    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+                 original_exception: Optional[Exception] = None):
+        super().__init__(message)
+        self.locator = locator
+        self.image = image
+        self.timeout = timeout
+        self.contains = contains
+        self.original_exception = original_exception
+        self.traceback = traceback.format_exc()
+
+
+class IsWaitForNotError(AppiumExtendedError):
+
+    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+                 original_exception: Optional[Exception] = None):
+        super().__init__(message)
+        self.locator = locator
+        self.image = image
+        self.timeout = timeout
+        self.contains = contains
+        self.original_exception = original_exception
+        self.traceback = traceback.format_exc()
+
+
+class WaitReturnTrueError(AppiumExtendedError):
     """
     Возникает, когда метод не возвращает True в течение заданного времени.
     """
@@ -327,7 +352,7 @@ class WaitReturnTrueError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class DrawByCoordinatesError(AppiumExtendedException):
+class DrawByCoordinatesError(AppiumExtendedError):
     """
     Возникает, когда не удается нарисовать прямоугольник на изображении.
     """
@@ -343,7 +368,7 @@ class DrawByCoordinatesError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class ExtractPointCoordinatesByTypingError(AppiumExtendedException):
+class ExtractPointCoordinatesByTypingError(AppiumExtendedError):
     """
     Возникает, когда не удается извлечь координаты точки на основе типа переданной позиции.
     """
@@ -359,7 +384,7 @@ class ExtractPointCoordinatesByTypingError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class ExtractPointCoordinatesError(AppiumExtendedException):
+class ExtractPointCoordinatesError(AppiumExtendedError):
     """
     Возникает, когда не удается извлечь координаты точки на основе заданных параметров.
     """
@@ -382,7 +407,7 @@ class ExtractPointCoordinatesError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class GetScreenshotError(AppiumExtendedException):
+class GetScreenshotError(AppiumExtendedError):
     """
     Возникает, когда не удается получить скриншот экрана.
     """
@@ -393,7 +418,7 @@ class GetScreenshotError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class SaveScreenshotError(AppiumExtendedException):
+class SaveScreenshotError(AppiumExtendedError):
     """
     Возникает, когда не удается сохранить скриншот.
     """
@@ -406,7 +431,7 @@ class SaveScreenshotError(AppiumExtendedException):
         self.traceback = traceback.format_exc()
 
 
-class SaveSourceError(AppiumExtendedException):
+class SaveSourceError(AppiumExtendedError):
     """
     Возникает, когда не удается сохранить исходный код страницы.
     """
@@ -417,4 +442,3 @@ class SaveSourceError(AppiumExtendedException):
         self.filename = filename
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
-

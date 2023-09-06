@@ -19,7 +19,8 @@ from appium_extended_exceptions.appium_extended_exceptions import TapError, GetE
     GetImageCoordinatesError, GetInnerImageCoordinatesError, GetManyCoordinatesOfImageError, GetTextCoordinatesError, \
     FindAndGetElementError, IsElementWithinScreenError, IsTextOnScreenError, IsImageOnScreenError, SaveSourceError, \
     GetScreenshotError, ExtractPointCoordinatesError, ExtractPointCoordinatesByTypingError, SaveScreenshotError, \
-    DrawByCoordinatesError, WaitReturnTrueError, WaitForNotError, WaitForError, SwipeError
+    DrawByCoordinatesError, WaitReturnTrueError, WaitForNotError, WaitForError, SwipeError, AppiumExtendedError, \
+    IsWaitForError, IsWaitForNotError
 
 from appium_extended_web_element.web_element_extended import WebElementExtended
 
@@ -947,10 +948,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
-                                    List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
-                                    str]] = None,
+                     List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
+                         str]] = None,
                      image: Union[bytes, np.ndarray, Image.Image, str,
-                                  List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
+                     List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                      timeout: int = 10,
                      contains: bool = True,
                      ) -> 'AppiumExtended':
@@ -1009,6 +1010,52 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                   timeout=timeout,
                                   contains=contains,
                                   original_exception=error) from error
+
+    def is_wait_for(self,
+                    locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
+                    List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
+                        str]] = None,
+                    image: Union[bytes, np.ndarray, Image.Image, str,
+                    List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
+                    timeout: int = 10,
+                    contains: bool = True,
+                    ) -> bool:
+        try:
+            if self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains):
+                return True
+            return False
+        except Exception as error:
+            raise IsWaitForError(message=f"""
+           Неизвестная ошибка в методе is_wait_for {error=}, {locator=}, {image=}""",
+                                 locator=locator,
+                                 image=image,
+                                 timeout=timeout,
+                                 contains=contains,
+                                 original_exception=error) from error
+
+    def is_wait_for_not(self,
+                        locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
+                        List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
+                            str]] = None,
+                        image: Union[bytes, np.ndarray, Image.Image, str,
+                        List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
+                        timeout: int = 10,
+                        contains: bool = True,
+                        ) -> bool:
+        try:
+            if self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains):
+                return True
+            return False
+        except TimeoutError:
+            return False
+        except Exception as error:
+            raise IsWaitForNotError(message=f"""Неизвестная ошибка в методе is_wait_for_not(): 
+                                              {error}, {locator=}, {image=}""",
+                                    locator=locator,
+                                    image=image,
+                                    timeout=timeout,
+                                    contains=contains,
+                                    original_exception=error) from error
 
     def wait_return_true(self, method, timeout: int = 10) -> 'AppiumExtended':
         try:

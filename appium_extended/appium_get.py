@@ -74,11 +74,6 @@ class AppiumGet(AppiumBase):
             element = app._get_element(by="id", value="backButton")
             element = app._get_element(by=MobileBy.ID, value="backButton")
 
-        Raises:
-            NoSuchElementException: Если элемент не найден.
-            TimeoutException: Если время ожидания истекло.
-            WebDriverException: Если произошла ошибка при взаимодействии с WebDriver.
-
         Returns:
             Union[WebElement, None]: Возвращает WebElement, если элемент найден, иначе None.
         """
