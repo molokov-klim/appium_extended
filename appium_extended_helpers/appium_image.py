@@ -626,6 +626,11 @@ class AppiumImage:
             self.logger.error(f"Не удалось сохранить скриншот: {error=}")
             return False
 
+    def show_screen(self):
+        cv2.imshow('screen', self.to_ndarray(self._get_screenshot_as_base64_decoded()))
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
     def _get_screenshot_as_base64_decoded(self) -> bytes:
         """
         Получает скриншот экрана, кодирует его в формате Base64, а затем декодирует в байты.
@@ -654,3 +659,7 @@ class AppiumImage:
         except WebDriverException as e:
             self.logger.error(f"Failed to get screenshot: {e}")
             raise
+
+
+
+
