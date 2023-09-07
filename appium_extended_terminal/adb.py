@@ -6,6 +6,8 @@ import sys
 import time
 import traceback
 from typing import Dict, Union, Tuple, Optional, Any
+
+from appium_extended_helpers.helpers_decorators import log_debug
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(
 #    __file__))))  # The sys.path.append line adds the parent directory of the tests directory to the Python module search path, allowing you to import modules from the root folder.
 
@@ -1096,3 +1098,4 @@ class Adb:
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
         return None
+

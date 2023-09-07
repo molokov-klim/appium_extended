@@ -830,3 +830,11 @@ class Terminal:
             self.logger.error(e)
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             self.logger.error(traceback_info)
+
+    @log_debug()
+    def past_text(self, text: str) -> None:
+        """
+        Помещает в буфер обмена заданный текст, затем вставляет его
+        """
+        self.driver.set_clipboard_text(text=text)
+        self.input_keycode('279')
