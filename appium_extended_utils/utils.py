@@ -2,6 +2,7 @@ import json
 import logging
 import math
 import os
+from collections import Counter
 from typing import Tuple
 
 
@@ -171,4 +172,19 @@ def calculate_center_of_coordinates(coordinates: Tuple[int, int, int, int]) -> T
 
     # Возвращаем кортеж с центральными координатами (center_x, center_y)
     return center_x, center_y
+
+
+def is_list_in_list(small_list: list, big_list: list) -> bool:
+    """
+    Метод проверки вхождения одного списка в другой
+    """
+
+    big_list_counter = Counter(big_list)
+    small_list_counter = Counter(small_list)
+
+    if all(big_list_counter[element] >= small_list_counter[element] for element in small_list):
+        return True
+    else:
+        return False
+
 

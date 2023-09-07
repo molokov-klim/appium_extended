@@ -627,6 +627,11 @@ class AppiumImage:
             return False
 
     def show_screen(self):
+        """
+        Выводит на экран теста скриншот текущего экрана устройства.
+        Код не будет продолжать выполнятся, пока изображение не закрыть.
+        Метод для отладки.
+        """
         cv2.imshow('screen', self.to_ndarray(self._get_screenshot_as_base64_decoded()))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
