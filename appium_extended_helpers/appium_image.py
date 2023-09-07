@@ -13,6 +13,7 @@ from selenium.common.exceptions import WebDriverException
 
 from appium_extended_helpers import helpers_decorators
 from appium_extended_terminal.terminal import Terminal
+from appium_extended_utils import utils
 
 
 class AppiumImage:
@@ -445,7 +446,10 @@ class AppiumImage:
                 current_sequence.append(word)  # Добавление слова в текущую последовательность
                 result_coordinates.append(coordinates)  # Добавление координат слова в результат
             else:
-                if current_sequence == words:
+                if utils.is_list_in_list(small_list=words, big_list=current_sequence):
+                    # Обрезка списка координат до размерности заданной последовательности слов
+                    if len(current_sequence) > len(words):
+                        result_coordinates = result_coordinates[-len(words):]
                     # Если найдена последовательность слов, вернуть соответствующие координаты
                     top_left = tuple(map(int, result_coordinates[0][:2]))  # Верхний левый угол рамки
                     bottom_right = tuple(map(int, result_coordinates[-1][2:]))  # Нижний правый угол рамки
