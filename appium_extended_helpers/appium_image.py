@@ -445,17 +445,17 @@ class AppiumImage:
             if word in words:
                 current_sequence.append(word)  # Добавление слова в текущую последовательность
                 result_coordinates.append(coordinates)  # Добавление координат слова в результат
-            else:
-                if utils.is_list_in_list(small_list=words, big_list=current_sequence):
-                    # Обрезка списка координат до размерности заданной последовательности слов
-                    if len(current_sequence) > len(words):
-                        result_coordinates = result_coordinates[-len(words):]
-                    # Если найдена последовательность слов, вернуть соответствующие координаты
-                    top_left = tuple(map(int, result_coordinates[0][:2]))  # Верхний левый угол рамки
-                    bottom_right = tuple(map(int, result_coordinates[-1][2:]))  # Нижний правый угол рамки
-                    return top_left + bottom_right
-                current_sequence = []  # Сброс текущей последовательности слов
-                result_coordinates = []  # Сброс координат последовательности слов
+
+        if utils.is_list_in_list(small_list=words, big_list=current_sequence):
+            # Обрезка списка координат до размерности заданной последовательности слов
+            if len(current_sequence) > len(words):
+                result_coordinates = result_coordinates[-len(words):]
+            # Если найдена последовательность слов, вернуть соответствующие координаты
+            top_left = tuple(map(int, result_coordinates[0][:2]))  # Верхний левый угол рамки
+            bottom_right = tuple(map(int, result_coordinates[-1][2:]))  # Нижний правый угол рамки
+            return top_left + bottom_right
+        current_sequence = []  # Сброс текущей последовательности слов
+        result_coordinates = []  # Сброс координат последовательности слов
 
         return None
 
