@@ -45,11 +45,11 @@ class WebElementScroll(WebElementGet):
                 locator = {'class': self._get_first_child_class()}
 
             # Получение верхнего и нижнего дочерних элементов родительского элемента
-            top_child = self._get_top_child_from_parent(locator=locator)
+            top_center_child = self._get_top_center_child_from_parent(locator=locator)
             bottom_child = self._get_bottom_child_from_parent(locator=locator)
 
             # Прокрутка вниз от нижнего дочернего элемента до верхнего дочернего элемента родительского элемента
-            self.driver.scroll(origin_el=bottom_child, destination_el=top_child, duration=duration)
+            self.driver.scroll(origin_el=bottom_child, destination_el=top_center_child, duration=duration)
             return True
 
         except (NoSuchElementException, StaleElementReferenceException, TimeoutException) as e:
@@ -84,10 +84,10 @@ class WebElementScroll(WebElementGet):
 
             # Получение верхнего и нижнего дочерних элементов родительского элемента
             top_child = self._get_top_child_from_parent(locator=locator)
-            bottom_child = self._get_bottom_child_from_parent(locator=locator)
+            bottom_center_child = self._get_bottom_center_child_from_parent(locator=locator)
 
             # Прокрутка вверх от верхнего дочернего элемента до нижнего дочернего элемента родительского элемента
-            self.driver.scroll(origin_el=top_child, destination_el=bottom_child, duration=duration)
+            self.driver.scroll(origin_el=top_child, destination_el=bottom_center_child, duration=duration)
             return True
 
         except (NoSuchElementException, StaleElementReferenceException, TimeoutException) as e:

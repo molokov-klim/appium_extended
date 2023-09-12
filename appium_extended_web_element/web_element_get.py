@@ -1,5 +1,6 @@
 # coding: utf-8
 import logging
+import math
 import time
 from typing import Union, Dict, List, Tuple
 
@@ -425,3 +426,82 @@ class WebElementGet(WebElement):
                 children = children[0].find_elements(by='xpath', value=f'//*')
         bottom_child = sorted(children, key=lambda x: x.location['y'] + x.size['height'])[-1]
         return bottom_child
+
+    def _get_center_child_from_parent(self,
+                                      locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+            Union[WebElement, None]:
+        """
+        Возвращает центральный дочерний элемент родительского элемента.
+        Если дочерний элемент только один, ищет внутри.
+
+        Args:
+            locator: Кортеж / объект WebElement / словарь, представляющий локатор для дочернего элемента.
+
+        Returns:
+            Центральный дочерний элемент родительского элемента, указанному в локаторе дочерних элементов,
+            или None, если соответствующий дочерний элемент не найден.
+        """
+        if locator is None:
+            locator = {'class': self._get_first_child_class()}
+        children = self._get_elements(locator=locator)
+        if len(children) <= 1:
+            while not len(children) > 1:
+                if len(children) == 0:
+                    return None
+                children = children[0].find_elements(by='xpath', value=f'//*')
+        center_child = sorted(children, key=lambda x: x.location['y'])[len(children) // 2]
+        return center_child
+
+    def _get_top_center_child_from_parent(self,
+                                          locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+            Union[WebElement, None]:
+        """
+        Возвращает дочерний элемент родительского элемента расположенный между центральным и верхним.
+        Если дочерний элемент только один, ищет внутри.
+
+        Args:
+            locator: Кортеж / объект WebElement / словарь, представляющий локатор для дочернего элемента.
+
+        Returns:
+            Дочерний элемент родительского элемента расположенный между центральным и верхним,
+            указанному в локаторе дочерних элементов,
+            или None, если соответствующий дочерний элемент не найден.
+        """
+        if locator is None:
+            locator = {'class': self._get_first_child_class()}
+        children = self._get_elements(locator=locator)
+        if len(children) <= 1:
+            while not len(children) > 1:
+                if len(children) == 0:
+                    return None
+                children = children[0].find_elements(by='xpath', value=f'//*')
+        top_center_child = sorted(children, key=lambda x: x.location['y'])[math.ceil(len(children) / 2 / 2)]
+        return top_center_child
+
+    def _get_bottom_center_child_from_parent(self,
+                                             locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+            Union[WebElement, None]:
+        """
+        Возвращает дочерний элемент родительского элемента расположенный между центральным и нижним.
+        Если дочерний элемент только один, ищет внутри.
+
+        Args:
+            locator: Кортеж / объект WebElement / словарь, представляющий локатор для дочернего элемента.
+
+        Returns:
+            Дочерний элемент родительского элемента расположенный между центральным и нижним,
+            указанному в локаторе дочерних элементов,
+            или None, если соответствующий дочерний элемент не найден.
+        """
+        if locator is None:
+            locator = {'class': self._get_first_child_class()}
+        children = self._get_elements(locator=locator)
+        if len(children) <= 1:
+            while not len(children) > 1:
+                if len(children) == 0:
+                    return None
+                children = children[0].find_elements(by='xpath', value=f'//*')
+        # sorted, 0 - верхний элемент
+        bottom_center_child = sorted(children, key=lambda x: x.location['y'])[
+            math.floor(len(children) / 2 + len(children) / 2 / 2)]
+        return bottom_center_child
