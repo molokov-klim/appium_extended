@@ -402,19 +402,27 @@ class AppiumImage:
             # Получаем снимок экрана, если изображение не предоставлено
             screenshot = self._get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
             image = self.to_ndarray(image=screenshot,
-                                    grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
+                                          grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
             # Если предоставлено, то преобразуем
             image = self.to_ndarray(image=image,
-                                    grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
+                                          grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
+
+        image = cv2.medianBlur(image, 3)  # + устранение шума
+
+        image = cv2.convertScaleAbs(image, alpha=1.5, beta=30)
 
         # Бинаризация изображения
         _, threshold = cv2.threshold(image, 0, 255,
                                      cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
 
+        oem_config = r'--oem 3 --psm 11'
+
         # Выполнение OCR с помощью PyTesseract
-        data = pytesseract.image_to_data(threshold, lang=language,
-                                         output_type=pytesseract.Output.DICT)  # Использование PyTesseract для распознавания текста и получения информации о распознанных словах
+        data = pytesseract.image_to_data(threshold,
+                                         lang=language,
+                                         output_type=pytesseract.Output.DICT,
+                                         config=oem_config)  # Использование PyTesseract для распознавания текста и получения информации о распознанных словах
 
         formatted_data = {}
         for i in range(len(data['text'])):
