@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 
 
 class AppiumExtendedError(Exception):
-    def __init__(self, message):
+    def __init__(self, message=''):
         super().__init__(message)
 
 
@@ -21,7 +21,7 @@ class GetElementError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message,
+                 message='',
                  locator=None,
                  by=None,
                  value=None,
@@ -49,7 +49,7 @@ class GetElementsError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
+                 message: str = '',
                  locator: Union[Tuple, List[WebElement], Dict[str, str], str] = None,
                  by: Union[MobileBy, AppiumBy, By, str] = None,
                  value: Union[str, Dict, None] = None,
@@ -77,7 +77,7 @@ class GetImageCoordinatesError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message,
+                 message='',
                  image=None,
                  full_image=None,
                  threshold=None,
@@ -97,7 +97,7 @@ class GetManyCoordinatesOfImageError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
+                 message: str = '',
                  image: Union[bytes, str] = None,
                  full_image: Union[bytes, str] = None,
                  cv_threshold: Optional[float] = None,
@@ -119,7 +119,7 @@ class GetInnerImageCoordinatesError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message,
+                 message='',
                  outer_image_path=None,
                  inner_image_path=None,
                  threshold=None,
@@ -139,8 +139,8 @@ class GetTextCoordinatesError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 text: str,
+                 message: str = '',
+                 text: str = None,
                  language: Optional[str] = None,
                  image: Union[bytes, str] = None,
                  ocr: Optional[bool] = None,
@@ -163,11 +163,11 @@ class FindAndGetElementError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str],
-                 timeout: int,
-                 tries: int,
-                 contains: bool,
+                 message: str = '',
+                 locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str] = None,
+                 timeout: int = None,
+                 tries: int = None,
+                 contains: bool = None,
                  original_exception: Optional[Exception] = None
                  ):
         super().__init__(message)
@@ -185,11 +185,11 @@ class IsElementWithinScreenError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str],
-                 timeout: int,
-                 contains: bool,
-                 original_exception: Exception
+                 message: str = '',
+                 locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str] = None,
+                 timeout: int = None,
+                 contains: bool = None,
+                 original_exception: Exception = None
                  ):
         super().__init__(message)
         self.locator = locator
@@ -205,12 +205,12 @@ class IsTextOnScreenError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 text: str,
-                 language: str,
-                 ocr: bool,
-                 contains: bool,
-                 original_exception: Exception
+                 message: str = '',
+                 text: str = None,
+                 language: str = None,
+                 ocr: bool = None,
+                 contains: bool = None,
+                 original_exception: Exception = None
                  ):
         super().__init__(message)
         self.text = text
@@ -227,10 +227,10 @@ class IsImageOnScreenError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 image: Union[bytes, str],
-                 threshold: float,
-                 original_exception: Exception
+                 message: str = '',
+                 image: Union[bytes, str] = None,
+                 threshold: float = None,
+                 original_exception: Exception = None
                  ):
         super().__init__(message)
         self.image = image
@@ -245,7 +245,7 @@ class TapError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
+                 message: str = '',
                  locator: Union[Tuple[str, str], 'WebElementExtended', 'WebElement', Dict[str, str], str] = None,
                  x: int = None,
                  y: int = None,
@@ -270,7 +270,13 @@ class SwipeError(AppiumExtendedError):
     Возникает, если свайп не может быть выполнен.
     """
 
-    def __init__(self, message: str, start_position, end_position, direction, distance, duration,
+    def __init__(self,
+                 message: str = '',
+                 start_position=None,
+                 end_position=None,
+                 direction=None,
+                 distance=None,
+                 duration=None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.start_position = start_position
@@ -287,7 +293,12 @@ class WaitForError(AppiumExtendedError):
     Возникает, когда элемент или изображение не появляются на экране в течение заданного времени.
     """
 
-    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+    def __init__(self,
+                 message: str = '',
+                 locator=None,
+                 image=None,
+                 timeout: int = None,
+                 contains: bool = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
@@ -303,7 +314,12 @@ class WaitForNotError(AppiumExtendedError):
     Возникает, когда элемент или изображение не исчезают с экрана в течение заданного времени.
     """
 
-    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+    def __init__(self,
+                 message: str = '',
+                 locator=None,
+                 image=None,
+                 timeout: int = None,
+                 contains: bool = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
@@ -315,7 +331,12 @@ class WaitForNotError(AppiumExtendedError):
 
 
 class IsWaitForError(AppiumExtendedError):
-    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+    def __init__(self,
+                 message: str = '',
+                 locator=None,
+                 image=None,
+                 timeout: int = None,
+                 contains: bool = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
@@ -328,7 +349,12 @@ class IsWaitForError(AppiumExtendedError):
 
 class IsWaitForNotError(AppiumExtendedError):
 
-    def __init__(self, message: str, locator, image, timeout: int, contains: bool,
+    def __init__(self,
+                 message: str = '',
+                 locator=None,
+                 image=None,
+                 timeout: int = None,
+                 contains: bool = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
@@ -344,7 +370,11 @@ class WaitReturnTrueError(AppiumExtendedError):
     Возникает, когда метод не возвращает True в течение заданного времени.
     """
 
-    def __init__(self, message: str, method, timeout: int, original_exception: Optional[Exception] = None):
+    def __init__(self,
+                 message: str = '',
+                 method=None,
+                 timeout: int = None,
+                 original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.method = method
         self.timeout = timeout
@@ -357,8 +387,13 @@ class DrawByCoordinatesError(AppiumExtendedError):
     Возникает, когда не удается нарисовать прямоугольник на изображении.
     """
 
-    def __init__(self, message: str, coordinates: Tuple[int, int, int, int], top_left: Tuple[int, int],
-                 bottom_right: Tuple[int, int], path: str, original_exception: Optional[Exception] = None):
+    def __init__(self,
+                 message: str = '',
+                 coordinates: Tuple[int, int, int, int] = None,
+                 top_left: Tuple[int, int] = None,
+                 bottom_right: Tuple[int, int] = None,
+                 path: str = None,
+                 original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.coordinates = coordinates
         self.top_left = top_left
@@ -374,9 +409,9 @@ class ExtractPointCoordinatesByTypingError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
+                 message: str = '',
                  position: Union[Tuple[int, int], str, bytes, 'np.ndarray', 'Image.Image',
-                 Tuple[str, str], Dict, WebElement, 'WebElementExtended'],
+                 Tuple[str, str], Dict, WebElement, 'WebElementExtended'] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.position = position
@@ -390,12 +425,12 @@ class ExtractPointCoordinatesError(AppiumExtendedError):
     """
 
     def __init__(self,
-                 message: str,
-                 direction: int,
-                 distance: int,
-                 start_x: int,
-                 start_y: int,
-                 screen_resolution: Tuple[int, int],
+                 message: str = '',
+                 direction: int = None,
+                 distance: int = None,
+                 start_x: int = None,
+                 start_y: int = None,
+                 screen_resolution: Tuple[int, int] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.direction = direction
@@ -412,7 +447,9 @@ class GetScreenshotError(AppiumExtendedError):
     Возникает, когда не удается получить скриншот экрана.
     """
 
-    def __init__(self, message: str, original_exception: Optional[Exception] = None):
+    def __init__(self,
+                 message: str = '',
+                 original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
@@ -423,7 +460,11 @@ class SaveScreenshotError(AppiumExtendedError):
     Возникает, когда не удается сохранить скриншот.
     """
 
-    def __init__(self, message: str, path: str, filename: str, original_exception: Optional[Exception] = None):
+    def __init__(self,
+                 message: str = '',
+                 path: str = None,
+                 filename: str = None,
+                 original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.path = path
         self.filename = filename
@@ -436,9 +477,14 @@ class SaveSourceError(AppiumExtendedError):
     Возникает, когда не удается сохранить исходный код страницы.
     """
 
-    def __init__(self, message: str, path: str, filename: str, original_exception: Optional[Exception] = None):
+    def __init__(self,
+                 message: str = '',
+                 path: str = None,
+                 filename: str = None,
+                 original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.path = path
         self.filename = filename
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
+
