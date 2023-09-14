@@ -838,3 +838,33 @@ class Terminal:
         """
         self.driver.set_clipboard_text(text=text)
         self.input_keycode('279')
+
+    @log_debug()
+    def get_prop(self) -> dict:
+        """
+        Выполняет команду getprop, преобразует в dict
+        """
+        raw_properties = self.adb_shell(command="getprop")
+
+        # Разбиваем входную строку на строки
+        lines = raw_properties.replace("\r", "").strip().split("\n")
+
+        # Создаем пустой словарь для хранения пар ключ-значение
+        result_dict = {}
+
+        # Обрабатываем каждую строку
+        for line in lines:
+            try:
+                # Разбиваем строку на две части, используя первое вхождение ":"
+                key, value = line.strip().split(":", 1)
+
+                # Убираем квадратные скобки вокруг ключа и значения
+                key = key.strip()[1:-1]
+                value = value.strip()[1:-1]
+                # Добавляем пару ключ-значение в словарь
+                result_dict[key] = value
+            except ValueError:
+                continue
+
+        return result_dict
+
