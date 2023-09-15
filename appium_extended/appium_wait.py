@@ -27,6 +27,7 @@ class AppiumWait(AppiumGet):
                   List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                   timeout: int = 10,
                   contains: bool = True,
+                  sleep: int = 1
                   ):
         """
         Ожидает появления на экране указанного локатора или изображения.
@@ -50,6 +51,8 @@ class AppiumWait(AppiumGet):
 
             contains (bool, optional): Если True, проверяет, содержит ли элемент указанный локатор.
                                        По умолчанию True.
+
+            sleep (int): время ожидания перед новым запросом в процессе поллинга.
 
         Usages:
             - _wait_for(locator=("id", "android.widget.ProgressBar"), timeout=5)
@@ -87,7 +90,7 @@ class AppiumWait(AppiumGet):
             for i in image:
                 # Check if the image is on the screen within the timeout period
                 while not self.helper.is_image_on_the_screen(image=i) and time.time() - start_time < timeout:
-                    time.sleep(1)
+                    time.sleep(sleep)
                 if not self.helper.is_image_on_the_screen(image=i):
                     return False
 
@@ -102,6 +105,7 @@ class AppiumWait(AppiumGet):
                       List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                       timeout: int = 10,
                       contains: bool = True,
+                      sleep: int = 1
                       ):
         """
         Ожидает пока указанный локатор или изображение исчезнет с экрана или DOM.
@@ -123,6 +127,8 @@ class AppiumWait(AppiumGet):
                                        If False, checks if the element exactly matches the specified locator.
                                        Defaults to True.
 
+            sleep (int): время ожидания перед новым запросом в процессе поллинга.
+
         Returns:
             bool: True if the element(s) are found within the timeout period, False otherwise.
         """
@@ -140,7 +146,7 @@ class AppiumWait(AppiumGet):
                         locators_present = True
                 if not locators_present:
                     return True
-                time.sleep(1)
+                time.sleep(sleep)
             raise TimeoutError
 
         if image is not None:
@@ -157,21 +163,22 @@ class AppiumWait(AppiumGet):
                         images_present = True
                 if not images_present:
                     return True
-                time.sleep(1)
+                time.sleep(sleep)
             raise TimeoutError
         return False
 
     @staticmethod
-    def _wait_return_true(method, timeout: int = 10):
+    def _wait_return_true(method, timeout: int = 10, sleep: int = 1):
         """
         Ожидает пока метод не вернет True.
         Args:
             method: ссылка на метод
-            timeout: таймаут на ожидание
+            timeout (int): таймаут на ожидание
+            sleep (int): время ожидания перед новым запросом в процессе поллинга.
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
             if method():
                 return
-            time.sleep(1)
+            time.sleep(sleep)
         raise TimeoutError
