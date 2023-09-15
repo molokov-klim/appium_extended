@@ -888,6 +888,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                  timeout: int = 10,
                  contains: bool = True,
                  full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
+                 sleep: int = 1
                  ) -> 'AppiumExtended':
         """
         Ожидает появления на экране указанного локатора или изображения.
@@ -930,7 +931,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Параметр `contains` используется только при поиске по локатору.
         """
         try:
-            if not self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains):
+            if not self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
                 raise WaitForError(message="Элемент или изображение не появились на экране в течение заданного времени",
                                    locator=locator,
                                    image=image,
@@ -954,6 +955,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                      List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                      timeout: int = 10,
                      contains: bool = True,
+                     sleep: int = 1
                      ) -> 'AppiumExtended':
         """
         Ожидает исчезновения указанного локатора или изображения с экрана.
@@ -996,7 +998,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Параметр `contains` используется только при поиске по локатору.
         """
         try:
-            if not self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains):
+            if not self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
                 raise WaitForNotError(message="Элемент или изображение не исчезли в течение заданного времени",
                                       locator=locator,
                                       image=image,
@@ -1019,9 +1021,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                     List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                     timeout: int = 10,
                     contains: bool = True,
+                    sleep: int = 1,
                     ) -> bool:
         try:
-            if self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains):
+            if self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
                 return True
             return False
         except Exception as error:
@@ -1041,9 +1044,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                         List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
                         timeout: int = 10,
                         contains: bool = True,
+                        sleep: int = 1
                         ) -> bool:
         try:
-            if self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains):
+            if self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
                 return True
             return False
         except TimeoutError:
@@ -1057,9 +1061,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                     contains=contains,
                                     original_exception=error) from error
 
-    def wait_return_true(self, method, timeout: int = 10) -> 'AppiumExtended':
+    def wait_return_true(self, method, timeout: int = 10, sleep: int = 1) -> 'AppiumExtended':
         try:
-            self._wait_return_true(method=method, timeout=timeout)
+            self._wait_return_true(method=method, timeout=timeout, sleep=sleep)
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitReturnTrueError(message=f"Ошибка ожидания возврата True от метода: {error}",
