@@ -6,7 +6,7 @@ import typing
 from typing import Optional, Union, Tuple, List, Dict
 
 import numpy as np
-from PIL.Image import Image
+from PIL import Image
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
