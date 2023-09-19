@@ -1,8 +1,10 @@
 # coding: utf-8
 import logging
+import typing
 from typing import Union, Dict, Tuple
 
 from appium.webdriver import WebElement
+from selenium.types import WaitExcTypes
 
 from appium_extended.appium_get import AppiumGet
 
@@ -18,9 +20,13 @@ class AppiumIs(AppiumGet):
 
     def _is_element_within_screen(
             self,
-            locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
-            timeout: int = 10,
-            contains: bool = True
+            locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
+            timeout_elem: float = 10,
+            timeout_method: float = 600,
+            elements_range: Union[Tuple, typing.List[WebElement], Dict[str, str], None] = None,
+            contains: bool = True,
+            poll_frequency: float = 0.5,
+            ignored_exceptions: typing.Optional[WaitExcTypes] = None
     ) -> bool:
         """
         Метод проверяет, находится ли заданный элемент на видимом экране.
@@ -47,7 +53,13 @@ class AppiumIs(AppiumGet):
         screen_size = self.terminal.get_screen_resolution()  # Получаем размеры экрана
         screen_width = screen_size[0]  # Ширина экрана
         screen_height = screen_size[1]  # Высота экрана
-        element = self._get_element(locator=locator, timeout_elem=timeout, contains=contains)
+        element = self._get_element(locator=locator,
+                                    timeout_elem=timeout_elem,
+                                    timeout_method=timeout_method,
+                                    elements_range=elements_range,
+                                    contains=contains,
+                                    poll_frequency=poll_frequency,
+                                    ignored_exceptions=ignored_exceptions)
         if element is None:
             return False
         if not element.get_attribute('displayed') == 'true':

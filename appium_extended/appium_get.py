@@ -1,10 +1,12 @@
 # coding: utf-8
 import logging
 import time
+import typing
 from typing import Union, Dict, List, Tuple, Optional, Any
 
 import numpy as np
 from PIL import Image
+from selenium.types import WaitExcTypes
 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException
@@ -30,10 +32,12 @@ class AppiumGet(AppiumBase):
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
                      by: Union[MobileBy, AppiumBy, By, str] = None,
                      value: Union[str, Dict, None] = None,
-                     timeout_elem: int = 10,
-                     timeout_method: int = 600,
+                     timeout_elem: float = 10,
+                     timeout_method: float = 600,
                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
-                     contains: bool = True
+                     contains: bool = True,
+                     poll_frequency: float = 0.5,
+                     ignored_exceptions: typing.Optional[WaitExcTypes] = None
                      ) -> \
             Union[WebElement, None]:
         """
@@ -109,7 +113,8 @@ class AppiumGet(AppiumBase):
             locator_type = type(locator)
             # Если локатор типа tuple, то выполняется извлечение элементов
             if isinstance(locator, tuple):
-                wait = WebDriverWait(driver=self.driver, timeout=timeout_elem)
+                wait = WebDriverWait(driver=self.driver, timeout=timeout_elem,
+                                     poll_frequency=poll_frequency, ignored_exceptions=ignored_exceptions)
                 try:
                     element = wait.until(EC.presence_of_element_located(locator))
                     return element
@@ -152,7 +157,10 @@ class AppiumGet(AppiumBase):
                       timeout_elements: int = 10,
                       timeout_method: int = 600,
                       elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
-                      contains: bool = True) -> \
+                      contains: bool = True,
+                      poll_frequency: float = 0.5,
+                      ignored_exceptions: typing.Optional[WaitExcTypes] = None
+                      ) -> \
             Union[List[WebElement], None]:
         """
         Метод обеспечивает поиск элементов в текущей DOM структуре.
@@ -203,7 +211,9 @@ class AppiumGet(AppiumBase):
                               f"{by=}\n"
                               f"{value=}\n"
                               f"{timeout_elements=}\n"
-                              f"{timeout_method=}\n")
+                              f"{timeout_method=}\n\n" +
+                              f"{poll_frequency=}\n" +
+                              f"{ignored_exceptions=}\n")
             return None
         if not locator and (by and value):
             locator = (by, value)
@@ -227,7 +237,8 @@ class AppiumGet(AppiumBase):
             locator_type = type(locator)
             # Если локатор типа tuple, то выполняется извлечение элементов
             if isinstance(locator, tuple):
-                wait = WebDriverWait(driver=self.driver, timeout=timeout_elements)
+                wait = WebDriverWait(driver=self.driver, timeout=timeout_elements,
+                                     poll_frequency=poll_frequency, ignored_exceptions=ignored_exceptions)
                 try:
                     element = wait.until(EC.presence_of_all_elements_located(locator))
                     return element
@@ -238,6 +249,8 @@ class AppiumGet(AppiumBase):
                                       f"{value=}\n"
                                       f"{timeout_elements=}\n"
                                       f"{timeout_method=}\n\n" +
+                                      f"{poll_frequency=}\n" +
+                                      f"{ignored_exceptions=}\n" +
                                       "{}\n".format(error))
                     return None
             # Выполнение подготовки локатора

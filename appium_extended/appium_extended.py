@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import typing
 from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
@@ -8,6 +9,7 @@ from PIL import Image
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
+from selenium.types import WaitExcTypes
 
 from selenium.webdriver.common.by import By
 
@@ -51,10 +53,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                     locator: Union[Tuple, WebElementExtended, Dict[str, str], str] = None,
                     by: Union[MobileBy, AppiumBy, By, str] = None,
                     value: Union[str, Dict, None] = None,
-                    timeout_elem: int = 10,
-                    timeout_method: int = 600,
+                    timeout_elem: float = 10.0,
+                    timeout_method: float = 600.0,
                     elements_range: Union[Tuple, List[WebElementExtended], Dict[str, str], None] = None,
                     contains: bool = True,
+                    poll_frequency: float = 0.5,
+                    ignored_exceptions: typing.Optional[WaitExcTypes] = None
                     ) -> Union[WebElementExtended, None]:
         """
         Метод обеспечивает поиск элемента в текущей DOM структуре.
@@ -105,7 +109,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                         timeout_elem=timeout_elem,
                                         timeout_method=timeout_method,
                                         elements_range=elements_range,
-                                        contains=contains)
+                                        contains=contains,
+                                        poll_frequency=poll_frequency,
+                                        ignored_exceptions=ignored_exceptions)
         except Exception as error:
             raise GetElementError(message=f"Ошибка при попытке извлечь элемент {error}",
                                   locator=locator,
@@ -115,7 +121,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                   timeout_method=timeout_method,
                                   elements_range=elements_range,
                                   contains=contains,
-                                  original_exception=error
+                                  original_exception=error,
+                                  poll_frequency=poll_frequency,
+                                  ignored_exceptions=ignored_exceptions
                                   ) from error
         if element is None:
             raise GetElementError(message="Элемент не найден",
@@ -125,7 +133,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                   timeout_elem=timeout_elem,
                                   timeout_method=timeout_method,
                                   elements_range=elements_range,
-                                  contains=contains
+                                  contains=contains,
+                                  poll_frequency=poll_frequency,
+                                  ignored_exceptions=ignored_exceptions
                                   )
         return WebElementExtended(driver=element.parent, element_id=element.id, logger=self.logger)
 
@@ -137,6 +147,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                      timeout_method: int = 600,
                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                      contains: bool = True,
+                     poll_frequency: float = 0.5,
+                     ignored_exceptions: typing.Optional[WaitExcTypes] = None
                      ) -> Union[List[WebElementExtended], List]:
         """
         Метод обеспечивает поиск элементов в текущей DOM структуре.
@@ -185,7 +197,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                              timeout_elements=timeout_elements,
                                              timeout_method=timeout_method,
                                              elements_range=elements_range,
-                                             contains=contains)
+                                             contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions
+                                             )
         except Exception as error:
             raise GetElementsError(message=f"Ошибка при попытке извлечь элементы: {error}",
                                    by=by,
@@ -195,6 +210,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                    elements_range=elements_range,
                                    contains=contains,
                                    original_exception=error,
+                                   poll_frequency=poll_frequency,
+                                   ignored_exceptions=ignored_exceptions
                                    ) from error
         if elements is None:
             raise GetElementsError(message="Элементы не найдены",
@@ -203,7 +220,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                    timeout_elements=timeout_elements,
                                    timeout_method=timeout_method,
                                    elements_range=elements_range,
-                                   contains=contains
+                                   contains=contains,
+                                   poll_frequency=poll_frequency,
+                                   ignored_exceptions=ignored_exceptions
                                    )
         elements_ext = []
         for element in elements:
@@ -514,9 +533,13 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                          original_exception=error) from error
 
     def is_element_within_screen(self,
-                                 locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str],
-                                 timeout: int = 10,
-                                 contains: bool = True
+                                 locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
+                                 timeout_elem: float = 10.0,
+                                 timeout_method: float = 600.0,
+                                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                                 contains: bool = True,
+                                 poll_frequency: float = 0.5,
+                                 ignored_exceptions: typing.Optional[WaitExcTypes] = None
                                  ) -> bool:
         """
         Метод проверяет, находится ли заданный элемент на видимом экране.
@@ -542,20 +565,35 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Проверяет атрибут: 'displayed'.
         """
         try:
-            return self._is_element_within_screen(locator=locator, timeout=timeout, contains=contains)
+            return self._is_element_within_screen(locator=locator,
+                                                  timeout_elem=timeout_elem,
+                                                  timeout_method=timeout_method,
+                                                  elements_range=elements_range,
+                                                  contains=contains,
+                                                  poll_frequency=poll_frequency,
+                                                  ignored_exceptions=ignored_exceptions, )
         except Exception as error:
             raise IsElementWithinScreenError(message=f"""
             Ошибка при проверке, находится ли элемент на видимом экране: {error}""",
                                              locator=locator,
-                                             timeout=timeout,
+                                             timeout_elem=timeout_elem,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
                                              contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions,
                                              original_exception=error) from error
 
     def is_text_on_screen(self,
                           text: str,
                           language: str = 'rus',
                           ocr: bool = True,
-                          contains: bool = True
+                          timeout_elem: float = 10.0,
+                          timeout_method: float = 600.0,
+                          elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                          contains: bool = True,
+                          poll_frequency: float = 0.5,
+                          ignored_exceptions: typing.Optional[WaitExcTypes] = None
                           ) -> bool:
         """
         Проверяет, присутствует ли заданный текст на экране.
@@ -576,7 +614,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         try:
             if ocr:
                 return self.helper.is_text_on_ocr_screen(text=text, language=language)
-            return self._is_element_within_screen(locator={'text': text}, contains=contains)
+            return self._is_element_within_screen(locator={'text': text},
+                                                  timeout_elem=timeout_elem,
+                                                  timeout_method=timeout_method,
+                                                  elements_range=elements_range,
+                                                  contains=contains,
+                                                  poll_frequency=poll_frequency,
+                                                  ignored_exceptions=ignored_exceptions,
+                                                  )
         except Exception as error:
             raise IsTextOnScreenError(message=f"""
             Ошибка при проверке, присутствует ли заданный текст на экране: {error}""",
@@ -885,10 +930,13 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                      str]] = None,
                  image: Union[bytes, np.ndarray, Image.Image, str,
                  List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                 timeout: int = 10,
                  contains: bool = True,
-                 full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
-                 sleep: int = 1
+                 sleep: int = 1,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  ) -> 'AppiumExtended':
         """
         Ожидает появления на экране указанного локатора или изображения.
@@ -931,21 +979,38 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Параметр `contains` используется только при поиске по локатору.
         """
         try:
-            if not self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
+            if not self._wait_for(locator=locator,
+                                  image=image,
+                                  sleep=sleep,
+                                  timeout_elem=timeout_elem,
+                                  timeout_method=timeout_method,
+                                  elements_range=elements_range,
+                                  contains=contains,
+                                  poll_frequency=poll_frequency,
+                                  ignored_exceptions=ignored_exceptions,):
                 raise WaitForError(message="Элемент или изображение не появились на экране в течение заданного времени",
                                    locator=locator,
                                    image=image,
-                                   timeout=timeout,
-                                   contains=contains)
+                                   sleep=sleep,
+                                   timeout_elem=timeout_elem,
+                                   timeout_method=timeout_method,
+                                   elements_range=elements_range,
+                                   contains=contains,
+                                   poll_frequency=poll_frequency,
+                                   ignored_exceptions=ignored_exceptions,)
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitForError(message=f"""
             Ошибка ожидания элемента или изображения на экране в течение заданного времени {locator=}, {image=}""",
                                locator=locator,
                                image=image,
-                               timeout=timeout,
+                               sleep=sleep,
+                               timeout_elem=timeout_elem,
+                               timeout_method=timeout_method,
+                               elements_range=elements_range,
                                contains=contains,
-                               original_exception=error) from error
+                               poll_frequency=poll_frequency,
+                               ignored_exceptions=ignored_exceptions,) from error
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
@@ -953,8 +1018,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                          str]] = None,
                      image: Union[bytes, np.ndarray, Image.Image, str,
                      List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                     timeout: int = 10,
+                     timeout_elem: float = 10.0,
+                     timeout_method: float = 600.0,
+                     elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                      contains: bool = True,
+                     poll_frequency: float = 0.5,
+                     ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                      sleep: int = 1
                      ) -> 'AppiumExtended':
         """
@@ -998,19 +1067,35 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Параметр `contains` используется только при поиске по локатору.
         """
         try:
-            if not self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
+            if not self._wait_for_not(locator=locator,
+                                      image=image,
+                                      timeout_elem=timeout_elem,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,
+                                      sleep=sleep):
                 raise WaitForNotError(message="Элемент или изображение не исчезли в течение заданного времени",
                                       locator=locator,
                                       image=image,
-                                      timeout=timeout,
-                                      contains=contains)
+                                      timeout_elem=timeout_elem,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,)
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitForNotError(message=f"Ошибка при ожидании wait_for_not(): {error}",
                                   locator=locator,
                                   image=image,
-                                  timeout=timeout,
+                                  timeout_elem=timeout_elem,
+                                  timeout_method=timeout_method,
+                                  elements_range=elements_range,
                                   contains=contains,
+                                  poll_frequency=poll_frequency,
+                                  ignored_exceptions=ignored_exceptions,
                                   original_exception=error) from error
 
     def is_wait_for(self,
@@ -1019,12 +1104,24 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                         str]] = None,
                     image: Union[bytes, np.ndarray, Image.Image, str,
                     List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                    timeout: int = 10,
+                    timeout_elem: float = 10.0,
+                    timeout_method: float = 600.0,
+                    elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                     contains: bool = True,
+                    poll_frequency: float = 0.5,
+                    ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                     sleep: int = 1,
                     ) -> bool:
         try:
-            if self._wait_for(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
+            if self._wait_for(locator=locator,
+                              timeout_elem=timeout_elem,
+                              timeout_method=timeout_method,
+                              elements_range=elements_range,
+                              contains=contains,
+                              poll_frequency=poll_frequency,
+                              ignored_exceptions=ignored_exceptions,
+                              sleep=sleep,
+                              image=image, ):
                 return True
             return False
         except Exception as error:
@@ -1032,8 +1129,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
            Неизвестная ошибка в методе is_wait_for {error=}, {locator=}, {image=}""",
                                  locator=locator,
                                  image=image,
-                                 timeout=timeout,
+                                 timeout_elem=timeout_elem,
+                                 timeout_method=timeout_method,
+                                 elements_range=elements_range,
                                  contains=contains,
+                                 poll_frequency=poll_frequency,
+                                 ignored_exceptions=ignored_exceptions,
                                  original_exception=error) from error
 
     def is_wait_for_not(self,
@@ -1042,12 +1143,24 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                             str]] = None,
                         image: Union[bytes, np.ndarray, Image.Image, str,
                         List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                        timeout: int = 10,
+                        timeout_elem: float = 10.0,
+                        timeout_method: float = 600.0,
+                        elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                         contains: bool = True,
+                        poll_frequency: float = 0.5,
+                        ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                         sleep: int = 1
                         ) -> bool:
         try:
-            if self._wait_for_not(locator=locator, image=image, timeout=timeout, contains=contains, sleep=sleep):
+            if self._wait_for_not(locator=locator,
+                                  image=image,
+                                  timeout_elem=timeout_elem,
+                                  timeout_method=timeout_method,
+                                  elements_range=elements_range,
+                                  contains=contains,
+                                  poll_frequency=poll_frequency,
+                                  ignored_exceptions=ignored_exceptions,
+                                  sleep=sleep):
                 return True
             return False
         except TimeoutError:
@@ -1057,8 +1170,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                               {error}, {locator=}, {image=}""",
                                     locator=locator,
                                     image=image,
-                                    timeout=timeout,
+                                    timeout_elem=timeout_elem,
+                                    timeout_method=timeout_method,
+                                    elements_range=elements_range,
                                     contains=contains,
+                                    poll_frequency=poll_frequency,
+                                    ignored_exceptions=ignored_exceptions,
                                     original_exception=error) from error
 
     def wait_return_true(self, method, timeout: int = 10, sleep: int = 1) -> 'AppiumExtended':

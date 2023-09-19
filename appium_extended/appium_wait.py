@@ -1,11 +1,13 @@
 # coding: utf-8
 import logging
 import time
+import typing
 from typing import Union, Dict, List, Tuple
 
 import numpy as np
 from PIL import Image
 from appium.webdriver import WebElement
+from selenium.types import WaitExcTypes
 
 from appium_extended.appium_get import AppiumGet
 
@@ -25,9 +27,14 @@ class AppiumWait(AppiumGet):
                       str]] = None,
                   image: Union[bytes, np.ndarray, Image.Image, str,
                   List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                  timeout: int = 10,
+                  timeout_elem: float = 10.0,
+                  timeout_method: float = 600.0,
+                  elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                   contains: bool = True,
-                  sleep: int = 1
+                  sleep: float = 1.0,
+                  poll_frequency: float = 0.5,
+                  ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                  threshold: float = 0.9,
                   ):
         """
         Ожидает появления на экране указанного локатора или изображения.
@@ -78,7 +85,13 @@ class AppiumWait(AppiumGet):
             # Loop through each locator
             for i in locator:
                 # Check if the element is present
-                if self._get_element(locator=i, timeout_elem=timeout, contains=contains) is None:
+                if self._get_element(locator=i,
+                                     timeout_elem=timeout_elem,
+                                     timeout_method=timeout_method,
+                                     elements_range=elements_range,
+                                     contains=contains,
+                                     poll_frequency=poll_frequency,
+                                     ignored_exceptions=ignored_exceptions,) is None:
                     return False
 
         if image is not None:
@@ -89,9 +102,9 @@ class AppiumWait(AppiumGet):
             # Loop through each image
             for i in image:
                 # Check if the image is on the screen within the timeout period
-                while not self.helper.is_image_on_the_screen(image=i) and time.time() - start_time < timeout:
+                while not self.helper.is_image_on_the_screen(image=i, threshold=threshold) and time.time() - start_time < timeout_method:
                     time.sleep(sleep)
-                if not self.helper.is_image_on_the_screen(image=i):
+                if not self.helper.is_image_on_the_screen(image=i, threshold=threshold):
                     return False
 
         # Return True if all conditions are met
@@ -103,9 +116,14 @@ class AppiumWait(AppiumGet):
                           str]] = None,
                       image: Union[bytes, np.ndarray, Image.Image, str,
                       List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
-                      timeout: int = 10,
+                      timeout_elem: float = 10.0,
+                      timeout_method: float = 600.0,
+                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                       contains: bool = True,
-                      sleep: int = 1
+                      poll_frequency: float = 0.5,
+                      ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                      sleep: float = 1.0,
+                      threshold: float = 0.9,
                       ):
         """
         Ожидает пока указанный локатор или изображение исчезнет с экрана или DOM.
@@ -121,7 +139,7 @@ class AppiumWait(AppiumGet):
                          The image(s) to wait for. Can be a single image or a list of images.
                          Defaults to None.
 
-            timeout (int, optional): The maximum time to wait in seconds. Defaults to 10.
+            timeout (float, optional): The maximum time to wait in seconds. Defaults to 10.0.
 
             contains (bool, optional): If True, checks if the element contains the specified locator.
                                        If False, checks if the element exactly matches the specified locator.
@@ -138,11 +156,17 @@ class AppiumWait(AppiumGet):
 
             # Loop through each locator
             start_time = time.time()
-            while time.time() - start_time < timeout:
+            while time.time() - start_time < timeout_method:
                 locators_present = False
                 for i in locator:
                     # Check if the element is present
-                    if not self._get_element(locator=i, timeout_elem=1, contains=contains) is None:
+                    if not self._get_element(locator=i,
+                                             timeout_elem=timeout_elem,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
+                                             contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions,) is None:
                         locators_present = True
                 if not locators_present:
                     return True
@@ -155,11 +179,11 @@ class AppiumWait(AppiumGet):
 
             # Loop through each image
             start_time = time.time()
-            while time.time() - start_time < timeout:
+            while time.time() - start_time < timeout_method:
                 images_present = False
                 for i in image:
                     # Check if the image is on the screen within the timeout period
-                    if self.helper.is_image_on_the_screen(image=i):
+                    if self.helper.is_image_on_the_screen(image=i, threshold=threshold):
                         images_present = True
                 if not images_present:
                     return True
@@ -168,17 +192,19 @@ class AppiumWait(AppiumGet):
         return False
 
     @staticmethod
-    def _wait_return_true(method, timeout: int = 10, sleep: int = 1):
+    def _wait_return_true(method, timeout: float = 10.0, sleep: float = 1.0, *args, **kwargs):
         """
         Ожидает пока метод не вернет True.
         Args:
             method: ссылка на метод
-            timeout (int): таймаут на ожидание
+            timeout (float): таймаут на ожидание
             sleep (int): время ожидания перед новым запросом в процессе поллинга.
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            if method():
+            if method(*args, **kwargs):
                 return
             time.sleep(sleep)
         raise TimeoutError
+
+

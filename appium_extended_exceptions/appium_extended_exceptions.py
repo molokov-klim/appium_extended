@@ -2,11 +2,15 @@
 Модуль исключений для класса AppiumExtended
 """
 import traceback
+import typing
 from typing import Optional, Union, Tuple, List, Dict
 
+import numpy as np
+from PIL.Image import Image
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
+from selenium.types import WaitExcTypes
 from selenium.webdriver.common.by import By
 
 
@@ -29,7 +33,9 @@ class GetElementError(AppiumExtendedError):
                  timeout_method=None,
                  elements_range=None,
                  contains=None,
-                 original_exception: Optional[Exception] = None
+                 original_exception: Optional[Exception] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None
                  ):
         super().__init__(message)
         self.locator = locator
@@ -39,6 +45,8 @@ class GetElementError(AppiumExtendedError):
         self.timeout_method = timeout_method
         self.elements_range = elements_range
         self.contains = contains
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.traceback = traceback.format_exc()
         self.original_exception = original_exception
 
@@ -57,7 +65,9 @@ class GetElementsError(AppiumExtendedError):
                  timeout_method: int = None,
                  elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                  contains: bool = None,
-                 original_exception: Optional[Exception] = None
+                 original_exception: Optional[Exception] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None
                  ):
         super().__init__(message)
         self.locator = locator
@@ -67,6 +77,8 @@ class GetElementsError(AppiumExtendedError):
         self.timeout_method = timeout_method
         self.elements_range = elements_range
         self.contains = contains
+        self.poll_frequency = poll_frequency,
+        self.ignored_exceptions = ignored_exceptions,
         self.traceback = traceback.format_exc()
         self.original_exception = original_exception
 
@@ -186,15 +198,23 @@ class IsElementWithinScreenError(AppiumExtendedError):
 
     def __init__(self,
                  message: str = '',
-                 locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str] = None,
-                 timeout: int = None,
-                 contains: bool = None,
+                 locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 contains: bool = True,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Exception = None
                  ):
         super().__init__(message)
         self.locator = locator
-        self.timeout = timeout
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
         self.contains = contains
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
 
@@ -295,15 +315,28 @@ class WaitForError(AppiumExtendedError):
 
     def __init__(self,
                  message: str = '',
-                 locator=None,
-                 image=None,
-                 timeout: int = None,
-                 contains: bool = None,
+                 locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
+                 List[Tuple[str, str]], List[WebElement], List['WebElementExtended'], List[Dict[str, str]], List[
+                     str]] = None,
+                 image: Union[bytes, np.ndarray, Image.Image, str,
+                 List[bytes], List[np.ndarray], List[Image.Image], List[str]] = None,
+                 contains: bool = True,
+                 sleep: int = 1,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
         self.image = image
-        self.timeout = timeout
+        self.sleep = sleep
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.contains = contains
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
@@ -318,13 +351,21 @@ class WaitForNotError(AppiumExtendedError):
                  message: str = '',
                  locator=None,
                  image=None,
-                 timeout: int = None,
-                 contains: bool = None,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 contains: bool = True,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
         self.image = image
-        self.timeout = timeout
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.contains = contains
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
@@ -335,13 +376,21 @@ class IsWaitForError(AppiumExtendedError):
                  message: str = '',
                  locator=None,
                  image=None,
-                 timeout: int = None,
-                 contains: bool = None,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 contains: bool = True,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
         self.image = image
-        self.timeout = timeout
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.contains = contains
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
@@ -353,13 +402,21 @@ class IsWaitForNotError(AppiumExtendedError):
                  message: str = '',
                  locator=None,
                  image=None,
-                 timeout: int = None,
-                 contains: bool = None,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 contains: bool = True,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Optional[Exception] = None):
         super().__init__(message)
         self.locator = locator
         self.image = image
-        self.timeout = timeout
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.contains = contains
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
