@@ -11,11 +11,11 @@ from appium_extended_web_element.web_element_click import WebElementClick
 from appium_extended_web_element.web_element_dom import WebElementDOM
 from appium_extended_web_element.web_element_scroll import WebElementScroll
 from appium_extended_web_element.web_element_tap import WebElementTap
-from appium_extended_web_element.web_element_adb_actions import WebElementAdbActions
+from appium_extended_web_element.web_element_adb_actions import WebElementTerminalActions
 
 
 class WebElementExtended(WebElementClick,
-                         WebElementAdbActions,
+                         WebElementTerminalActions,
                          WebElementDOM,
                          WebElementTap,
                          WebElementScroll):
@@ -120,8 +120,8 @@ class WebElementExtended(WebElementClick,
         tap by adb
         # TODO fill
         """
-        assert self._adb_tap(wait=wait,
-                             decorator_args=decorator_args)
+        assert self._terminal_tap(wait=wait,
+                                  decorator_args=decorator_args)
         return cast('WebElementExtended', self)
 
     def adb_swipe(self,
@@ -142,10 +142,10 @@ class WebElementExtended(WebElementClick,
         element = None
         if locator is not None:
             element = root.get_element(locator=locator, contains=contains)
-        assert self._adb_swipe(root=root, element=element,
-                               x=x, y=y,
-                               direction=direction, distance=distance,
-                               duration=duration)
+        assert self._terminal_swipe(root=root, element=element,
+                                    x=x, y=y,
+                                    direction=direction, distance=distance,
+                                    duration=duration)
         return cast('WebElementExtended', self)
 
     # TAP

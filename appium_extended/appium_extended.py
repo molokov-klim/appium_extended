@@ -384,7 +384,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                              language: Optional[str] = 'rus',
                              image: Union[bytes, str, Image.Image, np.ndarray] = None,
                              ocr: Optional[bool] = True,
-                             contains: bool = True
+                             timeout_elem: float = 10.0,
+                             timeout_method: float = 600.0,
+                             elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                             contains: bool = True,
+                             poll_frequency: float = 0.5,
+                             ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                              ) -> Union[tuple[int, ...], tuple[int, int, int, int], None]:
         """
         Возвращает координаты области с указанным текстом на предоставленном изображении или снимке экрана.
@@ -432,7 +437,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         else:
             try:
                 return self.get_element(locator={'text': text, 'displayed': 'true', 'enabled': 'true'},
-                                        contains=contains).get_coordinates()
+                                        timeout_elem=timeout_elem,
+                                        timeout_method=timeout_method,
+                                        elements_range=elements_range,
+                                        contains=contains,
+                                        poll_frequency=poll_frequency,
+                                        ignored_exceptions=ignored_exceptions,).get_coordinates()
             except Exception as error:
                 raise GetTextCoordinatesError(message=f"""
                 Ошибка при попытке найти координаты изображения с использованием поиска по DOM: {error}""",
@@ -459,12 +469,16 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         raise NotImplementedError("Метод еще не реализован.")  # TODO implement
 
-    # FIXME отладить, работает недостаточно стабильно в боевых условиях
+
     def find_and_get_element(self,
                              locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str],
-                             timeout: int = 10,
+                             timeout_elem: float = 10.0,
+                             timeout_method: float = 600.0,
+                             elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                             contains: bool = True,
+                             poll_frequency: float = 0.5,
+                             ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                              tries: int = 3,
-                             contains: bool = True
                              ) -> Union[WebElementExtended, None]:
         """
         Ищет элемент на странице и возвращает его. Если элемент не найден, метод прокручивает
@@ -493,43 +507,77 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             ValueError: Возникает, если элемент не найден. Исключение вызывается внутренним методом get_element.
         """
         try:
-            if self.is_element_within_screen(locator=locator, timeout=1, contains=contains):
+            if self.is_element_within_screen(locator=locator,
+                                             timeout_elem=timeout_elem,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
+                                             contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions, ):
                 try:
-                    return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
+                    return self.get_element(locator=locator,
+                                            timeout_elem=timeout_elem,
+                                            timeout_method=timeout_method,
+                                            elements_range=elements_range,
+                                            contains=contains,
+                                            poll_frequency=poll_frequency,
+                                            ignored_exceptions=ignored_exceptions, )
                 except GetElementError as error:
                     raise FindAndGetElementError(message="""
                     Не удалось получить элемент (несмотря на то, что он обнаружен на экране)""",
                                                  locator=locator,
-                                                 timeout=timeout,
-                                                 tries=tries,
+                                                 timeout_elem=timeout_elem,
+                                                 timeout_method=timeout_method,
+                                                 elements_range=elements_range,
                                                  contains=contains,
+                                                 poll_frequency=poll_frequency,
+                                                 ignored_exceptions=ignored_exceptions,
+                                                 tries=tries,
                                                  original_exception=error) from error
             recyclers = self.get_elements(locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
             if recyclers is None:
                 raise FindAndGetElementError(message="Не удалось обнаружить прокручиваемые элементы на экране",
                                              locator=locator,
-                                             timeout=timeout,
-                                             tries=tries,
-                                             contains=contains)
+                                             timeout_elem=timeout_elem,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
+                                             contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions,
+                                             tries=tries, )
             for i in range(tries):
                 for recycler in recyclers:
                     if recycler.scroll_until_find(locator=locator, contains=contains) is not None:
                         try:
-                            return self.get_element(locator=locator, timeout_elem=timeout, contains=contains)
+                            return self.get_element(locator=locator,
+                                                    timeout_elem=timeout_elem,
+                                                    timeout_method=timeout_method,
+                                                    elements_range=elements_range,
+                                                    contains=contains,
+                                                    poll_frequency=poll_frequency,
+                                                    ignored_exceptions=ignored_exceptions, )
                         except GetElementError as error:
                             raise FindAndGetElementError(message="Не удалось извлечь элемент",
                                                          locator=locator,
-                                                         timeout=timeout,
-                                                         tries=tries,
+                                                         timeout_elem=timeout_elem,
+                                                         timeout_method=timeout_method,
+                                                         elements_range=elements_range,
                                                          contains=contains,
+                                                         poll_frequency=poll_frequency,
+                                                         ignored_exceptions=ignored_exceptions,
+                                                         tries=tries,
                                                          original_exception=error) from error
             return None
         except Exception as error:
             raise FindAndGetElementError(message=f"Ошибка при попытке найти и извлечь элемент: {error}",
                                          locator=locator,
-                                         timeout=timeout,
-                                         tries=tries,
+                                         timeout_elem=timeout_elem,
+                                         timeout_method=timeout_method,
+                                         elements_range=elements_range,
                                          contains=contains,
+                                         poll_frequency=poll_frequency,
+                                         ignored_exceptions=ignored_exceptions,
+                                         tries=tries,
                                          original_exception=error) from error
 
     def is_element_within_screen(self,
@@ -666,7 +714,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             y: int = None,
             image: Union[bytes, np.ndarray, Image.Image, str] = None,
             duration: Optional[int] = None,
-            timeout: int = 5,
+            timeout: float = 5.0,
+            threshold: float = 0.9
             ) -> 'AppiumExtended':
         """
         Выполняет тап по заданным координатам, элементу или изображению на экране.
@@ -705,7 +754,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 x, y = self._extract_point_coordinates_by_typing(locator)
             if image is not None:
                 start_time = time.time()
-                while not self.is_image_on_the_screen(image=image) and time.time() - start_time < timeout:
+                while not self.is_image_on_the_screen(image=image, threshold=threshold) \
+                        and time.time() - start_time < timeout:
                     time.sleep(1)
                 # Извлечение координат
                 x, y = self._extract_point_coordinates_by_typing(image)
@@ -987,7 +1037,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                   elements_range=elements_range,
                                   contains=contains,
                                   poll_frequency=poll_frequency,
-                                  ignored_exceptions=ignored_exceptions,):
+                                  ignored_exceptions=ignored_exceptions, ):
                 raise WaitForError(message="Элемент или изображение не появились на экране в течение заданного времени",
                                    locator=locator,
                                    image=image,
@@ -997,7 +1047,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                    elements_range=elements_range,
                                    contains=contains,
                                    poll_frequency=poll_frequency,
-                                   ignored_exceptions=ignored_exceptions,)
+                                   ignored_exceptions=ignored_exceptions, )
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitForError(message=f"""
@@ -1010,7 +1060,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                elements_range=elements_range,
                                contains=contains,
                                poll_frequency=poll_frequency,
-                               ignored_exceptions=ignored_exceptions,) from error
+                               ignored_exceptions=ignored_exceptions, ) from error
 
     def wait_for_not(self,
                      locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str,
@@ -1084,7 +1134,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                       elements_range=elements_range,
                                       contains=contains,
                                       poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,)
+                                      ignored_exceptions=ignored_exceptions, )
             return cast('AppiumExtended', self)
         except Exception as error:
             raise WaitForNotError(message=f"Ошибка при ожидании wait_for_not(): {error}",

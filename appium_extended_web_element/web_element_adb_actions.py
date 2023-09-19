@@ -8,7 +8,7 @@ from appium_extended_helpers import helpers_decorators
 from appium_extended_utils.utils import find_coordinates_by_vector
 
 
-class WebElementAdbActions(WebElementGet):
+class WebElementTerminalActions(WebElementGet):
     """
     Класс для выполнения adb-действий с элементами.
     Наследуется от класса WebElementGet.
@@ -17,9 +17,9 @@ class WebElementAdbActions(WebElementGet):
     def __init__(self, logger: logging.Logger, driver, element_id):
         super().__init__(logger=logger, driver=driver, element_id=element_id)
 
-    def _adb_tap(self,
-                 decorator_args: dict = None,
-                 wait: bool = False) -> bool:
+    def _terminal_tap(self,
+                      decorator_args: dict = None,
+                      wait: bool = False) -> bool:
         """
         Выполняет нажатие на элемент с помощью adb.
 
@@ -37,19 +37,19 @@ class WebElementAdbActions(WebElementGet):
             if not decorator_args:
                 decorator_args = {"timeout_window": 5,
                                   "tries": 5}
-            return self._adb_tap_to_element_and_wait(decorator_args=decorator_args)
+            return self._terminal_tap_to_element_and_wait(decorator_args=decorator_args)
         # Если не нужно ожидать изменения окна.
-        return self._adb_tap_to_element()
+        return self._terminal_tap_to_element()
 
-    def _adb_tap_to_element(self) -> bool:
-        return self.__adb_tap()
+    def _terminal_tap_to_element(self) -> bool:
+        return self.__terminal_tap()
 
     @helpers_decorators.wait_for_window_change()
-    def _adb_tap_to_element_and_wait(self,
-                                     decorator_args: dict = None) -> bool:
-        return self.__adb_tap()
+    def _terminal_tap_to_element_and_wait(self,
+                                          decorator_args: dict = None) -> bool:
+        return self.__terminal_tap()
 
-    def __adb_tap(self) -> bool:
+    def __terminal_tap(self) -> bool:
         """
         Выполняет нажатие на элемент с помощью adb.
 
@@ -62,14 +62,14 @@ class WebElementAdbActions(WebElementGet):
         except Exception as e:
             return False
 
-    def _adb_swipe(self,
-                   root,
-                   element: WebElement = None,
-                   x: int = None,
-                   y: int = None,
-                   direction: int = None,
-                   distance: int = None,
-                   duration: int = 1) -> bool:
+    def _terminal_swipe(self,
+                        root,
+                        element: WebElement = None,
+                        x: int = None,
+                        y: int = None,
+                        direction: int = None,
+                        distance: int = None,
+                        duration: int = 1) -> bool:
         """
         Выполняет прокрутку с помощью adb.
 

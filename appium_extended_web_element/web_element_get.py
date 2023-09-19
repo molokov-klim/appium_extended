@@ -2,6 +2,7 @@
 import logging
 import math
 import time
+import typing
 from typing import Union, Dict, List, Tuple
 
 import xml.etree.ElementTree as ET
@@ -11,7 +12,10 @@ from selenium.common.exceptions import WebDriverException
 
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.types import WaitExcTypes
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from appium_extended_helpers.appium_helpers import AppiumHelpers
 
@@ -33,10 +37,12 @@ class WebElementGet(WebElement):
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
                      by: Union[MobileBy, AppiumBy, By, str] = None,
                      value: Union[str, Dict, None] = None,
-                     timeout_elem: int = 10,
-                     timeout_method: int = 600,
+                     timeout_elem: float = 10,
+                     timeout_method: float = 600,
                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
-                     contains: bool = True
+                     contains: bool = True,
+                     poll_frequency: float = 0.5,
+                     ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                      ) -> \
             Union[WebElement, None]:
         """
@@ -106,6 +112,9 @@ class WebElementGet(WebElement):
             # Если локатор типа tuple, то выполняется извлечение элементов
             if isinstance(locator, tuple):
                 try:
+                    wait = WebDriverWait(driver=self.driver, timeout=timeout_elem,
+                                         poll_frequency=poll_frequency, ignored_exceptions=ignored_exceptions)
+                    wait.until(EC.presence_of_element_located(locator))
                     element = self.find_element(*locator)
                     return element
                 except WebDriverException:
@@ -138,10 +147,13 @@ class WebElementGet(WebElement):
                       locator: Union[Tuple, List[WebElement], Dict[str, str], str] = None,
                       by: Union[MobileBy, AppiumBy, By, str] = None,
                       value: Union[str, Dict, None] = None,
-                      timeout_elements: int = 10,
-                      timeout_method: int = 600,
+                      timeout_elements: float = 10.0,
+                      timeout_method: float = 600.0,
                       elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
-                      contains: bool = True) -> \
+                      contains: bool = True,
+                      poll_frequency: float = 0.5,
+                      ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                      ) -> \
             Union[List[WebElement], None]:
         """
         Метод обеспечивает поиск элементов в текущей DOM структуре.
@@ -198,6 +210,9 @@ class WebElementGet(WebElement):
             # Если локатор типа tuple, то выполняется извлечение элементов
             if isinstance(locator, tuple):
                 try:
+                    wait = WebDriverWait(driver=self.driver, timeout=timeout_elements,
+                                         poll_frequency=poll_frequency, ignored_exceptions=ignored_exceptions)
+                    wait.until(EC.presence_of_element_located(locator))
                     elements = self.find_elements(*locator)
                     return elements
                 except WebDriverException:
@@ -378,7 +393,14 @@ class WebElementGet(WebElement):
                 return str(child_class)
 
     def _get_top_child_from_parent(self,
-                                   locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+                                   locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
+                                   timeout_elements: float = 10.0,
+                                   timeout_method: float = 600.0,
+                                   elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                                   contains: bool = True,
+                                   poll_frequency: float = 0.5,
+                                   ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                   ) -> \
             Union[WebElement, None]:
         """
         Возвращает самый верхний дочерний элемент родительского элемента.
@@ -393,7 +415,13 @@ class WebElementGet(WebElement):
         """
         if locator is None:
             locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator)
+        children = self._get_elements(locator=locator,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions, )
         if len(children) <= 1:
             while not len(children) > 1:
                 if len(children) == 0:
@@ -403,7 +431,14 @@ class WebElementGet(WebElement):
         return top_child
 
     def _get_bottom_child_from_parent(self,
-                                      locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+                                      locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
+                                      timeout_elements: float = 10.0,
+                                      timeout_method: float = 600.0,
+                                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                                      contains: bool = True,
+                                      poll_frequency: float = 0.5,
+                                      ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                      ) -> \
             Union[WebElement, None]:
         """
         Метод возвращает нижний дочерний элемент родительского элемента с заданным классом.
@@ -416,7 +451,14 @@ class WebElementGet(WebElement):
         """
         if locator is None:
             locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator)
+        children = self._get_elements(locator=locator,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,
+                                      )
         if len(children) == 0:
             return None
         if len(children) <= 1:
@@ -428,7 +470,14 @@ class WebElementGet(WebElement):
         return bottom_child
 
     def _get_center_child_from_parent(self,
-                                      locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+                                      locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
+                                      timeout_elements: float = 10.0,
+                                      timeout_method: float = 600.0,
+                                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                                      contains: bool = True,
+                                      poll_frequency: float = 0.5,
+                                      ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                      ) -> \
             Union[WebElement, None]:
         """
         Возвращает центральный дочерний элемент родительского элемента.
@@ -443,7 +492,14 @@ class WebElementGet(WebElement):
         """
         if locator is None:
             locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator)
+        children = self._get_elements(locator=locator,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,
+                                      )
         if len(children) <= 1:
             while not len(children) > 1:
                 if len(children) == 0:
@@ -453,7 +509,14 @@ class WebElementGet(WebElement):
         return center_child
 
     def _get_top_center_child_from_parent(self,
-                                          locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+                                          locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
+                                          timeout_elements: float = 10.0,
+                                          timeout_method: float = 600.0,
+                                          elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                                          contains: bool = True,
+                                          poll_frequency: float = 0.5,
+                                          ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                          ) -> \
             Union[WebElement, None]:
         """
         Возвращает дочерний элемент родительского элемента расположенный между центральным и верхним.
@@ -469,7 +532,14 @@ class WebElementGet(WebElement):
         """
         if locator is None:
             locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator)
+        children = self._get_elements(locator=locator,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,
+                                      )
         if len(children) <= 1:
             while not len(children) > 1:
                 if len(children) == 0:
@@ -479,7 +549,15 @@ class WebElementGet(WebElement):
         return top_center_child
 
     def _get_bottom_center_child_from_parent(self,
-                                             locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None) -> \
+                                             locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
+                                             timeout_elements: float = 10.0,
+                                             timeout_method: float = 600.0,
+                                             elements_range: Union[
+                                                 Tuple, List[WebElement], Dict[str, str], None] = None,
+                                             contains: bool = True,
+                                             poll_frequency: float = 0.5,
+                                             ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                             ) -> \
             Union[WebElement, None]:
         """
         Возвращает дочерний элемент родительского элемента расположенный между центральным и нижним.
@@ -495,7 +573,14 @@ class WebElementGet(WebElement):
         """
         if locator is None:
             locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator)
+        children = self._get_elements(locator=locator,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains,
+                                      poll_frequency=poll_frequency,
+                                      ignored_exceptions=ignored_exceptions,
+                                      )
         if len(children) <= 1:
             while not len(children) > 1:
                 if len(children) == 0:

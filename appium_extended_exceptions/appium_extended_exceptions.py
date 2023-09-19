@@ -177,14 +177,22 @@ class FindAndGetElementError(AppiumExtendedError):
     def __init__(self,
                  message: str = '',
                  locator: Union[Tuple[str, str], 'WebElement', 'WebElementExtended', Dict[str, str], str] = None,
-                 timeout: int = None,
                  tries: int = None,
                  contains: bool = None,
+                 timeout_elem: float = 10.0,
+                 timeout_method: float = 600.0,
+                 elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
                  original_exception: Optional[Exception] = None
                  ):
         super().__init__(message)
         self.locator = locator
-        self.timeout = timeout
+        self.timeout_elem = timeout_elem
+        self.timeout_method = timeout_method
+        self.elements_range = elements_range
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
         self.tries = tries
         self.contains = contains
         self.traceback = traceback.format_exc()

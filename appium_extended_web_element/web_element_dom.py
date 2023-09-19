@@ -48,7 +48,6 @@ class WebElementDOM(WebElementGet):
 
         return parents
 
-
     def _get_sibling(self, attributes: Dict[str, str], contains: bool = True) -> Union[WebElement, None]:
         """
         Возвращает брата элемента по указанным атрибутам.
