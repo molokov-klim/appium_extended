@@ -37,11 +37,6 @@ class AppiumBase:
         self.aapt = Aapt()
         self.adb = Adb()
 
-        aapt_logger = logging.getLogger('aapt')
-        aapt_logger.setLevel(self.logger.level)
-        adb_logger = logging.getLogger('adb')
-        adb_logger.setLevel(self.logger.level)
-
     def connect(self,
                 capabilities: dict,
                 server_ip: str = '127.0.0.1',
