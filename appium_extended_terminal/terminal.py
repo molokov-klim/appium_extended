@@ -18,7 +18,7 @@ class Terminal:
         self.logger = logger
         if logger is None:
             self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(log_level)
+            self.logger.setLevel(log_level)
         if bool(log_path):
             if not log_path.endswith('.log'):
                 log_path = log_path + '.log'
