@@ -188,3 +188,16 @@ def is_list_in_list(small_list: list, big_list: list) -> bool:
         return False
 
 
+def get_keys_contains(dictionary: dict, key_fragment: str) -> dict:
+    """
+    Извлекает все ключи и значения из словаря, ключи которых содержат заданный фрагмент.
+    Args:
+        dictionary (dict): словарь, для поиска
+        key_fragment (str): фрагмент ключа
+    Returns:
+        dict: словарь содержащий совпадения
+    """
+    return {key: value for key, value in dictionary.items() if key_fragment in key}
+
+
+

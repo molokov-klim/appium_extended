@@ -868,3 +868,20 @@ class Terminal:
 
         return result_dict
 
+    def get_prop_hardware(self) -> str:
+        return self.get_prop()['ro.boot.hardware']
+
+    def get_prop_model(self) -> str:
+        return self.get_prop()['ro.product.model']
+
+    def get_prop_serial(self) -> str:
+        return self.get_prop()['ro.serialno']
+
+    def get_prop_build(self) -> str:
+        return self.get_prop()['ro.build.description']
+
+    def get_prop_device(self) -> str:
+        return self.get_prop()['ro.product.device']
+
+    def get_prop_uin(self) -> str:
+        return self.get_prop()['sys.atol.uin']

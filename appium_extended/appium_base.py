@@ -23,7 +23,7 @@ class AppiumBase:
     Обеспечивает подключение к устройству
     """
 
-    def __init__(self, logger: logging.Logger = None):
+    def __init__(self, logger: logging.Logger = None, log_level=logging.CRITICAL):
         self.server_log_level: str = None
         self.server_port: int = None
         self.server_ip: str = None
@@ -36,6 +36,7 @@ class AppiumBase:
         self.keep_alive_server: bool = True
         self.aapt = Aapt()
         self.adb = Adb()
+        self.logger.setLevel(log_level)
 
     def connect(self,
                 capabilities: dict,
