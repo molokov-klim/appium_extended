@@ -888,7 +888,7 @@ class Terminal:
 
     def get_packages(self) -> list:
         # Get the output from adb_shell command
-        output = self.terminal.adb_shell(command='pm', args='list packages')
+        output = self.adb_shell(command='pm', args='list packages')
 
         # Split the output by newline to get each line separately
         lines = output.strip().split('\n')
