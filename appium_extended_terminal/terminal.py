@@ -885,3 +885,14 @@ class Terminal:
 
     def get_prop_uin(self) -> str:
         return self.get_prop()['sys.atol.uin']
+
+    def get_packages(self) -> list:
+        # Get the output from adb_shell command
+        output = self.terminal.adb_shell(command='pm', args='list packages')
+
+        # Split the output by newline to get each line separately
+        lines = output.strip().split('\n')
+
+        # Extract package names from each line and return as a list
+        packages = [line.split(':')[-1].replace('\r', '') for line in lines]
+        return packages
