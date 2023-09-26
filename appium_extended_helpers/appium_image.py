@@ -271,13 +271,17 @@ class AppiumImage:
             else:
                 image = self.to_ndarray(screen)
 
-            # Бинаризация изображения
-            _, image_bin = cv2.threshold(image, 0, 255,
-                                         cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
+            # # Бинаризация изображения
+            # _, image_bin = cv2.threshold(image, 0, 255,
+            #                              cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
+
+            # Адаптивная бинаризация
+            threshold = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
             # Преобразование двоичного изображения в текст
             custom_config = r'--oem 3 --psm 6'
-            ocr_text = pytesseract.image_to_string(image_bin, lang=language, config=custom_config)
+
+            ocr_text = pytesseract.image_to_string(threshold, lang=language, config=custom_config)
 
             # Проверка наличия заданного текста в распознанном тексте
             return text.lower() in ocr_text.lower()
@@ -412,11 +416,16 @@ class AppiumImage:
 
         image = cv2.convertScaleAbs(image, alpha=1.5, beta=30)
 
-        # Бинаризация изображения
-        _, threshold = cv2.threshold(image, 0, 255,
-                                     cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
+        # # Бинаризация изображения
+        # _, threshold = cv2.threshold(image, 0, 255,
+        #                              cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # Применение бинаризации для получения двоичного изображения
+        #
+        # oem_config = r'--oem 3 --psm 11'
 
-        oem_config = r'--oem 3 --psm 11'
+        # Адаптивная бинаризация
+        threshold = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+        oem_config = r'--oem 3 --psm 6'
 
         # Выполнение OCR с помощью PyTesseract
         data = pytesseract.image_to_data(threshold,
