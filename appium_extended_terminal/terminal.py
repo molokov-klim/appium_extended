@@ -1,6 +1,8 @@
 import logging
 import base64
+import os
 import re
+import subprocess
 import sys
 import time
 import traceback
@@ -842,7 +844,7 @@ class Terminal:
     @log_debug()
     def get_prop(self) -> dict:
         """
-        Выполняет команду getprop, преобразует в dict
+        Возвращает словарь атрибутов и их значений полученных командой getprop
         """
         raw_properties = self.adb_shell(command="getprop")
 
@@ -869,24 +871,45 @@ class Terminal:
         return result_dict
 
     def get_prop_hardware(self) -> str:
+        """
+        Возвращает значение атрибута 'ro.boot.hardware'
+        """
         return self.get_prop()['ro.boot.hardware']
 
     def get_prop_model(self) -> str:
+        """
+        Возвращает значение атрибута 'ro.product.model'
+        """
         return self.get_prop()['ro.product.model']
 
     def get_prop_serial(self) -> str:
+        """
+        Возвращает значение атрибута 'ro.serialno'
+        """
         return self.get_prop()['ro.serialno']
 
     def get_prop_build(self) -> str:
+        """
+        Возвращает значение атрибута 'ro.build.description'
+        """
         return self.get_prop()['ro.build.description']
 
     def get_prop_device(self) -> str:
+        """
+        Возвращает значение атрибута 'ro.product.device'
+        """
         return self.get_prop()['ro.product.device']
 
     def get_prop_uin(self) -> str:
+        """
+        Вовзращает УИН устройства
+        """
         return self.get_prop()['sys.atol.uin']
 
     def get_packages(self) -> list:
+        """
+        Возвращает список пакетов установленных на устройство
+        """
         # Get the output from adb_shell command
         output = self.adb_shell(command='pm', args='list packages')
 
@@ -896,3 +919,71 @@ class Terminal:
         # Extract package names from each line and return as a list
         packages = [line.split(':')[-1].replace('\r', '') for line in lines]
         return packages
+
+    def get_package_path(self, package: str) -> str:
+        """
+        Возвращает путь к пакету на устройстве.
+        Args:
+            package (str): Наименование пакета
+        Returns:
+            str: путь к пакету на устройстве
+        """
+        return self.adb_shell(command='pm', args=f'path {package}').\
+            replace('package:', '').\
+            replace('\r', '').\
+            replace('\n', '')
+
+    def pull_package(self, package: str, path: str = '', filename: str = 'temp.apk'):
+        """
+        Скачивает с устройства указанный пакет.
+        Args:
+            package (str): Наименование пакета
+            path (str): Путь к папке сохранения пакета на ПК
+            filename (str): Имя файла сохраняемого на ПК
+        """
+        package_path = self.get_package_path(package=package)
+        if not filename.endswith('.apk'):
+            filename = f"{filename}.apk"
+        self.pull(source=package_path, destination=os.path.join(path, filename))
+
+    def get_package_manifest(self, package: str) -> dict:
+        """
+        Метод скачивает указанный пакет с устройства.
+        Получает с него манифест и возвращает его преобразованный в словарь.
+        Args:
+            package (str): наименование пакета
+        Returns:
+            dict: манифест в виде словаря
+        """
+        if not os.path.exists("test"):
+            os.makedirs(name='test')
+
+        self.pull_package(package=package, path="test",
+                          filename="temp.apk")
+
+        command = ["aapt", "dump", "badging", os.path.join("test", "temp.apk")]
+        try:
+            output: str = str(subprocess.check_output(command)).strip()
+        except subprocess.CalledProcessError as error:
+            # self.logger.error(f"get_package_manifest ошибка получения манифеста: {error}")
+            return {}
+        # Убираем лишние символы
+        output = output.replace('\\r\\n', ' ').replace('b"', '').replace('"', '').replace(":'", ": '")
+
+        # Строим список
+        list_of_elements = output.split()
+        result = {}
+        current_key = None
+
+        for element in list_of_elements:
+            if element.endswith(':'):
+                result[element] = []
+                current_key = element
+                continue
+            result[current_key].append(element.replace("'", ""))
+
+        os.remove(os.path.join('test', 'temp.apk'))
+
+        return result
+
+
