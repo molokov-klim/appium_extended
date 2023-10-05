@@ -32,6 +32,7 @@ class AppiumBase:
         self.driver: WebDriver = None
         self.terminal: Terminal = None
         self.session_id: str = None
+        self.capabilities = None
         self.helper: AppiumHelpers = None
         self.keep_alive_server: bool = True
         self.aapt = Aapt()
@@ -93,6 +94,7 @@ class AppiumBase:
         self.server_port = server_port
         self.server_log_level = server_log_level
         self.keep_alive_server = keep_alive_server
+        self.capabilities = capabilities
         self.server = AppiumServer(server_ip=self.server_ip,
                                    server_port=self.server_port,
                                    remote_log_level=self.server_log_level,
@@ -156,3 +158,20 @@ class AppiumBase:
             bool: Возвращает True, если сервер и сессия активны, иначе False.
         """
         return self.driver.is_running()
+
+    def reconnect(self):
+        url = f'http://{self.server_ip}:{str(self.server_port)}/wd/hub'
+        self.logger.info(f"Подключение к серверу: {url}")
+        self.driver = webdriver.Remote(command_executor=url,
+                                       desired_capabilities=self.capabilities,
+                                       keep_alive=True)
+        self.session_id = self.driver.session_id
+        # Инициализация объектов требующих драйвер
+        self.terminal = Terminal(driver=self.driver, logger=self.logger)
+        self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
+
+        app_capabilities = json.dumps(self.capabilities)
+        self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
+        self.logger.info(f'Сессия №: {self.driver.session_id}')
+
+

@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import re
@@ -1098,4 +1099,12 @@ class Adb:
             traceback_info = "".join(traceback.format_tb(sys.exc_info()[2]))
             logger.error(traceback_info)
         return None
+
+    @staticmethod
+    def execute(command: str):
+        logger.debug(f"execute() < {command}")
+        execute_command = ['adb', *command.split()]
+        return subprocess.check_output(execute_command).decode()
+
+
 

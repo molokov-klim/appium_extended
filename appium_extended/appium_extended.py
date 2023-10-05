@@ -6,6 +6,7 @@ from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
 
+from selenium.common.exceptions import NoSuchDriverException
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
@@ -112,6 +113,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                         contains=contains,
                                         poll_frequency=poll_frequency,
                                         ignored_exceptions=ignored_exceptions)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetElementError(message=f"Ошибка при попытке извлечь элемент {error}",
                                   locator=locator,
@@ -201,6 +204,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                              poll_frequency=poll_frequency,
                                              ignored_exceptions=ignored_exceptions
                                              )
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetElementsError(message=f"Ошибка при попытке извлечь элементы: {error}",
                                    by=by,
@@ -262,6 +267,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             coordinates = self._get_image_coordinates(full_image=full_image,
                                                       image=image,
                                                       threshold=threshold)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetImageCoordinatesError(message=f"Ошибка при попытке извлечения координат изображения: {error}",
                                            full_image=full_image,
@@ -310,6 +317,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             inner_image_coordinates = self._get_inner_image_coordinates(outer_image_path=outer_image_path,
                                                                         inner_image_path=inner_image_path,
                                                                         threshold=threshold)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetInnerImageCoordinatesError(message=f"Ошибка при попытке извлечь внутреннее изображение: {error}",
                                                 outer_image_path=outer_image_path,
@@ -363,6 +372,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                                     image=image,
                                                                     cv_threshold=cv_threshold,
                                                                     coord_threshold=coord_threshold)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetManyCoordinatesOfImageError(
                 message=f"Ошибка при попытке извлечения координат изображений: {error}",
@@ -419,6 +430,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         if ocr:
             try:
                 coordinates = self._get_text_coordinates(text=text, language=language, image=image)
+            except NoSuchDriverException:
+                self.reconnect()
             except Exception as error:
                 raise GetTextCoordinatesError(message=f"""
                 Ошибка при попытке найти координаты изображения с использованием OCR: {error}""",
@@ -443,6 +456,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                         contains=contains,
                                         poll_frequency=poll_frequency,
                                         ignored_exceptions=ignored_exceptions,).get_coordinates()
+            except NoSuchDriverException:
+                self.reconnect()
             except Exception as error:
                 raise GetTextCoordinatesError(message=f"""
                 Ошибка при попытке найти координаты изображения с использованием поиска по DOM: {error}""",
@@ -522,6 +537,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+                except NoSuchDriverException:
+                    self.reconnect()
                 except GetElementError as error:
                     raise FindAndGetElementError(message="""
                     Не удалось получить элемент (несмотря на то, что он обнаружен на экране)""",
@@ -556,6 +573,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                     contains=contains,
                                                     poll_frequency=poll_frequency,
                                                     ignored_exceptions=ignored_exceptions, )
+                        except NoSuchDriverException:
+                            self.reconnect()
                         except GetElementError as error:
                             raise FindAndGetElementError(message="Не удалось извлечь элемент",
                                                          locator=locator,
@@ -568,6 +587,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                          tries=tries,
                                                          original_exception=error) from error
             return None
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise FindAndGetElementError(message=f"Ошибка при попытке найти и извлечь элемент: {error}",
                                          locator=locator,
@@ -620,6 +641,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                   contains=contains,
                                                   poll_frequency=poll_frequency,
                                                   ignored_exceptions=ignored_exceptions, )
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise IsElementWithinScreenError(message=f"""
             Ошибка при проверке, находится ли элемент на видимом экране: {error}""",
@@ -670,6 +693,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                   poll_frequency=poll_frequency,
                                                   ignored_exceptions=ignored_exceptions,
                                                   )
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise IsTextOnScreenError(message=f"""
             Ошибка при проверке, присутствует ли заданный текст на экране: {error}""",
@@ -701,6 +726,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             return self.helper.is_image_on_the_screen(image=image, threshold=threshold)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise IsImageOnScreenError(message=f"""
             Ошибка при проверке, присутствует ли заданное изображение на экране: {error}""",
@@ -767,6 +794,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                duration=duration,
                                timeout=timeout)
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise TapError(message=f"Ошибка при выполнении tap: {error}",
                            locator=locator,
@@ -848,6 +877,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
 
             # Возвращаем экземпляр класса appium_extended
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise SwipeError(message=f"Ошибка при попытке выполнения свайпа: {error}",
                              start_position=start_position,
@@ -1049,6 +1080,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                    poll_frequency=poll_frequency,
                                    ignored_exceptions=ignored_exceptions, )
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise WaitForError(message=f"""
             Ошибка ожидания элемента или изображения на экране в течение заданного времени {locator=}, {image=}""",
@@ -1136,6 +1169,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                       poll_frequency=poll_frequency,
                                       ignored_exceptions=ignored_exceptions, )
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise WaitForNotError(message=f"Ошибка при ожидании wait_for_not(): {error}",
                                   locator=locator,
@@ -1174,6 +1209,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                               image=image, ):
                 return True
             return False
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise IsWaitForError(message=f"""
            Неизвестная ошибка в методе is_wait_for {error=}, {locator=}, {image=}""",
@@ -1215,6 +1252,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             return False
         except TimeoutError:
             return False
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise IsWaitForNotError(message=f"""Неизвестная ошибка в методе is_wait_for_not(): 
                                               {error}, {locator=}, {image=}""",
@@ -1232,6 +1271,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         try:
             self._wait_return_true(method=method, timeout=timeout, sleep=sleep)
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise WaitReturnTrueError(message=f"Ошибка ожидания возврата True от метода: {error}",
                                       method=method,
@@ -1280,6 +1321,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                    bottom_right=bottom_right,
                                                    path=path)
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise DrawByCoordinatesError(message=f"Не удалось нарисовать прямоугольник на изображении: {error}",
                                          coordinates=coordinates,
@@ -1314,6 +1357,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         try:
             assert self.helper.save_screenshot(path=path, filename=filename)
             return cast('AppiumExtended', self)
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise SaveScreenshotError(message=f"Не удалось сохранить скриншот: {error}",
                                       path=path,
@@ -1373,6 +1418,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 x, y = utils.calculate_center_of_coordinates(
                     self.get_image_coordinates(image=position))
             return x, y
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise ExtractPointCoordinatesByTypingError(
                 message=f"Не удалось извлечь координаты точки на основе типа переданной позиции: {error}",
@@ -1432,6 +1479,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             return self._get_screenshot_as_base64_decoded()
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise GetScreenshotError(message=f"Не удалось получить скриншот: {error}",
                                      original_exception=error) from error
@@ -1462,6 +1511,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             path_to_file = os.path.join(path, filename)
             with open(path_to_file, "wb") as f:
                 f.write(source.encode('utf-8'))
+        except NoSuchDriverException:
+            self.reconnect()
         except Exception as error:
             raise SaveSourceError(message="Не удалось сохранить исходный код страницы",
                                   path=path,
