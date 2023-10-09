@@ -747,7 +747,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - np.ndarray - Преобразованный массив NumPy (ndarray) представляющий изображение.
         """
         try:
-            return self.to_ndarray(image=image, grayscale=grayscale)
+            return self.__to_ndarray(image=image, grayscale=grayscale)
         except NoSuchDriverException:
             self.reconnect()
 

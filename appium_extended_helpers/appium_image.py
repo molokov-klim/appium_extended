@@ -57,11 +57,11 @@ class AppiumImage(AppiumBase):
         """
         if full_image is None:
             screenshot = self.__get_screenshot_as_base64_decoded()
-            big_image = self.to_ndarray(image=screenshot, grayscale=True)
+            big_image = self.__to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self.__to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self.__to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         # Сопоставление частичного изображения и снимка экрана
         max_val_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
@@ -120,13 +120,13 @@ class AppiumImage(AppiumBase):
         screenshot = base64.b64decode(self.driver.get_screenshot_as_base64())
 
         # Читаем скриншот
-        full_image = self.to_ndarray(image=screenshot, grayscale=True)
+        full_image = self.__to_ndarray(image=screenshot, grayscale=True)
 
         # Прочитать внешнее изображение
-        outer_image = self.to_ndarray(image=outer_image_path, grayscale=True)
+        outer_image = self.__to_ndarray(image=outer_image_path, grayscale=True)
 
         # Прочитать внутреннее изображение
-        inner_image = self.to_ndarray(image=inner_image_path, grayscale=True)
+        inner_image = self.__to_ndarray(image=inner_image_path, grayscale=True)
 
         # Вычисляем коэффициенты масштабирования
         width_ratio = screen_width / full_image.shape[1]
@@ -192,8 +192,8 @@ class AppiumImage(AppiumBase):
             screenshot = self.__get_screenshot_as_base64_decoded()
 
             # Чтение снимка экрана и частичного изображения
-            full_image = self.to_ndarray(image=screenshot, grayscale=True)
-            small_image = self.to_ndarray(image=image, grayscale=True)
+            full_image = self.__to_ndarray(image=screenshot, grayscale=True)
+            small_image = self.__to_ndarray(image=image, grayscale=True)
 
             # Проверка размеров изображений
             if small_image.shape[0] > full_image.shape[0] or small_image.shape[1] > full_image.shape[1]:
@@ -269,9 +269,9 @@ class AppiumImage(AppiumBase):
         try:
             if screen is None:
                 screenshot = self.__get_screenshot_as_base64_decoded()
-                image = self.to_ndarray(screenshot)
+                image = self.__to_ndarray(screenshot)
             else:
-                image = self.to_ndarray(screen)
+                image = self.__to_ndarray(screen)
 
             # # Бинаризация изображения
             # _, image_bin = cv2.threshold(image, 0, 255,
@@ -337,11 +337,11 @@ class AppiumImage(AppiumBase):
 
         if full_image is None:
             screenshot = self.__get_screenshot_as_base64_decoded()
-            big_image = self.to_ndarray(image=screenshot, grayscale=True)
+            big_image = self.__to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self.__to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self.__to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         result = self._multi_scale_matching(full_image=big_image, template_image=small_image,
                                             return_raw=True, threshold=cv_threshold)
@@ -408,12 +408,12 @@ class AppiumImage(AppiumBase):
         if not image:
             # Получаем снимок экрана, если изображение не предоставлено
             screenshot = self.__get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
-            image = self.to_ndarray(image=screenshot,
-                                          grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
+            image = self.__to_ndarray(image=screenshot,
+                                      grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
             # Если предоставлено, то преобразуем
-            image = self.to_ndarray(image=image,
-                                          grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
+            image = self.__to_ndarray(image=image,
+                                      grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
 
         image = cv2.medianBlur(image, 3)  # + устранение шума
 
@@ -514,9 +514,9 @@ class AppiumImage(AppiumBase):
             if image is None:
                 # Если изображение не предоставлено, получаем снимок экрана с помощью драйвера
                 screenshot = self.__get_screenshot_as_base64_decoded()
-                image = self.to_ndarray(screenshot)
+                image = self.__to_ndarray(screenshot)
             else:
-                image = self.to_ndarray(image)
+                image = self.__to_ndarray(image)
 
             # Если верхняя левая и нижняя правая точки не предоставлены, используем координаты для определения
             # прямоугольника
@@ -588,7 +588,7 @@ class AppiumImage(AppiumBase):
         # Иначе, возвращаем изображение без изменений
         return image
 
-    def to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
+    def __to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
         """
         Преобразует входные данные из различных типов в ndarray (NumPy array).
 
@@ -656,7 +656,7 @@ class AppiumImage(AppiumBase):
         Код не будет продолжать выполнятся, пока изображение не закрыть.
         Метод для отладки.
         """
-        cv2.imshow('screen', self.to_ndarray(self.__get_screenshot_as_base64_decoded()))
+        cv2.imshow('screen', self.__to_ndarray(self.__get_screenshot_as_base64_decoded()))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 

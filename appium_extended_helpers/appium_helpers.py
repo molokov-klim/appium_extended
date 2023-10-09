@@ -89,7 +89,7 @@ class AppiumHelpers(AppiumImage):
             return None
         # поиск координат фрагмента изображения на экране
         screenshot = self.__get_screenshot_as_base64_decoded()
-        full_image = self.to_ndarray(screenshot)
+        full_image = self.__to_ndarray(screenshot)
         max_loc = self.get_image_coordinates(full_image=full_image, image=locator)
         x = max_loc[0]
         y = max_loc[1]
