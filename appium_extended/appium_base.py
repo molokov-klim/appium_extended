@@ -160,6 +160,7 @@ class AppiumBase:
         return self.driver.is_running()
 
     def reconnect(self):
+        self.logger.error("RECONNECT")
         url = f'http://{self.server_ip}:{str(self.server_port)}/wd/hub'
         self.logger.info(f"Подключение к серверу: {url}")
         self.driver = webdriver.Remote(command_executor=url,

@@ -6,7 +6,7 @@ from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
 
-from selenium.common.exceptions import NoSuchDriverException
+from selenium.common.exceptions import NoSuchDriverException, WebDriverException
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
@@ -692,7 +692,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                   poll_frequency=poll_frequency,
                                                   ignored_exceptions=ignored_exceptions,
                                                   )
-        except NoSuchDriverException:
+        except WebDriverException as error:
+            self.logger.error(f"is_text_on_screen_ERROR {error}")
             self.reconnect()
         except Exception as error:
             raise IsTextOnScreenError(message=f"""
