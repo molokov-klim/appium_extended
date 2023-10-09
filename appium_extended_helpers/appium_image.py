@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 from pytesseract import pytesseract
 
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, NoSuchDriverException
 
 from appium_extended_helpers import helpers_decorators
 from appium_extended_terminal.terminal import Terminal

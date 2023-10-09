@@ -455,7 +455,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                         elements_range=elements_range,
                                         contains=contains,
                                         poll_frequency=poll_frequency,
-                                        ignored_exceptions=ignored_exceptions,).get_coordinates()
+                                        ignored_exceptions=ignored_exceptions, ).get_coordinates()
             except NoSuchDriverException:
                 self.reconnect()
             except Exception as error:
@@ -483,7 +483,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Не реализован.
         """
         raise NotImplementedError("Метод еще не реализован.")  # TODO implement
-
 
     def find_and_get_element(self,
                              locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -734,6 +733,22 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                        image=image,
                                        threshold=threshold,
                                        original_exception=error) from error
+
+    def to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
+        """
+        Преобразует входные данные из различных типов в ndarray (NumPy array).
+
+        Аргументы:
+        - image: Union[bytes, np.ndarray, Image.Image, str] - Входные данные,
+          представляющие изображение. Может быть типами bytes, np.ndarray, PIL Image или str.
+
+        Возвращает:
+        - np.ndarray - Преобразованный массив NumPy (ndarray) представляющий изображение.
+        """
+        try:
+            return self.helper.to_ndarray(image=image, grayscale=grayscale)
+        except NoSuchDriverException:
+            self.reconnect()
 
     def tap(self,
             locator: Union[Tuple[str, str], WebElementExtended, WebElement, Dict[str, str], str] = None,
