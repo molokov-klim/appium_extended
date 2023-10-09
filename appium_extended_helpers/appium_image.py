@@ -11,20 +11,21 @@ from pytesseract import pytesseract
 
 from selenium.common.exceptions import WebDriverException, NoSuchDriverException
 
+from appium_extended.appium_base import AppiumBase
 from appium_extended_helpers import helpers_decorators
 from appium_extended_terminal.terminal import Terminal
 from appium_extended_utils import utils
 
 
-class AppiumImage:
+class AppiumImage(AppiumBase):
     """
     Класс работы с Appium.
     Обеспечивает работу с изображениями
     """
 
-    def __init__(self, driver, logger: logging.Logger):
+    def __init__(self, logger: logging.Logger):
+        super().__init__(logger)
         self.logger = logger
-        self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
 
     @helpers_decorators.retry

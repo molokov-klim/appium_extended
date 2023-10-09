@@ -11,8 +11,8 @@ from appium_extended_helpers.appium_image import AppiumImage
 
 class AppiumHelpers(AppiumImage):
 
-    def __init__(self, driver, logger: logging.Logger = None):
-        super().__init__(driver=driver, logger=logger)
+    def __init__(self, logger: logging.Logger = None):
+        super().__init__(logger=logger)
 
     @staticmethod
     def handle_webelement_locator(locator, timeout: int,

@@ -5,7 +5,6 @@ from typing import Any, Optional, List
 
 from appium_extended.appium_extended import AppiumExtended
 from appium_extended_graph.appium_graph import AppiumGraph
-from appium_extended_helpers.appium_image import AppiumImage
 
 
 class AppiumNavigator:
@@ -14,7 +13,6 @@ class AppiumNavigator:
         self.driver = self.app.driver
         self.graph_manager = AppiumGraph(self)
         self.logger = logger
-        self.image = AppiumImage(driver=app.driver, logger=logger)
 
     def add_page(self, page, edges):
         """
