@@ -273,7 +273,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.__is_image_on_the_screen(image=locator, threshold=threshold):
+                    if self._is_image_on_the_screen(image=locator, threshold=threshold):
                         return True
                 element = self._get_element(locator=locator,
                                             timeout_elem=timeout_elem,
@@ -296,7 +296,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.__is_image_on_the_screen(image=locator, threshold=threshold):
+                    if self._is_image_on_the_screen(image=locator, threshold=threshold):
                         return True
                 element = self._get_element(locator=locator,
                                             timeout_elem=timeout_elem,
@@ -354,7 +354,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.__is_image_on_the_screen(image=locator):
+                    if self._is_image_on_the_screen(image=locator):
                         return self._get_element(locator=locator,
                                                  timeout_elem=timeout_elem,
                                                  timeout_method=timeout_method,
@@ -383,7 +383,7 @@ class WebElementScroll(WebElementGet):
         while time.time() - start_time < timeout_method:
             try:
                 if isinstance(locator, str):
-                    if self.__is_image_on_the_screen(image=locator):
+                    if self._is_image_on_the_screen(image=locator):
                         return self._get_element(locator=locator,
                                                  timeout_elem=timeout_elem,
                                                  timeout_method=timeout_method,

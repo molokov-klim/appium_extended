@@ -369,9 +369,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             coordinates = self.get_many_coordinates_of_image(full_image=full_image,
-                                                                    image=image,
-                                                                    cv_threshold=cv_threshold,
-                                                                    coord_threshold=coord_threshold)
+                                                             image=image,
+                                                             cv_threshold=cv_threshold,
+                                                             coord_threshold=coord_threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -705,9 +705,9 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                       original_exception=error) from error
 
     def is_image_on_the_screen(self,
-                                 image: Union[bytes, np.ndarray, Image.Image, str],
-                                 threshold: float = 0.9,
-                                 ) -> bool:
+                               image: Union[bytes, np.ndarray, Image.Image, str],
+                               threshold: float = 0.9,
+                               ) -> bool:
         """
         Сравнивает, присутствует ли заданное изображение на экране.
 
@@ -725,7 +725,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Exception: Остальные исключения.
         """
         try:
-            return self.__is_image_on_the_screen(image=image, threshold=threshold)
+            return self._is_image_on_the_screen(image=image, threshold=threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -797,7 +797,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 x, y = self._extract_point_coordinates_by_typing(locator)
             if image is not None:
                 start_time = time.time()
-                while not self.__is_image_on_the_screen(image=image, threshold=threshold) \
+                while not self._is_image_on_the_screen(image=image, threshold=threshold) \
                         and time.time() - start_time < timeout:
                     time.sleep(1)
                 # Извлечение координат
@@ -1332,10 +1332,10 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             assert self.draw_by_coordinates(image=image,
-                                                   coordinates=coordinates,
-                                                   top_left=top_left,
-                                                   bottom_right=bottom_right,
-                                                   path=path)
+                                            coordinates=coordinates,
+                                            top_left=top_left,
+                                            bottom_right=bottom_right,
+                                            path=path)
             return cast('AppiumExtended', self)
         except NoSuchDriverException:
             self.reconnect()

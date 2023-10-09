@@ -85,7 +85,7 @@ class AppiumHelpers(AppiumImage):
         Returns:
             Union[WebElement, None]: Найденный WebElement, либо None, если элемент не найден.
         """
-        if not self.__is_image_on_the_screen(image=locator):
+        if not self._is_image_on_the_screen(image=locator):
             return None
         # поиск координат фрагмента изображения на экране
         screenshot = self.__get_screenshot_as_base64_decoded()

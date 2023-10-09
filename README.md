@@ -689,7 +689,7 @@ is_present = app.is_text_on_screen(text='Hello')
 
 ```python
 # Допустим, мы хотим проверить, находится ли изображение 'button.png' на экране.
-is_present = app.__is_image_on_the_screen(image='button.png')
+is_present = app._is_image_on_the_screen(image='button.png')
 ```
 
 ### Дополнительная информация
@@ -2165,7 +2165,7 @@ class PageBase(object):
             all_images_found = True  # Предполагаем, что все изображения найдены  
 
             for image in page_images:
-                if not self.app.image.__is_image_on_the_screen(image=image):
+                if not self.app.image._is_image_on_the_screen(image=image):
                     all_images_found = False
                     break  # Прерываем цикл, если хотя бы одно изображение не найдено  
 
