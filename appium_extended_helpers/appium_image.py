@@ -1,5 +1,6 @@
 # coding: utf-8
 import base64
+import inspect
 import logging
 import os
 import traceback
@@ -205,7 +206,9 @@ class AppiumImage(AppiumBase):
                                                           threshold=threshold)
 
             return max_val > threshold
-
+        except WebDriverException as e:
+            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
+            self.reconnect()
         except cv2.error as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
@@ -287,7 +290,9 @@ class AppiumImage(AppiumBase):
 
             # Проверка наличия заданного текста в распознанном тексте
             return text.lower() in ocr_text.lower()
-
+        except WebDriverException as e:
+            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
+            self.reconnect()
         except cv2.error as e:
             self.logger.error(f"is_text_on_ocr_screen(): {e}")
             return False
@@ -533,9 +538,8 @@ class AppiumImage(AppiumBase):
 
             return True
         except WebDriverException as e:
-            # Обрабатываем исключение WebDriverException и записываем ошибку в журнал
-            self.logger.error(f'draw_by_coordinates() WebDriverException {e}')
-            return False
+            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
+            self.reconnect()
         except cv2.error as e:
             # Обработка исключения cv2.error
             self.logger.error(f'draw_by_coordinates() cv2.error: {e}')
@@ -646,6 +650,9 @@ class AppiumImage(AppiumBase):
             with open(path_to_file, "wb") as f:
                 f.write(screenshot)
             return True
+        except WebDriverException as e:
+            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
+            self.reconnect()
         except Exception as error:
             self.logger.error(f"Не удалось сохранить скриншот: {error=}")
             return False
@@ -686,8 +693,8 @@ class AppiumImage(AppiumBase):
             screenshot = base64.b64decode(screenshot)
             return screenshot
         except WebDriverException as e:
-            self.logger.error(f"Failed to get screenshot: {e}")
-            raise
+            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
+            self.reconnect()
 
 
 
