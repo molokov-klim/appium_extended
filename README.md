@@ -565,7 +565,7 @@ coordinates = app.get_text_coordinates(text="Hello, world!", language="eng", ima
 ### Пример использования
 
 ```python
-screenshot = app._get_screenshot_as_base64_decoded()
+screenshot = app.__get_screenshot_as_base64_decoded()
 ```
 
 ### Дополнительная информация

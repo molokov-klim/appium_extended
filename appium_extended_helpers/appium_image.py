@@ -2,6 +2,7 @@
 import base64
 import logging
 import os
+import traceback
 from typing import Union, List, Tuple, Optional
 
 import cv2
@@ -55,7 +56,7 @@ class AppiumImage(AppiumBase):
                 или None, если совпадение не найдено.
         """
         if full_image is None:
-            screenshot = self._get_screenshot_as_base64_decoded()
+            screenshot = self.__get_screenshot_as_base64_decoded()
             big_image = self.to_ndarray(image=screenshot, grayscale=True)
         else:
             big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
@@ -188,7 +189,7 @@ class AppiumImage(AppiumBase):
             Exception: Остальные исключения.
         """
         try:
-            screenshot = self._get_screenshot_as_base64_decoded()
+            screenshot = self.__get_screenshot_as_base64_decoded()
 
             # Чтение снимка экрана и частичного изображения
             full_image = self.to_ndarray(image=screenshot, grayscale=True)
@@ -267,7 +268,7 @@ class AppiumImage(AppiumBase):
         """
         try:
             if screen is None:
-                screenshot = self._get_screenshot_as_base64_decoded()
+                screenshot = self.__get_screenshot_as_base64_decoded()
                 image = self.to_ndarray(screenshot)
             else:
                 image = self.to_ndarray(screen)
@@ -297,7 +298,8 @@ class AppiumImage(AppiumBase):
             self.logger.error(f"is_text_on_ocr_screen(): {e}")
             return False
         except Exception as e:
-            self.logger.error(f"is_text_on_ocr_screen(): {e}")
+            error_message = f"is_text_on_ocr_screen(): {e}\n{traceback.format_exc()}"
+            self.logger.error(error_message)
             return False
 
     @helpers_decorators.retry
@@ -334,7 +336,7 @@ class AppiumImage(AppiumBase):
         """
 
         if full_image is None:
-            screenshot = self._get_screenshot_as_base64_decoded()
+            screenshot = self.__get_screenshot_as_base64_decoded()
             big_image = self.to_ndarray(image=screenshot, grayscale=True)
         else:
             big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
@@ -405,7 +407,7 @@ class AppiumImage(AppiumBase):
 
         if not image:
             # Получаем снимок экрана, если изображение не предоставлено
-            screenshot = self._get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
+            screenshot = self.__get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
             image = self.to_ndarray(image=screenshot,
                                           grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
@@ -511,7 +513,7 @@ class AppiumImage(AppiumBase):
         try:
             if image is None:
                 # Если изображение не предоставлено, получаем снимок экрана с помощью драйвера
-                screenshot = self._get_screenshot_as_base64_decoded()
+                screenshot = self.__get_screenshot_as_base64_decoded()
                 image = self.to_ndarray(screenshot)
             else:
                 image = self.to_ndarray(image)
@@ -639,7 +641,7 @@ class AppiumImage(AppiumBase):
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
         try:
-            screenshot = self._get_screenshot_as_base64_decoded()
+            screenshot = self.__get_screenshot_as_base64_decoded()
             path_to_file = os.path.join(path, filename)
             with open(path_to_file, "wb") as f:
                 f.write(screenshot)
@@ -654,11 +656,11 @@ class AppiumImage(AppiumBase):
         Код не будет продолжать выполнятся, пока изображение не закрыть.
         Метод для отладки.
         """
-        cv2.imshow('screen', self.to_ndarray(self._get_screenshot_as_base64_decoded()))
+        cv2.imshow('screen', self.to_ndarray(self.__get_screenshot_as_base64_decoded()))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def _get_screenshot_as_base64_decoded(self) -> bytes:
+    def __get_screenshot_as_base64_decoded(self) -> bytes:
         """
         Получает скриншот экрана, кодирует его в формате Base64, а затем декодирует в байты.
 
