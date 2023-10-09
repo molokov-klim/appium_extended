@@ -689,7 +689,7 @@ is_present = app.is_text_on_screen(text='Hello')
 
 ```python
 # Допустим, мы хотим проверить, находится ли изображение 'button.png' на экране.
-is_present = app.is_image_on_the_screen(image='button.png')
+is_present = app.__is_image_on_the_screen(image='button.png')
 ```
 
 ### Дополнительная информация
@@ -2146,43 +2146,44 @@ class Page1(PageBase):
 ```
 
 `#page_base.py`
+
   ```python
-class PageBase(object):  
-    def __init__(self, app):  
-        self.app: AppiumExtended = app  
-        self.page_images_path: str  
-        self.page_images: list[str]  
-        self.logger = logging.getLogger(config.LOGGER_NAME)  
-  
-    def _is_current_page(self, page_images, max_attempts=3) -> bool:  
-        attempts = 0  
-  
-        while attempts < max_attempts:  
-            if len(page_images) == 0:  
-                return False  
-  
+class PageBase(object):
+    def __init__(self, app):
+        self.app: AppiumExtended = app
+        self.page_images_path: str
+        self.page_images: list[str]
+        self.logger = logging.getLogger(config.LOGGER_NAME)
+
+    def _is_current_page(self, page_images, max_attempts=3) -> bool:
+        attempts = 0
+
+        while attempts < max_attempts:
+            if len(page_images) == 0:
+                return False
+
             all_images_found = True  # Предполагаем, что все изображения найдены  
-  
-            for image in page_images:  
-                if not self.app.image.is_image_on_the_screen(image=image):  
-                    all_images_found = False  
+
+            for image in page_images:
+                if not self.app.image.__is_image_on_the_screen(image=image):
+                    all_images_found = False
                     break  # Прерываем цикл, если хотя бы одно изображение не найдено  
-  
-            if all_images_found:  
-                return True  
-  
-            attempts += 1  
+
+            if all_images_found:
+                return True
+
+            attempts += 1
             time.sleep(1)  # Подождать 1 секунду перед следующей попыткой  
-  
-        return False  
-  
-    @staticmethod  
-    def _get_page_images(page_images_path):  
-        page_images = []  
-        if os.path.exists(page_images_path):  
-            page_images = os.listdir(page_images_path)  
-        for index, image_name in enumerate(page_images):  
-            page_images[index] = os.path.join(page_images_path, image_name)  
+
+        return False
+
+    @staticmethod
+    def _get_page_images(page_images_path):
+        page_images = []
+        if os.path.exists(page_images_path):
+            page_images = os.listdir(page_images_path)
+        for index, image_name in enumerate(page_images):
+            page_images[index] = os.path.join(page_images_path, image_name)
         return page_images
 ```
 

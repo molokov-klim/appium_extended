@@ -120,9 +120,9 @@ class AppiumBase:
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
         self.logger.info(f'Сессия №: {self.driver.session_id}')
-        start_time = time.time()
-        while time.time() - start_time < timeout_connect and not self.is_running():
-            time.sleep(5)
+        # start_time = time.time()
+        # while time.time() - start_time < timeout_connect and not self.is_running():
+        #     time.sleep(5)
 
     def disconnect(self) -> None:
         """

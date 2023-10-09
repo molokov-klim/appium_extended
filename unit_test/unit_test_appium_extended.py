@@ -196,21 +196,21 @@ class AppiumExtendedUTIs(unittest.TestCase):
         # Проверка с использованием данных типа bytes
         with open(part_image, 'rb') as f:
             part_image_bytes = f.read()
-        result_bytes = app.is_image_on_the_screen(image=part_image_bytes)
+        result_bytes = app.__is_image_on_the_screen(image=part_image_bytes)
         self.assertTrue(result_bytes)
 
         # Проверка с использованием данных типа np.ndarray
         part_image_array = np.array(Image.open(part_image))
-        result_array = app.is_image_on_the_screen(image=part_image_array)
+        result_array = app.__is_image_on_the_screen(image=part_image_array)
         self.assertTrue(result_array)
 
         # Проверка с использованием данных типа PIL Image
         part_image_pil = Image.open(part_image)
-        result_pil = app.is_image_on_the_screen(image=part_image_pil)
+        result_pil = app.__is_image_on_the_screen(image=part_image_pil)
         self.assertTrue(result_pil)
 
         # Проверка с использованием данных типа str (путь к файлу)
-        result_path = app.is_image_on_the_screen(image=part_image)
+        result_path = app.__is_image_on_the_screen(image=part_image)
         self.assertTrue(result_path)
 
     @time_it

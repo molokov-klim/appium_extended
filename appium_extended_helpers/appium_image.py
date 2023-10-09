@@ -170,9 +170,9 @@ class AppiumImage(AppiumBase):
         # Вернуть None, если внутреннее изображение не найдено
         return None
 
-    def is_image_on_the_screen(self,
-                               image: Union[bytes, np.ndarray, Image.Image, str],
-                               threshold: float = 0.9) -> bool:
+    def __is_image_on_the_screen(self,
+                                 image: Union[bytes, np.ndarray, Image.Image, str],
+                                 threshold: float = 0.9) -> bool:
         """
         Сравнивает, присутствует ли заданное изображение на экране.
 
