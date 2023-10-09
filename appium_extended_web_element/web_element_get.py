@@ -18,9 +18,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from appium_extended_helpers.appium_helpers import AppiumHelpers
+from appium_extended_terminal.terminal import Terminal
 
 
-class WebElementGet(WebElement):
+class WebElementGet(WebElement, AppiumHelpers):
     """
     Класс расширяющий Appium WebElement.
     Обеспечивает получение сущностей из элемента.
@@ -30,8 +31,6 @@ class WebElementGet(WebElement):
         super().__init__(parent=driver, id_=element_id)
         self.driver = driver
         self.logger = logger
-        self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
-        self.terminal = self.helper.terminal
 
     def _get_element(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -97,9 +96,9 @@ class WebElementGet(WebElement):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.helper.handle_dict_locator,
+            dict: self.handle_dict_locator,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.helper.handle_string_locator,
+            str: self.handle_string_locator,
         }
 
         # Цикл подготовки локатора и поиска элементов
@@ -197,11 +196,11 @@ class WebElementGet(WebElement):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # подразумевается список элементов, возвращает себя же
-            list: self.helper.handle_webelement_locator_elements,
+            list: self.handle_webelement_locator_elements,
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.helper.handle_dict_locator_elements,
+            dict: self.handle_dict_locator_elements,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.helper.handle_string_locator_elements,
+            str: self.handle_string_locator_elements,
         }
 
         # Цикл подготовки локатора и поиска элементов

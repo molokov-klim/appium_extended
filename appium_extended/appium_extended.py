@@ -368,7 +368,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             При неудаче повторяет выполнение, до трёх раз.
         """
         try:
-            coordinates = self.helper.get_many_coordinates_of_image(full_image=full_image,
+            coordinates = self.get_many_coordinates_of_image(full_image=full_image,
                                                                     image=image,
                                                                     cv_threshold=cv_threshold,
                                                                     coord_threshold=coord_threshold)
@@ -683,7 +683,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             if ocr:
-                return self.helper.is_text_on_ocr_screen(text=text, language=language)
+                return self.is_text_on_ocr_screen(text=text, language=language)
             return self._is_element_within_screen(locator={'text': text},
                                                   timeout_elem=timeout_elem,
                                                   timeout_method=timeout_method,
@@ -725,7 +725,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Exception: Остальные исключения.
         """
         try:
-            return self.helper.is_image_on_the_screen(image=image, threshold=threshold)
+            return self.is_image_on_the_screen(image=image, threshold=threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -747,7 +747,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - np.ndarray - Преобразованный массив NumPy (ndarray) представляющий изображение.
         """
         try:
-            return self.helper.to_ndarray(image=image, grayscale=grayscale)
+            return self.to_ndarray(image=image, grayscale=grayscale)
         except NoSuchDriverException:
             self.reconnect()
 
@@ -1331,7 +1331,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если не указаны верхняя левая и нижняя правая точки, будут использованы координаты.
         """
         try:
-            assert self.helper.draw_by_coordinates(image=image,
+            assert self.draw_by_coordinates(image=image,
                                                    coordinates=coordinates,
                                                    top_left=top_left,
                                                    bottom_right=bottom_right,
@@ -1371,7 +1371,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
         try:
-            assert self.helper.save_screenshot(path=path, filename=filename)
+            assert self.save_screenshot(path=path, filename=filename)
             return cast('AppiumExtended', self)
         except NoSuchDriverException:
             self.reconnect()
