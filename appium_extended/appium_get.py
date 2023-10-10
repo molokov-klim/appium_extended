@@ -16,10 +16,10 @@ from appium.webdriver import WebElement
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
 
-from appium_extended_helpers.appium_helpers import AppiumHelpers
+from appium_extended.appium_base import AppiumBase
 
 
-class AppiumGet(AppiumHelpers):
+class AppiumGet(AppiumBase):
     """
     Класс расширяющий Appium.
     Обеспечивает получение чего-либо со страницы.
@@ -97,13 +97,13 @@ class AppiumGet(AppiumHelpers):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # возвращает себя же
-            WebElement: self.handle_webelement_locator,
+            WebElement: self.helpers.handle_webelement_locator,
             # возвращает себя же
-            'WebElementExtended': self.handle_webelement_locator,
+            'WebElementExtended': self.helpers.handle_webelement_locator,
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.handle_dict_locator,
+            dict: self.helpers.handle_dict_locator,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.handle_string_locator,
+            str: self.helpers.handle_string_locator,
         }
 
         # Цикл подготовки локатора и поиска элементов
@@ -223,11 +223,11 @@ class AppiumGet(AppiumHelpers):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # подразумевается список элементов, возвращает себя же
-            list: self.handle_webelement_locator_elements,
+            list: self.helpers.handle_webelement_locator_elements,
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.handle_dict_locator_elements,
+            dict: self.helpers.handle_dict_locator_elements,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.handle_string_locator_elements,
+            str: self.helpers.handle_string_locator_elements,
         }
 
         # Цикл подготовки локатора и поиска элементов
@@ -275,14 +275,14 @@ class AppiumGet(AppiumHelpers):
                                full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
                                threshold: float = 0.7,
                                ) -> Union[Tuple[int, int, int, int], None]:
-        return self.get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
+        return self.helpers.get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
 
     def _get_inner_image_coordinates(self,
                                      outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      threshold: float = 0.9) -> \
             Union[Tuple[int, int, int, int], None]:
-        return self.get_inner_image_coordinates(outer_image_path=outer_image_path,
+        return self.helpers.get_inner_image_coordinates(outer_image_path=outer_image_path,
                                                        inner_image_path=inner_image_path,
                                                        threshold=threshold)
 
@@ -290,7 +290,7 @@ class AppiumGet(AppiumHelpers):
                               text: str,
                               language: str = 'rus',
                               image: Union[bytes, str, Image.Image, np.ndarray] = None, ) -> Optional[tuple[int, ...]]:
-        return self.get_text_coordinates(text=text, language=language, image=image)
+        return self.helpers.get_text_coordinates(text=text, language=language, image=image)
 
     def _get_screenshot_as_base64_decoded(self):
-        return self.__get_screenshot_as_base64_decoded()
+        return self.helpers._get_screenshot_as_base64_decoded()

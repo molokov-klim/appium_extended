@@ -11,8 +11,8 @@ from appium_extended_helpers.appium_image import AppiumImage
 
 class AppiumHelpers(AppiumImage):
 
-    def __init__(self, logger: logging.Logger = None):
-        super().__init__(logger=logger)
+    def __init__(self, driver, logger: logging.Logger = None):
+        super().__init__(driver=driver, logger=logger)
 
     @staticmethod
     def handle_webelement_locator(locator, timeout: int,
@@ -88,8 +88,8 @@ class AppiumHelpers(AppiumImage):
         if not self._is_image_on_the_screen(image=locator):
             return None
         # поиск координат фрагмента изображения на экране
-        screenshot = self.__get_screenshot_as_base64_decoded()
-        full_image = self.__to_ndarray(screenshot)
+        screenshot = self._get_screenshot_as_base64_decoded()
+        full_image = self._to_ndarray(screenshot)
         max_loc = self.get_image_coordinates(full_image=full_image, image=locator)
         x = max_loc[0]
         y = max_loc[1]

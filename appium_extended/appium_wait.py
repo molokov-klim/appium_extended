@@ -102,9 +102,9 @@ class AppiumWait(AppiumGet):
             # Loop through each image
             for i in image:
                 # Check if the image is on the screen within the timeout period
-                while not self._is_image_on_the_screen(image=i, threshold=threshold) and time.time() - start_time < timeout_method:
+                while not self.helpers._is_image_on_the_screen(image=i, threshold=threshold) and time.time() - start_time < timeout_method:
                     time.sleep(sleep)
-                if not self._is_image_on_the_screen(image=i, threshold=threshold):
+                if not self.helpers._is_image_on_the_screen(image=i, threshold=threshold):
                     return False
 
         # Return True if all conditions are met
@@ -183,7 +183,7 @@ class AppiumWait(AppiumGet):
                 images_present = False
                 for i in image:
                     # Check if the image is on the screen within the timeout period
-                    if self._is_image_on_the_screen(image=i, threshold=threshold):
+                    if self.helpers._is_image_on_the_screen(image=i, threshold=threshold):
                         images_present = True
                 if not images_present:
                     return True

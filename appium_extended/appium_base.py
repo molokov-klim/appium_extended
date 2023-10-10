@@ -9,6 +9,7 @@ import time
 
 from appium import webdriver
 
+from appium_extended_helpers.appium_helpers import AppiumHelpers
 from appium_extended_server.appium_server import AppiumServer
 from appium_extended_terminal.terminal import Terminal
 from appium_extended_terminal.aapt import Aapt
@@ -31,6 +32,7 @@ class AppiumBase:
         self.logger = logger
         self.driver: WebDriver = None
         self.terminal: Terminal = None
+        self.helpers = None
         self.session_id: str = None
         self.capabilities = None
         self.keep_alive_server: bool = True
@@ -117,6 +119,7 @@ class AppiumBase:
         self.session_id = self.driver.session_id
         # Инициализация объектов требующих драйвер
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
+        self.terminal = AppiumHelpers(driver=self.driver, logger=self.logger)
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')

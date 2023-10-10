@@ -103,6 +103,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Returns:
             Union[WebElementExtended, None]: Возвращает WebElementExtended, если элемент найден, иначе None.
         """
+        element = None
         try:
             element = self._get_element(locator=locator,
                                         by=by,
@@ -193,6 +194,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Union[List[WebElementExtended], List]: Возвращает список объектов WebElementExtended,
             если элементы найдены, иначе пустой список.
         """
+        elements = None
         try:
             elements = super()._get_elements(locator=locator,
                                              by=by,
@@ -263,6 +265,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        coordinates = None
         try:
             coordinates = self._get_image_coordinates(full_image=full_image,
                                                       image=image,
@@ -313,6 +316,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        inner_image_coordinates = None
         try:
             inner_image_coordinates = self._get_inner_image_coordinates(outer_image_path=outer_image_path,
                                                                         inner_image_path=inner_image_path,
@@ -367,6 +371,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        coordinates = None
         try:
             coordinates = self.get_many_coordinates_of_image(full_image=full_image,
                                                              image=image,
@@ -427,6 +432,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - Union[Tuple[int, int, int, int], None]: Координаты области с текстом или None, если текст не найден.
           Если ocr=False, возвращаются координаты, полученные с помощью метода get_element.
         """
+        coordinates = None
         if ocr:
             try:
                 coordinates = self._get_text_coordinates(text=text, language=language, image=image)
@@ -683,7 +689,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             if ocr:
-                return self.is_text_on_ocr_screen(text=text, language=language)
+                return self.helpers.is_text_on_ocr_screen(text=text, language=language)
             return self._is_element_within_screen(locator={'text': text},
                                                   timeout_elem=timeout_elem,
                                                   timeout_method=timeout_method,
@@ -725,7 +731,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Exception: Остальные исключения.
         """
         try:
-            return self._is_image_on_the_screen(image=image, threshold=threshold)
+            return self.helpers._is_image_on_the_screen(image=image, threshold=threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -747,7 +753,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - np.ndarray - Преобразованный массив NumPy (ndarray) представляющий изображение.
         """
         try:
-            return self.__to_ndarray(image=image, grayscale=grayscale)
+            return self.helpers._to_ndarray(image=image, grayscale=grayscale)
         except NoSuchDriverException:
             self.reconnect()
 
@@ -797,7 +803,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 x, y = self._extract_point_coordinates_by_typing(locator)
             if image is not None:
                 start_time = time.time()
-                while not self._is_image_on_the_screen(image=image, threshold=threshold) \
+                while not self.helpers._is_image_on_the_screen(image=image, threshold=threshold) \
                         and time.time() - start_time < timeout:
                     time.sleep(1)
                 # Извлечение координат

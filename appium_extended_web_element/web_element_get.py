@@ -21,7 +21,7 @@ from appium_extended_helpers.appium_helpers import AppiumHelpers
 from appium_extended_terminal.terminal import Terminal
 
 
-class WebElementGet(WebElement, AppiumHelpers):
+class WebElementGet(WebElement):
     """
     Класс расширяющий Appium WebElement.
     Обеспечивает получение сущностей из элемента.
@@ -31,6 +31,8 @@ class WebElementGet(WebElement, AppiumHelpers):
         super().__init__(parent=driver, id_=element_id)
         self.driver = driver
         self.logger = logger
+        self.terminal = Terminal(driver=self.driver, logger=self.logger)
+        self.helpers = AppiumHelpers(driver=self.driver, logger=self.logger)
 
     def _get_element(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -96,9 +98,9 @@ class WebElementGet(WebElement, AppiumHelpers):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.handle_dict_locator,
+            dict: self.helpers.handle_dict_locator,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.handle_string_locator,
+            str: self.helpers.handle_string_locator,
         }
 
         # Цикл подготовки локатора и поиска элементов
@@ -196,11 +198,11 @@ class WebElementGet(WebElement, AppiumHelpers):
         # Объявление стратегии поиска элементов
         locator_handler = {
             # подразумевается список элементов, возвращает себя же
-            list: self.handle_webelement_locator_elements,
+            list: self.helpers.handle_webelement_locator_elements,
             # составляет локатор типа tuple из словаря с атрибутами искомого элемента
-            dict: self.handle_dict_locator_elements,
+            dict: self.helpers.handle_dict_locator_elements,
             # производит поиск элементов по фрагменту изображения, возвращает список элементов
-            str: self.handle_string_locator_elements,
+            str: self.helpers.handle_string_locator_elements,
         }
 
         # Цикл подготовки локатора и поиска элементов

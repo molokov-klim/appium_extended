@@ -11,23 +11,22 @@ import numpy as np
 from PIL import Image
 from pytesseract import pytesseract
 
-from selenium.common.exceptions import WebDriverException, NoSuchDriverException
+from selenium.common.exceptions import WebDriverException
 
-from appium_extended.appium_base import AppiumBase
 from appium_extended_helpers import helpers_decorators
 from appium_extended_terminal.terminal import Terminal
 from appium_extended_utils import utils
 
 
-class AppiumImage(AppiumBase):
+class AppiumImage:
     """
     Класс работы с Appium.
     Обеспечивает работу с изображениями
     """
 
-    def __init__(self, logger: logging.Logger):
-        super().__init__(logger)
+    def __init__(self, driver, logger: logging.Logger):
         self.logger = logger
+        self.driver = driver
         self.terminal = Terminal(driver=self.driver, logger=logger)
 
     @helpers_decorators.retry
@@ -57,12 +56,12 @@ class AppiumImage(AppiumBase):
                 или None, если совпадение не найдено.
         """
         if full_image is None:
-            screenshot = self.__get_screenshot_as_base64_decoded()
-            big_image = self.__to_ndarray(image=screenshot, grayscale=True)
+            screenshot = self._get_screenshot_as_base64_decoded()
+            big_image = self._to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.__to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self._to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.__to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self._to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         # Сопоставление частичного изображения и снимка экрана
         max_val_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
@@ -121,13 +120,13 @@ class AppiumImage(AppiumBase):
         screenshot = base64.b64decode(self.driver.get_screenshot_as_base64())
 
         # Читаем скриншот
-        full_image = self.__to_ndarray(image=screenshot, grayscale=True)
+        full_image = self._to_ndarray(image=screenshot, grayscale=True)
 
         # Прочитать внешнее изображение
-        outer_image = self.__to_ndarray(image=outer_image_path, grayscale=True)
+        outer_image = self._to_ndarray(image=outer_image_path, grayscale=True)
 
         # Прочитать внутреннее изображение
-        inner_image = self.__to_ndarray(image=inner_image_path, grayscale=True)
+        inner_image = self._to_ndarray(image=inner_image_path, grayscale=True)
 
         # Вычисляем коэффициенты масштабирования
         width_ratio = screen_width / full_image.shape[1]
@@ -190,11 +189,11 @@ class AppiumImage(AppiumBase):
             Exception: Остальные исключения.
         """
         try:
-            screenshot = self.__get_screenshot_as_base64_decoded()
+            screenshot = self._get_screenshot_as_base64_decoded()
 
             # Чтение снимка экрана и частичного изображения
-            full_image = self.__to_ndarray(image=screenshot, grayscale=True)
-            small_image = self.__to_ndarray(image=image, grayscale=True)
+            full_image = self._to_ndarray(image=screenshot, grayscale=True)
+            small_image = self._to_ndarray(image=image, grayscale=True)
 
             # Проверка размеров изображений
             if small_image.shape[0] > full_image.shape[0] or small_image.shape[1] > full_image.shape[1]:
@@ -206,21 +205,16 @@ class AppiumImage(AppiumBase):
                                                           threshold=threshold)
 
             return max_val > threshold
-        except WebDriverException as e:
-            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
-            self.reconnect()
         except cv2.error as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
         except AssertionError as e:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
-        except Exception as e:
-            self.logger.error(f"is_image_on_the_screen(): {e}")
-            return False
 
-    def _multi_scale_matching(self,
-                              full_image: np.ndarray,
+
+    @staticmethod
+    def _multi_scale_matching(full_image: np.ndarray,
                               template_image: np.ndarray,
                               threshold: float = 0.8,
                               return_raw: bool = False):
@@ -271,10 +265,10 @@ class AppiumImage(AppiumBase):
         """
         try:
             if screen is None:
-                screenshot = self.__get_screenshot_as_base64_decoded()
-                image = self.__to_ndarray(screenshot)
+                screenshot = self._get_screenshot_as_base64_decoded()
+                image = self._to_ndarray(screenshot)
             else:
-                image = self.__to_ndarray(screen)
+                image = self._to_ndarray(screen)
 
             # # Бинаризация изображения
             # _, image_bin = cv2.threshold(image, 0, 255,
@@ -290,9 +284,6 @@ class AppiumImage(AppiumBase):
 
             # Проверка наличия заданного текста в распознанном тексте
             return text.lower() in ocr_text.lower()
-        except WebDriverException as e:
-            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
-            self.reconnect()
         except cv2.error as e:
             self.logger.error(f"is_text_on_ocr_screen(): {e}")
             return False
@@ -302,10 +293,7 @@ class AppiumImage(AppiumBase):
         except AssertionError as e:
             self.logger.error(f"is_text_on_ocr_screen(): {e}")
             return False
-        except Exception as e:
-            error_message = f"is_text_on_ocr_screen(): {e}\n{traceback.format_exc()}"
-            self.logger.error(error_message)
-            return False
+
 
     @helpers_decorators.retry
     def get_many_coordinates_of_image(self,
@@ -341,12 +329,12 @@ class AppiumImage(AppiumBase):
         """
 
         if full_image is None:
-            screenshot = self.__get_screenshot_as_base64_decoded()
-            big_image = self.__to_ndarray(image=screenshot, grayscale=True)
+            screenshot = self._get_screenshot_as_base64_decoded()
+            big_image = self._to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.__to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self._to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.__to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self._to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         result = self._multi_scale_matching(full_image=big_image, template_image=small_image,
                                             return_raw=True, threshold=cv_threshold)
@@ -412,13 +400,13 @@ class AppiumImage(AppiumBase):
 
         if not image:
             # Получаем снимок экрана, если изображение не предоставлено
-            screenshot = self.__get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
-            image = self.__to_ndarray(image=screenshot,
-                                      grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
+            screenshot = self._get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
+            image = self._to_ndarray(image=screenshot,
+                                     grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
             # Если предоставлено, то преобразуем
-            image = self.__to_ndarray(image=image,
-                                      grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
+            image = self._to_ndarray(image=image,
+                                     grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
 
         image = cv2.medianBlur(image, 3)  # + устранение шума
 
@@ -518,10 +506,10 @@ class AppiumImage(AppiumBase):
         try:
             if image is None:
                 # Если изображение не предоставлено, получаем снимок экрана с помощью драйвера
-                screenshot = self.__get_screenshot_as_base64_decoded()
-                image = self.__to_ndarray(screenshot)
+                screenshot = self._get_screenshot_as_base64_decoded()
+                image = self._to_ndarray(screenshot)
             else:
-                image = self.__to_ndarray(image)
+                image = self._to_ndarray(image)
 
             # Если верхняя левая и нижняя правая точки не предоставлены, используем координаты для определения
             # прямоугольника
@@ -537,9 +525,6 @@ class AppiumImage(AppiumBase):
             cv2.imwrite(path, image)
 
             return True
-        except WebDriverException as e:
-            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
-            self.reconnect()
         except cv2.error as e:
             # Обработка исключения cv2.error
             self.logger.error(f'draw_by_coordinates() cv2.error: {e}')
@@ -592,7 +577,7 @@ class AppiumImage(AppiumBase):
         # Иначе, возвращаем изображение без изменений
         return image
 
-    def __to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
+    def _to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
         """
         Преобразует входные данные из различных типов в ndarray (NumPy array).
 
@@ -644,18 +629,11 @@ class AppiumImage(AppiumBase):
             - Если путь не указан, скриншот будет сохранен в текущей директории.
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
-        try:
-            screenshot = self.__get_screenshot_as_base64_decoded()
-            path_to_file = os.path.join(path, filename)
-            with open(path_to_file, "wb") as f:
-                f.write(screenshot)
-            return True
-        except WebDriverException as e:
-            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
-            self.reconnect()
-        except Exception as error:
-            self.logger.error(f"Не удалось сохранить скриншот: {error=}")
-            return False
+        screenshot = self._get_screenshot_as_base64_decoded()
+        path_to_file = os.path.join(path, filename)
+        with open(path_to_file, "wb") as f:
+            f.write(screenshot)
+        return True
 
     def show_screen(self):
         """
@@ -663,11 +641,11 @@ class AppiumImage(AppiumBase):
         Код не будет продолжать выполнятся, пока изображение не закрыть.
         Метод для отладки.
         """
-        cv2.imshow('screen', self.__to_ndarray(self.__get_screenshot_as_base64_decoded()))
+        cv2.imshow('screen', self._to_ndarray(self._get_screenshot_as_base64_decoded()))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def __get_screenshot_as_base64_decoded(self) -> bytes:
+    def _get_screenshot_as_base64_decoded(self) -> bytes:
         """
         Получает скриншот экрана, кодирует его в формате Base64, а затем декодирует в байты.
 
@@ -688,13 +666,9 @@ class AppiumImage(AppiumBase):
             - Скриншот возвращается в формате PNG.
             - Исходный скриншот получается в формате Base64, который затем кодируется в UTF-8 и декодируется обратно в байты.
         """
-        try:
-            screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
-            screenshot = base64.b64decode(screenshot)
-            return screenshot
-        except WebDriverException as e:
-            self.logger.error(f"{inspect.currentframe().f_back.f_code.co_name}() Failed: {e}")
-            self.reconnect()
+        screenshot = self.driver.get_screenshot_as_base64().encode('utf-8')
+        screenshot = base64.b64decode(screenshot)
+        return screenshot
 
 
 

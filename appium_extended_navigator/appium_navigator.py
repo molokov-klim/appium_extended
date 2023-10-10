@@ -5,12 +5,14 @@ from typing import Any, Optional, List
 
 from appium_extended.appium_extended import AppiumExtended
 from appium_extended_graph.appium_graph import AppiumGraph
+from appium_extended_helpers.appium_helpers import AppiumHelpers
 
 
 class AppiumNavigator:
     def __init__(self, app, logger: logging.Logger):
         self.app: AppiumExtended = app
         self.driver = self.app.driver
+        self.helpers = AppiumHelpers(driver=self.app.driver, logger=self.app.logger)
         self.graph_manager = AppiumGraph(self)
         self.logger = logger
 
