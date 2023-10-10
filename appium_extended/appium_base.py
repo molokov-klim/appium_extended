@@ -119,7 +119,7 @@ class AppiumBase:
         self.session_id = self.driver.session_id
         # Инициализация объектов требующих драйвер
         self.terminal = Terminal(driver=self.driver, logger=self.logger)
-        self.terminal = AppiumHelpers(driver=self.driver, logger=self.logger)
+        self.helpers = AppiumHelpers(driver=self.driver, logger=self.logger)
 
         app_capabilities = json.dumps(capabilities)
         self.logger.info(f'Подключение установлено с  параметрами: {str(app_capabilities)}, {url}')
