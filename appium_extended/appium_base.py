@@ -15,6 +15,7 @@ from appium_extended_terminal.aapt import Aapt
 from appium_extended_terminal.adb import Adb
 from appium.webdriver.webdriver import WebDriver
 
+
 class AppiumBase:
     """
     Класс работы с Appium.
@@ -173,5 +174,3 @@ class AppiumBase:
                      server_log_level=self.server_log_level,
                      remote=self.remote,
                      keep_alive_server=self.keep_alive_server)
-
-
