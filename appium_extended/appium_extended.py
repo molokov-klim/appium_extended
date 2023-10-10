@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 
 from selenium.common.exceptions import NoSuchDriverException
+from selenium.common.exceptions import WebDriverException
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
@@ -103,6 +104,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Returns:
             Union[WebElementExtended, None]: Возвращает WebElementExtended, если элемент найден, иначе None.
         """
+        element = None
         try:
             element = self._get_element(locator=locator,
                                         by=by,
@@ -193,6 +195,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Union[List[WebElementExtended], List]: Возвращает список объектов WebElementExtended,
             если элементы найдены, иначе пустой список.
         """
+        elements = None
         try:
             elements = super()._get_elements(locator=locator,
                                              by=by,
@@ -263,6 +266,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        coordinates = None
         try:
             coordinates = self._get_image_coordinates(full_image=full_image,
                                                       image=image,
@@ -313,6 +317,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        inner_image_coordinates = None
         try:
             inner_image_coordinates = self._get_inner_image_coordinates(outer_image_path=outer_image_path,
                                                                         inner_image_path=inner_image_path,
@@ -367,11 +372,12 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Note:
             При неудаче повторяет выполнение, до трёх раз.
         """
+        coordinates = None
         try:
-            coordinates = self.helper.get_many_coordinates_of_image(full_image=full_image,
-                                                                    image=image,
-                                                                    cv_threshold=cv_threshold,
-                                                                    coord_threshold=coord_threshold)
+            coordinates = self.helper._get_many_coordinates_of_image(full_image=full_image,
+                                                                     image=image,
+                                                                     cv_threshold=cv_threshold,
+                                                                     coord_threshold=coord_threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -427,6 +433,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         - Union[Tuple[int, int, int, int], None]: Координаты области с текстом или None, если текст не найден.
           Если ocr=False, возвращаются координаты, полученные с помощью метода get_element.
         """
+        coordinates = None
         if ocr:
             try:
                 coordinates = self._get_text_coordinates(text=text, language=language, image=image)
@@ -455,7 +462,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                         elements_range=elements_range,
                                         contains=contains,
                                         poll_frequency=poll_frequency,
-                                        ignored_exceptions=ignored_exceptions,).get_coordinates()
+                                        ignored_exceptions=ignored_exceptions, ).get_coordinates()
             except NoSuchDriverException:
                 self.reconnect()
             except Exception as error:
@@ -483,7 +490,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Не реализован.
         """
         raise NotImplementedError("Метод еще не реализован.")  # TODO implement
-
 
     def find_and_get_element(self,
                              locator: Union[Tuple[str, str], WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -684,7 +690,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         try:
             if ocr:
-                return self.helper.is_text_on_ocr_screen(text=text, language=language)
+                return self.helper._is_text_on_ocr_screen(text=text, language=language)
             return self._is_element_within_screen(locator={'text': text},
                                                   timeout_elem=timeout_elem,
                                                   timeout_method=timeout_method,
@@ -725,7 +731,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             Exception: Остальные исключения.
         """
         try:
-            return self.helper.is_image_on_the_screen(image=image, threshold=threshold)
+            return self.helper._is_image_on_the_screen(image=image, threshold=threshold)
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
@@ -1315,11 +1321,11 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если не указаны верхняя левая и нижняя правая точки, будут использованы координаты.
         """
         try:
-            assert self.helper.draw_by_coordinates(image=image,
-                                                   coordinates=coordinates,
-                                                   top_left=top_left,
-                                                   bottom_right=bottom_right,
-                                                   path=path)
+            assert self.helper._draw_by_coordinates(image=image,
+                                                    coordinates=coordinates,
+                                                    top_left=top_left,
+                                                    bottom_right=bottom_right,
+                                                    path=path)
             return cast('AppiumExtended', self)
         except NoSuchDriverException:
             self.reconnect()
@@ -1355,7 +1361,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
         try:
-            assert self.helper.save_screenshot(path=path, filename=filename)
+            assert self.helper._save_screenshot(path=path, filename=filename)
             return cast('AppiumExtended', self)
         except NoSuchDriverException:
             self.reconnect()

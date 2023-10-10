@@ -30,8 +30,8 @@ class WebElementGet(WebElement):
         super().__init__(parent=driver, id_=element_id)
         self.driver = driver
         self.logger = logger
-        self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
-        self.terminal = self.helper.terminal
+        # self.helper = AppiumHelpers(driver=self.driver, logger=self.logger)
+        # self.terminal = self.helper.terminal
 
     def _get_element(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,

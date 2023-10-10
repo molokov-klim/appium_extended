@@ -275,22 +275,22 @@ class AppiumGet(AppiumBase):
                                full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
                                threshold: float = 0.7,
                                ) -> Union[Tuple[int, int, int, int], None]:
-        return self.helper.get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
+        return self.helper._get_image_coordinates(image=image, full_image=full_image, threshold=threshold)
 
     def _get_inner_image_coordinates(self,
                                      outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
                                      threshold: float = 0.9) -> \
             Union[Tuple[int, int, int, int], None]:
-        return self.helper.get_inner_image_coordinates(outer_image_path=outer_image_path,
-                                                       inner_image_path=inner_image_path,
-                                                       threshold=threshold)
+        return self.helper._get_inner_image_coordinates(outer_image_path=outer_image_path,
+                                                        inner_image_path=inner_image_path,
+                                                        threshold=threshold)
 
     def _get_text_coordinates(self,
                               text: str,
                               language: str = 'rus',
                               image: Union[bytes, str, Image.Image, np.ndarray] = None, ) -> Optional[tuple[int, ...]]:
-        return self.helper.get_text_coordinates(text=text, language=language, image=image)
+        return self.helper._get_text_coordinates(text=text, language=language, image=image)
 
     def _get_screenshot_as_base64_decoded(self):
         return self.helper._get_screenshot_as_base64_decoded()

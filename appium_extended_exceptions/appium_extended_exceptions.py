@@ -279,7 +279,7 @@ class TapError(AppiumExtendedError):
                  y: int = None,
                  image: Union[bytes, str] = None,
                  duration: Optional[int] = None,
-                 timeout: int = 5,
+                 timeout: float = 5,
                  original_exception: Optional[Exception] = None
                  ):
         super().__init__(message)

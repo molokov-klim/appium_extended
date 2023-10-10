@@ -13,9 +13,11 @@ class AppiumHelpers(AppiumImage):
 
     def __init__(self, driver, logger: logging.Logger = None):
         super().__init__(driver=driver, logger=logger)
+        self.driver = driver
 
     @staticmethod
-    def handle_webelement_locator(locator, timeout: int,
+    def handle_webelement_locator(locator,
+                                  timeout: float,
                                   elements_range=None,
                                   contains: bool = False) -> Union[WebElement, None]:
         """
@@ -33,7 +35,7 @@ class AppiumHelpers(AppiumImage):
 
     def handle_dict_locator(self,
                             locator,
-                            timeout: int = 10,
+                            timeout: float = 10,
                             elements_range=None,
                             contains: bool = False) -> Union[Tuple, None]:
         """
@@ -69,7 +71,7 @@ class AppiumHelpers(AppiumImage):
 
     def handle_string_locator(self,
                               locator,
-                              timeout: int,
+                              timeout: float,
                               elements_range: Union[dict, list, tuple] = None,
                               contains: bool = False
                               ) -> Union[WebElement, None]:
@@ -85,12 +87,12 @@ class AppiumHelpers(AppiumImage):
         Returns:
             Union[WebElement, None]: Найденный WebElement, либо None, если элемент не найден.
         """
-        if not self.is_image_on_the_screen(image=locator):
+        if not self._is_image_on_the_screen(image=locator):
             return None
         # поиск координат фрагмента изображения на экране
         screenshot = self._get_screenshot_as_base64_decoded()
-        full_image = self.to_ndarray(screenshot)
-        max_loc = self.get_image_coordinates(full_image=full_image, image=locator)
+        full_image = self._to_ndarray(screenshot)
+        max_loc = self._get_image_coordinates(full_image=full_image, image=locator)
         x = max_loc[0]
         y = max_loc[1]
 
@@ -147,7 +149,7 @@ class AppiumHelpers(AppiumImage):
 
     def handle_webelement_locator_elements(self,
                                            locator: List[WebElement],
-                                           timeout: int,
+                                           timeout: float,
                                            elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                                            contains: bool = True) -> \
             Union[List[WebElement], None]:
@@ -171,7 +173,7 @@ class AppiumHelpers(AppiumImage):
 
     def handle_dict_locator_elements(self,
                                      locator: Dict[str, str],
-                                     timeout: int = 10,
+                                     timeout: float = 10,
                                      elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                                      contains: bool = True) -> \
             Optional[Tuple[str, str]]:
@@ -207,7 +209,7 @@ class AppiumHelpers(AppiumImage):
 
     def handle_string_locator_elements(self,  # FIXME оптимизировать используя силу xpath и/или xml tree
                                        locator: str,
-                                       timeout: int = 10,
+                                       timeout: float = 10,
                                        elements_range: Union[Tuple, List[WebElement], Dict[str, str], None] = None,
                                        cv_threshold: float = 0.7,  # веса откалиброваны
                                        coord_threshold: int = 1,
@@ -228,10 +230,10 @@ class AppiumHelpers(AppiumImage):
         #  Сохранение скриншота изображения и поиск координат совпадающих изображений
         with open('full_image.png', 'wb') as file:
             file.write(self.driver.get_screenshot_as_png())
-        max_locs = self.get_many_coordinates_of_image(full_image='full_image.png',
-                                                      image=locator,
-                                                      cv_threshold=cv_threshold,
-                                                      coord_threshold=coord_threshold)
+        max_locs = self._get_many_coordinates_of_image(full_image='full_image.png',
+                                                       image=locator,
+                                                       cv_threshold=cv_threshold,
+                                                       coord_threshold=coord_threshold)
         if not max_locs:
             self.logger.error("Элементы не обнаружены")
             return None

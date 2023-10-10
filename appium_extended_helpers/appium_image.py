@@ -12,7 +12,6 @@ from pytesseract import pytesseract
 from selenium.common.exceptions import WebDriverException
 
 from appium_extended_helpers import helpers_decorators
-from appium_extended_terminal.terminal import Terminal
 from appium_extended_utils import utils
 
 
@@ -23,16 +22,16 @@ class AppiumImage:
     """
 
     def __init__(self, driver, logger: logging.Logger):
+        super().__init__(logger)
         self.logger = logger
         self.driver = driver
-        self.terminal = Terminal(driver=self.driver, logger=logger)
 
     @helpers_decorators.retry
-    def get_image_coordinates(self,
-                              image: Union[bytes, np.ndarray, Image.Image, str],
-                              full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
-                              threshold: Optional[float] = 0.7,
-                              ) -> Union[Tuple[int, int, int, int], None]:
+    def _get_image_coordinates(self,
+                               image: Union[bytes, np.ndarray, Image.Image, str],
+                               full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
+                               threshold: Optional[float] = 0.7,
+                               ) -> Union[Tuple[int, int, int, int], None]:
         """
         Находит координаты наиболее вероятного совпадения частичного изображения в полном изображении.
 
@@ -55,11 +54,11 @@ class AppiumImage:
         """
         if full_image is None:
             screenshot = self._get_screenshot_as_base64_decoded()
-            big_image = self.to_ndarray(image=screenshot, grayscale=True)
+            big_image = self._to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self._to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self._to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         # Сопоставление частичного изображения и снимка экрана
         max_val_loc = self._multi_scale_matching(full_image=big_image, template_image=small_image,
@@ -84,10 +83,10 @@ class AppiumImage:
         return int(left), int(top), int(right), int(bottom)  # Возвращаем координаты наиболее вероятного совпадения
 
     @helpers_decorators.retry
-    def get_inner_image_coordinates(self,
-                                    outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
-                                    inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
-                                    threshold: float = 0.9) -> Union[Tuple[int, int, int, int], None]:
+    def _get_inner_image_coordinates(self,
+                                     outer_image_path: Union[bytes, np.ndarray, Image.Image, str],
+                                     inner_image_path: Union[bytes, np.ndarray, Image.Image, str],
+                                     threshold: float = 0.9) -> Union[Tuple[int, int, int, int], None]:
         """
         Находит изображение на экране и внутри него находит другое изображение (внутреннее).
 
@@ -118,13 +117,13 @@ class AppiumImage:
         screenshot = base64.b64decode(self.driver.get_screenshot_as_base64())
 
         # Читаем скриншот
-        full_image = self.to_ndarray(image=screenshot, grayscale=True)
+        full_image = self._to_ndarray(image=screenshot, grayscale=True)
 
         # Прочитать внешнее изображение
-        outer_image = self.to_ndarray(image=outer_image_path, grayscale=True)
+        outer_image = self._to_ndarray(image=outer_image_path, grayscale=True)
 
         # Прочитать внутреннее изображение
-        inner_image = self.to_ndarray(image=inner_image_path, grayscale=True)
+        inner_image = self._to_ndarray(image=inner_image_path, grayscale=True)
 
         # Вычисляем коэффициенты масштабирования
         width_ratio = screen_width / full_image.shape[1]
@@ -167,9 +166,9 @@ class AppiumImage:
         # Вернуть None, если внутреннее изображение не найдено
         return None
 
-    def is_image_on_the_screen(self,
-                               image: Union[bytes, np.ndarray, Image.Image, str],
-                               threshold: float = 0.9) -> bool:
+    def _is_image_on_the_screen(self,
+                                image: Union[bytes, np.ndarray, Image.Image, str],
+                                threshold: float = 0.9) -> bool:
         """
         Сравнивает, присутствует ли заданное изображение на экране.
 
@@ -190,8 +189,8 @@ class AppiumImage:
             screenshot = self._get_screenshot_as_base64_decoded()
 
             # Чтение снимка экрана и частичного изображения
-            full_image = self.to_ndarray(image=screenshot, grayscale=True)
-            small_image = self.to_ndarray(image=image, grayscale=True)
+            full_image = self._to_ndarray(image=screenshot, grayscale=True)
+            small_image = self._to_ndarray(image=image, grayscale=True)
 
             # Проверка размеров изображений
             if small_image.shape[0] > full_image.shape[0] or small_image.shape[1] > full_image.shape[1]:
@@ -214,8 +213,8 @@ class AppiumImage:
             self.logger.error(f"is_image_on_the_screen(): {e}")
             return False
 
-    def _multi_scale_matching(self,
-                              full_image: np.ndarray,
+    @staticmethod
+    def _multi_scale_matching(full_image: np.ndarray,
                               template_image: np.ndarray,
                               threshold: float = 0.8,
                               return_raw: bool = False):
@@ -223,7 +222,6 @@ class AppiumImage:
 
         # Цикл по различным масштабам, включая масштабы больше 1.0 для "растягивания"
         for scale in np.concatenate([np.linspace(0.2, 1.0, 10)[::-1], np.linspace(1.1, 2.0, 10)]):
-
 
             # Изменение размера изображения и сохранение масштаба
             resized = cv2.resize(full_image, (int(full_image.shape[1] * scale), int(full_image.shape[0] * scale)))
@@ -248,10 +246,10 @@ class AppiumImage:
             return None
         return 0, (0, 0)
 
-    def is_text_on_ocr_screen(self,
-                              text: str,
-                              screen: Union[bytes, np.ndarray, Image.Image, str] = None,
-                              language: str = 'rus') -> bool:
+    def _is_text_on_ocr_screen(self,
+                               text: str,
+                               screen: Union[bytes, np.ndarray, Image.Image, str] = None,
+                               language: str = 'rus') -> bool:
         """
         Проверяет, присутствует ли заданный текст на экране.
         Распознавание текста производит с помощью библиотеки pytesseract.
@@ -267,9 +265,9 @@ class AppiumImage:
         try:
             if screen is None:
                 screenshot = self._get_screenshot_as_base64_decoded()
-                image = self.to_ndarray(screenshot)
+                image = self._to_ndarray(screenshot)
             else:
-                image = self.to_ndarray(screen)
+                image = self._to_ndarray(screen)
 
             # # Бинаризация изображения
             # _, image_bin = cv2.threshold(image, 0, 255,
@@ -300,11 +298,11 @@ class AppiumImage:
             return False
 
     @helpers_decorators.retry
-    def get_many_coordinates_of_image(self,
-                                      image: Union[bytes, np.ndarray, Image.Image, str],
-                                      full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
-                                      cv_threshold: float = 0.7,
-                                      coord_threshold: int = 5) -> Union[List[Tuple], None]:
+    def _get_many_coordinates_of_image(self,
+                                       image: Union[bytes, np.ndarray, Image.Image, str],
+                                       full_image: Union[bytes, np.ndarray, Image.Image, str] = None,
+                                       cv_threshold: float = 0.7,
+                                       coord_threshold: int = 5) -> Union[List[Tuple], None]:
         """
         Находит все вхождения частичного изображения внутри полного изображения.
 
@@ -334,11 +332,11 @@ class AppiumImage:
 
         if full_image is None:
             screenshot = self._get_screenshot_as_base64_decoded()
-            big_image = self.to_ndarray(image=screenshot, grayscale=True)
+            big_image = self._to_ndarray(image=screenshot, grayscale=True)
         else:
-            big_image = self.to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
+            big_image = self._to_ndarray(image=full_image, grayscale=True)  # Загрузка полного изображения
 
-        small_image = self.to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
+        small_image = self._to_ndarray(image=image, grayscale=True)  # Загрузка частичного изображения
 
         result = self._multi_scale_matching(full_image=big_image, template_image=small_image,
                                             return_raw=True, threshold=cv_threshold)
@@ -378,7 +376,7 @@ class AppiumImage:
         return matches_with_corners
 
     @helpers_decorators.retry
-    def get_text_coordinates(
+    def _get_text_coordinates(
             self,
             text: str,
             image: Union[bytes, str, Image.Image, np.ndarray] = None,
@@ -405,12 +403,12 @@ class AppiumImage:
         if not image:
             # Получаем снимок экрана, если изображение не предоставлено
             screenshot = self._get_screenshot_as_base64_decoded()  # Получение снимка экрана в формате base64
-            image = self.to_ndarray(image=screenshot,
-                                          grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
+            image = self._to_ndarray(image=screenshot,
+                                     grayscale=True)  # Преобразование снимка экрана в массив numpy и преобразование в оттенки серого
         else:
             # Если предоставлено, то преобразуем
-            image = self.to_ndarray(image=image,
-                                          grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
+            image = self._to_ndarray(image=image,
+                                     grayscale=True)  # Преобразование изображения в массив numpy и преобразование в оттенки серого
 
         image = cv2.medianBlur(image, 3)  # + устранение шума
 
@@ -476,12 +474,12 @@ class AppiumImage:
 
         return None
 
-    def draw_by_coordinates(self,
-                            image: Union[bytes, str, Image.Image, np.ndarray] = None,
-                            coordinates: Tuple[int, int, int, int] = None,
-                            top_left: Tuple[int, int] = None,
-                            bottom_right: Tuple[int, int] = None,
-                            path: str = None) -> bool:
+    def _draw_by_coordinates(self,
+                             image: Union[bytes, str, Image.Image, np.ndarray] = None,
+                             coordinates: Tuple[int, int, int, int] = None,
+                             top_left: Tuple[int, int] = None,
+                             bottom_right: Tuple[int, int] = None,
+                             path: str = None) -> bool:
         """
         Рисует прямоугольник на предоставленном изображении или снимке экрана с помощью драйвера.
 
@@ -511,9 +509,9 @@ class AppiumImage:
             if image is None:
                 # Если изображение не предоставлено, получаем снимок экрана с помощью драйвера
                 screenshot = self._get_screenshot_as_base64_decoded()
-                image = self.to_ndarray(screenshot)
+                image = self._to_ndarray(screenshot)
             else:
-                image = self.to_ndarray(image)
+                image = self._to_ndarray(image)
 
             # Если верхняя левая и нижняя правая точки не предоставлены, используем координаты для определения
             # прямоугольника
@@ -539,7 +537,7 @@ class AppiumImage:
             return False
 
     @staticmethod
-    def is_rgb(image: np.ndarray) -> bool:
+    def _is_rgb(image: np.ndarray) -> bool:
         """
         Проверяет, является ли изображение цветным (RGB).
 
@@ -552,7 +550,7 @@ class AppiumImage:
         return len(image.shape) == 3 and image.shape[2] == 3 or image.ndim == 3 or image.ndim == '3'
 
     @staticmethod
-    def is_grayscale(image: np.ndarray) -> bool:
+    def _is_grayscale(image: np.ndarray) -> bool:
         """
         Проверяет, является ли изображение оттенков серого.
 
@@ -565,7 +563,7 @@ class AppiumImage:
         return len(image.shape) == 2 or (
                 len(image.shape) == 3 and image.shape[2] == 1) or image.ndim == 2 or image.ndim == '2'
 
-    def to_grayscale(self, image: np.ndarray) -> np.ndarray:
+    def _to_grayscale(self, image: np.ndarray) -> np.ndarray:
         """
         Преобразует изображение в оттенки серого.
 
@@ -576,7 +574,7 @@ class AppiumImage:
         - np.ndarray - Преобразованное изображение в оттенках серого.
         """
         # Проверяем, является ли изображение в формате RGB
-        if self.is_rgb(image):
+        if self._is_rgb(image):
             # Если да, то преобразуем его в оттенки серого
             gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             # Приводим значения пикселей к диапазону от 0 до 255
@@ -585,7 +583,7 @@ class AppiumImage:
         # Иначе, возвращаем изображение без изменений
         return image
 
-    def to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
+    def _to_ndarray(self, image: Union[bytes, np.ndarray, Image.Image, str], grayscale: bool = True) -> np.ndarray:
         """
         Преобразует входные данные из различных типов в ndarray (NumPy array).
 
@@ -611,10 +609,10 @@ class AppiumImage:
 
         # Вернуть преобразованный массив NumPy
         if grayscale:
-            return self.to_grayscale(image=image)
+            return self._to_grayscale(image=image)
         return image
 
-    def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
+    def _save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
         """
         Сохраняет скриншот экрана в указанный файл.
 
@@ -647,13 +645,13 @@ class AppiumImage:
             self.logger.error(f"Не удалось сохранить скриншот: {error=}")
             return False
 
-    def show_screen(self):
+    def _show_screen(self):
         """
         Выводит на экран теста скриншот текущего экрана устройства.
         Код не будет продолжать выполнятся, пока изображение не закрыть.
         Метод для отладки.
         """
-        cv2.imshow('screen', self.to_ndarray(self._get_screenshot_as_base64_decoded()))
+        cv2.imshow('screen', self._to_ndarray(self._get_screenshot_as_base64_decoded()))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -685,7 +683,3 @@ class AppiumImage:
         except WebDriverException as e:
             self.logger.error(f"Failed to get screenshot: {e}")
             raise
-
-
-
-
