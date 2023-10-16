@@ -74,7 +74,13 @@ class WebElementScroll(WebElementGet):
             # Прокрутка вниз от нижнего дочернего элемента до верхнего дочернего элемента родительского элемента
             self.driver.scroll(origin_el=bottom_child, destination_el=top_center_child, duration=duration)
             return True
-        except NoSuchElementException or StaleElementReferenceException or TimeoutException as error:
+        except NoSuchElementException as error:
+            self.logger.error("_scroll_down(): Ошибка. {}".format(error))
+            return False
+        except StaleElementReferenceException as error:
+            self.logger.error("_scroll_down(): Ошибка. {}".format(error))
+            return False
+        except TimeoutException as error:
             self.logger.error("_scroll_down(): Ошибка. {}".format(error))
             return False
 
@@ -132,7 +138,13 @@ class WebElementScroll(WebElementGet):
             # Прокрутка вверх от верхнего дочернего элемента до нижнего дочернего элемента родительского элемента
             self.driver.scroll(origin_el=top_child, destination_el=bottom_center_child, duration=duration)
             return True
-        except NoSuchElementException or StaleElementReferenceException or TimeoutException as error:
+        except NoSuchElementException as error:
+            self.logger.error("_scroll_down(): Ошибка. {}".format(error))
+            return False
+        except StaleElementReferenceException as error:
+            self.logger.error("_scroll_down(): Ошибка. {}".format(error))
+            return False
+        except TimeoutException as error:
             self.logger.error("_scroll_down(): Ошибка. {}".format(error))
             return False
 
