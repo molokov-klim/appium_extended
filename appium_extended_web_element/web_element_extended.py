@@ -79,7 +79,7 @@ class WebElementExtended(WebElementClick,
         Returns:
             True если удалось нажать на элемент, иначе False
         """
-        assert self._click(duration=duration,
+        self._click(duration=duration,
                            wait=wait,
                            decorator_args=decorator_args)
         return cast('WebElementExtended', self)
@@ -92,7 +92,7 @@ class WebElementExtended(WebElementClick,
         fill me
         # TODO fill
         """
-        assert self._double_click(decorator_args=decorator_args,
+        self._double_click(decorator_args=decorator_args,
                                   wait=wait)
         return cast('WebElementExtended', self)
 
@@ -108,7 +108,7 @@ class WebElementExtended(WebElementClick,
         """
         root = self.driver.find_element('xpath', '//*')
         root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        assert super()._click_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
+        super()._click_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
         return cast('WebElementExtended', self)
 
     # ADB TAP
@@ -120,7 +120,7 @@ class WebElementExtended(WebElementClick,
         tap by adb
         # TODO fill
         """
-        assert self._terminal_tap(wait=wait,
+        self._terminal_tap(wait=wait,
                                   decorator_args=decorator_args)
         return cast('WebElementExtended', self)
 
@@ -142,7 +142,7 @@ class WebElementExtended(WebElementClick,
         element = None
         if locator is not None:
             element = root.get_element(locator=locator, contains=contains)
-        assert self._terminal_swipe(root=root, element=element,
+        self._terminal_swipe(root=root, element=element,
                                     x=x, y=y,
                                     direction=direction, distance=distance,
                                     duration=duration)
@@ -158,7 +158,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         positions = self.get_center()
-        assert self._tap(positions=[positions],
+        self._tap(positions=[positions],
                          duration=duration,
                          decorator_args=decorator_args,
                          wait=wait)
@@ -173,7 +173,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         positions = self.get_center()
-        assert self._double_tap(positions=positions,
+        self._double_tap(positions=positions,
                                 decorator_args=decorator_args,
                                 wait=wait,
                                 pause=pause)
@@ -191,7 +191,7 @@ class WebElementExtended(WebElementClick,
         """
         root = self.driver.find_element('xpath', '//*')
         root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        assert self._tap_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
+        self._tap_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
         return cast('WebElementExtended', self)
 
     # ELEMENTS
@@ -233,8 +233,8 @@ class WebElementExtended(WebElementClick,
         :return: bool, True, если скроллинг выполнен успешно.
         # TODO fill
         """
-        assert self._scroll_down(locator=locator,
-                                 duration=duration)
+        self._scroll_down(locator=locator,
+                          duration=duration)
         return cast('WebElementExtended', self)
 
     def scroll_up(self,
@@ -249,9 +249,8 @@ class WebElementExtended(WebElementClick,
         :return: bool, True, если скроллинг выполнен успешно.
         # TODO fill
         """
-        assert self._scroll_up(locator=locator,
+        self._scroll_up(locator=locator,
                                duration=duration)
-
         return cast('WebElementExtended', self)
 
     def scroll_to_bottom(self,
@@ -261,7 +260,7 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        assert self._scroll_to_bottom(locator=locator,
+        self._scroll_to_bottom(locator=locator,
                                       timeout_method=timeout_method)
         return cast('WebElementExtended', self)
 
@@ -272,7 +271,7 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        assert self._scroll_to_top(locator=locator,
+        self._scroll_to_top(locator=locator,
                                    timeout_method=timeout_method)
         return cast('WebElementExtended', self)
 
