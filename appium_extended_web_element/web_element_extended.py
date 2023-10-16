@@ -46,6 +46,8 @@ class WebElementExtended(WebElementClick,
                                           timeout_method=timeout_method,
                                           elements_range=elements_range,
                                           contains=contains)
+        if inner_element is None:
+            return None
         return WebElementExtended(logger=self.logger, driver=inner_element.parent, element_id=inner_element.id)
 
     def get_attributes(self,
@@ -55,6 +57,8 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         attributes = self._get_attributes(desired_attributes=desired_attributes)
+        if attributes is None:
+            return None
         return attributes
 
     # CLICK
@@ -80,8 +84,8 @@ class WebElementExtended(WebElementClick,
             True если удалось нажать на элемент, иначе False
         """
         self._click(duration=duration,
-                           wait=wait,
-                           decorator_args=decorator_args)
+                    wait=wait,
+                    decorator_args=decorator_args)
         return cast('WebElementExtended', self)
 
     def double_click(self,
@@ -93,7 +97,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         self._double_click(decorator_args=decorator_args,
-                                  wait=wait)
+                           wait=wait)
         return cast('WebElementExtended', self)
 
     def click_and_move(self, locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -121,7 +125,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         self._terminal_tap(wait=wait,
-                                  decorator_args=decorator_args)
+                           decorator_args=decorator_args)
         return cast('WebElementExtended', self)
 
     def adb_swipe(self,
@@ -143,9 +147,9 @@ class WebElementExtended(WebElementClick,
         if locator is not None:
             element = root.get_element(locator=locator, contains=contains)
         self._terminal_swipe(root=root, element=element,
-                                    x=x, y=y,
-                                    direction=direction, distance=distance,
-                                    duration=duration)
+                             x=x, y=y,
+                             direction=direction, distance=distance,
+                             duration=duration)
         return cast('WebElementExtended', self)
 
     # TAP
@@ -159,9 +163,9 @@ class WebElementExtended(WebElementClick,
         """
         positions = self.get_center()
         self._tap(positions=[positions],
-                         duration=duration,
-                         decorator_args=decorator_args,
-                         wait=wait)
+                  duration=duration,
+                  decorator_args=decorator_args,
+                  wait=wait)
         return cast('WebElementExtended', self)
 
     def double_tap(self,
@@ -174,9 +178,9 @@ class WebElementExtended(WebElementClick,
         """
         positions = self.get_center()
         self._double_tap(positions=positions,
-                                decorator_args=decorator_args,
-                                wait=wait,
-                                pause=pause)
+                         decorator_args=decorator_args,
+                         wait=wait,
+                         pause=pause)
         return cast('WebElementExtended', self)
 
     def tap_and_move(self,
@@ -215,6 +219,8 @@ class WebElementExtended(WebElementClick,
                                       elements_range=elements_range,
                                       contains=contains)
         result = []
+        if elements is None or elements == []:
+            return None
         for element in elements:
             result.append(WebElementExtended(logger=self.logger,
                                              driver=element.parent,
@@ -250,7 +256,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         self._scroll_up(locator=locator,
-                               duration=duration)
+                        duration=duration)
         return cast('WebElementExtended', self)
 
     def scroll_to_bottom(self,
@@ -261,7 +267,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         self._scroll_to_bottom(locator=locator,
-                                      timeout_method=timeout_method)
+                               timeout_method=timeout_method)
         return cast('WebElementExtended', self)
 
     def scroll_to_top(self,
@@ -272,7 +278,7 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         self._scroll_to_top(locator=locator,
-                                   timeout_method=timeout_method)
+                            timeout_method=timeout_method)
         return cast('WebElementExtended', self)
 
     def scroll_until_find(self,
@@ -303,19 +309,23 @@ class WebElementExtended(WebElementClick,
                                   element_id=element.id)
 
     # DOM
-    def get_parent(self) -> 'WebElementExtended':
+    def get_parent(self) -> Union['WebElementExtended', None]:
         """
         # TODO fill
         """
         element = self._get_parent()
+        if element is None:
+            return None
         return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
-    def get_parents(self) -> List['WebElementExtended']:
+    def get_parents(self) -> Union[List['WebElementExtended'], None]:
         """
         # TODO fill
         """
         elements = self._get_parents()
         elements_ext = []
+        if elements is None or elements == []:
+            return None
         for element in elements:
             elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
         return elements_ext
@@ -323,14 +333,16 @@ class WebElementExtended(WebElementClick,
     def get_sibling(self,
                     attributes: Dict[str, str],
                     contains: bool = True,
-                    ) -> 'WebElementExtended':
+                    ) -> Union['WebElementExtended', None]:
         """
         # TODO fill
         """
         element = self._get_sibling(attributes=attributes, contains=contains)
+        if element is None:
+            return None
         return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
-    def get_siblings(self) -> List['WebElementExtended']:
+    def get_siblings(self) -> Union[List['WebElementExtended'], None]:
         """
         # TODO fill
         """
@@ -344,7 +356,7 @@ class WebElementExtended(WebElementClick,
                    ancestor: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
                    cousin: Dict[str, str],
                    contains: bool = True,
-                   ) -> 'WebElementExtended':
+                   ) -> Union['WebElementExtended', None]:
         """
         # TODO fill
         """
@@ -353,13 +365,15 @@ class WebElementExtended(WebElementClick,
         ancestor = root.get_element(ancestor)
         ancestor = WebElement(ancestor.parent, ancestor.id)
         element = self._get_cousin(ancestor=ancestor, cousin=cousin, contains=contains)
+        if element is None:
+            return None
         return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
     def get_cousins(self,
                     ancestor: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
                     cousin: Dict[str, str],
                     contains: bool = True,
-                    ) -> List['WebElementExtended']:
+                    ) -> Union[List['WebElementExtended'], None]:
         """
         # TODO fill
         """
@@ -369,6 +383,8 @@ class WebElementExtended(WebElementClick,
         ancestor = WebElement(ancestor.parent, ancestor.id)
         elements = self._get_cousins(ancestor=ancestor, cousin=cousin, contains=contains)
         elements_ext = []
+        if elements is None or elements == []:
+            return None
         for element in elements:
             elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
         return elements_ext
