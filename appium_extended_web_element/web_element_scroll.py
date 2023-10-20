@@ -178,11 +178,14 @@ class WebElementScroll(WebElementGet):
 
         # Прокрутка вниз до упора
         while time.time() - start_time < timeout_method:
-            child = self._get_element(locator=locator)
-            if child == last_child:
-                return True
-            last_child = child
-            self._scroll_down(locator=locator)
+            try:
+                child = self._get_element(locator=locator)
+                if child == last_child:
+                    return True
+                last_child = child
+                self._scroll_down(locator=locator)
+            except StaleElementReferenceException:
+                continue
         self.logger.error("_scroll_to_bottom(): Неизвестная ошибка")
         return False
 
@@ -223,26 +226,29 @@ class WebElementScroll(WebElementGet):
 
         # Прокрутка вверх до упора
         while time.time() - start_time < timeout_method:
-            child = self._get_element(locator=locator,
-                                      timeout_elem=timeout_elem,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,
-                                      )
-            if child == last_child:
-                return True
-            last_child = child
-            self._scroll_up(locator=locator,
-                            duration=duration,
-                            timeout_elements=timeout_elements,
-                            timeout_method=timeout_method,
-                            elements_range=elements_range,
-                            contains=contains,
-                            poll_frequency=poll_frequency,
-                            ignored_exceptions=ignored_exceptions,
-                            )
+            try:
+                child = self._get_element(locator=locator,
+                                          timeout_elem=timeout_elem,
+                                          timeout_method=timeout_method,
+                                          elements_range=elements_range,
+                                          contains=contains,
+                                          poll_frequency=poll_frequency,
+                                          ignored_exceptions=ignored_exceptions,
+                                          )
+                if child == last_child:
+                    return True
+                last_child = child
+                self._scroll_up(locator=locator,
+                                duration=duration,
+                                timeout_elements=timeout_elements,
+                                timeout_method=timeout_method,
+                                elements_range=elements_range,
+                                contains=contains,
+                                poll_frequency=poll_frequency,
+                                ignored_exceptions=ignored_exceptions,
+                                )
+            except StaleElementReferenceException:
+                continue
 
         self.logger.error("_scroll_to_top(): Неизвестная ошибка")
         return False
@@ -296,6 +302,8 @@ class WebElementScroll(WebElementGet):
                     return True
             except NoSuchElementException:
                 continue
+            except StaleElementReferenceException:
+                continue
             current_element_image = self.screenshot_as_base64
             if current_element_image == last_element_image:
                 break
@@ -318,7 +326,9 @@ class WebElementScroll(WebElementGet):
                 if element is not None:
                     return True
             except NoSuchElementException:
-                pass
+                continue
+            except StaleElementReferenceException:
+                continue
             current_element_image = self.screenshot_as_base64
             if current_element_image == last_element_image:
                 break
@@ -383,6 +393,8 @@ class WebElementScroll(WebElementGet):
                     return element
             except NoSuchElementException:
                 continue
+            except StaleElementReferenceException:
+                continue
             current_element_image = self.screenshot_as_base64
             if current_element_image == last_element_image:
                 break
@@ -411,7 +423,9 @@ class WebElementScroll(WebElementGet):
                 if element is not None:
                     return element
             except NoSuchElementException:
-                pass
+                continue
+            except StaleElementReferenceException:
+                continue
             current_element_image = self.screenshot_as_base64
             if current_element_image == last_element_image:
                 break
