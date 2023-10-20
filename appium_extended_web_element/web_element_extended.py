@@ -1,11 +1,11 @@
 # coding: utf-8
+import inspect
 import logging
 from typing import Union, Tuple, Dict, List, cast
 
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
-from selenium.common import NoSuchDriverException
 from selenium.webdriver.common.by import By
 
 from appium_extended_exceptions.appium_extended_exceptions import WebElementExtendedError
@@ -48,9 +48,18 @@ class WebElementExtended(WebElementClick,
                                           timeout_method=timeout_method,
                                           elements_range=elements_range,
                                           contains=contains)
-        if inner_element is None:
-            return None
-        return WebElementExtended(logger=self.logger, driver=inner_element.parent, element_id=inner_element.id)
+        if inner_element is not None:
+            return WebElementExtended(logger=self.logger, driver=inner_element.parent, element_id=inner_element.id)
+
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      locator=locator,
+                                      by=by,
+                                      value=value,
+                                      timeout_elem=timeout_elem,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains)
 
     def get_attributes(self,
                        desired_attributes: Union[str, List[str]] = None,
@@ -59,9 +68,11 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         attributes = self._get_attributes(desired_attributes=desired_attributes)
-        if attributes is None:
-            return None
-        return attributes
+        if attributes is not None:
+            return attributes
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      desired_attributes=desired_attributes)
 
     # CLICK
     def click(self,
@@ -85,10 +96,18 @@ class WebElementExtended(WebElementClick,
         Returns:
             True если удалось нажать на элемент, иначе False
         """
-        self._click(duration=duration,
-                    wait=wait,
-                    decorator_args=decorator_args)
-        return cast('WebElementExtended', self)
+        try:
+            self._click(duration=duration,
+                        wait=wait,
+                        decorator_args=decorator_args)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          duration=duration,
+                                          decorator_args=decorator_args,
+                                          wait=wait,
+                                          original_exception=error) from error
 
     def double_click(self,
                      decorator_args: dict = None,
@@ -98,11 +117,19 @@ class WebElementExtended(WebElementClick,
         fill me
         # TODO fill
         """
-        self._double_click(decorator_args=decorator_args,
-                           wait=wait)
-        return cast('WebElementExtended', self)
+        try:
+            self._double_click(decorator_args=decorator_args,
+                               wait=wait)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          decorator_args=decorator_args,
+                                          wait=wait,
+                                          original_exception=error) from error
 
-    def click_and_move(self, locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
+    def click_and_move(self,
+                       locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
                        x: int = None,
                        y: int = None,
                        direction: int = None,
@@ -112,10 +139,20 @@ class WebElementExtended(WebElementClick,
         fill me
         # TODO fill
         """
-        root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        super()._click_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
-        return cast('WebElementExtended', self)
+        try:
+            root = self.driver.find_element('xpath', '//*')
+            root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
+            super()._click_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          x=x,
+                                          y=y,
+                                          direction=direction,
+                                          distance=distance,
+                                          original_exception=error) from error
 
     # ADB TAP
     def adb_tap(self,
@@ -126,9 +163,16 @@ class WebElementExtended(WebElementClick,
         tap by adb
         # TODO fill
         """
-        self._terminal_tap(wait=wait,
-                           decorator_args=decorator_args)
-        return cast('WebElementExtended', self)
+        try:
+            self._terminal_tap(wait=wait,
+                               decorator_args=decorator_args)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          decorator_args=decorator_args,
+                                          wait=wait,
+                                          original_exception=error) from error
 
     def adb_swipe(self,
                   locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -143,16 +187,28 @@ class WebElementExtended(WebElementClick,
         swipe by adb
         # TODO fill
         """
-        root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        element = None
-        if locator is not None:
-            element = root.get_element(locator=locator, contains=contains)
-        self._terminal_swipe(root=root, element=element,
-                             x=x, y=y,
-                             direction=direction, distance=distance,
-                             duration=duration)
-        return cast('WebElementExtended', self)
+        try:
+            root = self.driver.find_element('xpath', '//*')
+            root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
+            element = None
+            if locator is not None:
+                element = root.get_element(locator=locator, contains=contains)
+            self._terminal_swipe(root=root, element=element,
+                                 x=x, y=y,
+                                 direction=direction, distance=distance,
+                                 duration=duration)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          x=x,
+                                          y=y,
+                                          direction=direction,
+                                          distance=distance,
+                                          duration=duration,
+                                          contains=contains,
+                                          original_exception=error) from error
 
     # TAP
     def tap(self,
@@ -163,12 +219,20 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        positions = self.get_center()
-        self._tap(positions=[positions],
-                  duration=duration,
-                  decorator_args=decorator_args,
-                  wait=wait)
-        return cast('WebElementExtended', self)
+        try:
+            positions = self.get_center()
+            self._tap(positions=[positions],
+                      duration=duration,
+                      decorator_args=decorator_args,
+                      wait=wait)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          duration=duration,
+                                          decorator_args=decorator_args,
+                                          wait=wait,
+                                          original_exception=error) from error
 
     def double_tap(self,
                    decorator_args: dict = None,
@@ -178,12 +242,20 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        positions = self.get_center()
-        self._double_tap(positions=positions,
-                         decorator_args=decorator_args,
-                         wait=wait,
-                         pause=pause)
-        return cast('WebElementExtended', self)
+        try:
+            positions = self.get_center()
+            self._double_tap(positions=positions,
+                             decorator_args=decorator_args,
+                             wait=wait,
+                             pause=pause)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          decorator_args=decorator_args,
+                                          wait=wait,
+                                          pause=pause,
+                                          original_exception=error) from error
 
     def tap_and_move(self,
                      locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
@@ -195,10 +267,20 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        self._tap_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
-        return cast('WebElementExtended', self)
+        try:
+            root = self.driver.find_element('xpath', '//*')
+            root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
+            self._tap_and_move(root=root, locator=locator, x=x, y=y, direction=direction, distance=distance)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          x=x,
+                                          y=y,
+                                          direction=direction,
+                                          distance=distance,
+                                          original_exception=error) from error
 
     # ELEMENTS
     def get_elements(self,
@@ -221,13 +303,21 @@ class WebElementExtended(WebElementClick,
                                       elements_range=elements_range,
                                       contains=contains)
         result = []
-        if elements is None or elements == []:
-            return None
-        for element in elements:
-            result.append(WebElementExtended(logger=self.logger,
-                                             driver=element.parent,
-                                             element_id=element.id))
-        return result
+        if elements is not None or elements != []:
+            for element in elements:
+                result.append(WebElementExtended(logger=self.logger,
+                                                 driver=element.parent,
+                                                 element_id=element.id))
+            return result
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      locator=locator,
+                                      by=by,
+                                      value=value,
+                                      timeout_elements=timeout_elements,
+                                      timeout_method=timeout_method,
+                                      elements_range=elements_range,
+                                      contains=contains)
 
     # SCROLL
     def scroll_down(self,
@@ -241,9 +331,16 @@ class WebElementExtended(WebElementClick,
         :return: bool, True, если скроллинг выполнен успешно.
         # TODO fill
         """
-        self._scroll_down(locator=locator,
-                          duration=duration)
-        return cast('WebElementExtended', self)
+        try:
+            self._scroll_down(locator=locator,
+                              duration=duration)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          duration=duration,
+                                          original_exception=error) from error
 
     def scroll_up(self,
                   locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str] = None,
@@ -257,9 +354,16 @@ class WebElementExtended(WebElementClick,
         :return: bool, True, если скроллинг выполнен успешно.
         # TODO fill
         """
-        self._scroll_up(locator=locator,
-                        duration=duration)
-        return cast('WebElementExtended', self)
+        try:
+            self._scroll_up(locator=locator,
+                            duration=duration)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          duration=duration,
+                                          original_exception=error) from error
 
     def scroll_to_bottom(self,
                          locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str] = None,
@@ -268,9 +372,16 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        self._scroll_to_bottom(locator=locator,
-                               timeout_method=timeout_method)
-        return cast('WebElementExtended', self)
+        try:
+            self._scroll_to_bottom(locator=locator,
+                                   timeout_method=timeout_method)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          timeout_method=timeout_method,
+                                          original_exception=error) from error
 
     def scroll_to_top(self,
                       locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str] = None,
@@ -279,9 +390,16 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        self._scroll_to_top(locator=locator,
-                            timeout_method=timeout_method)
-        return cast('WebElementExtended', self)
+        try:
+            self._scroll_to_top(locator=locator,
+                                timeout_method=timeout_method)
+            return cast('WebElementExtended', self)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          locator=locator,
+                                          timeout_method=timeout_method,
+                                          original_exception=error) from error
 
     def scroll_until_find(self,
                           locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
@@ -291,11 +409,15 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        if not self._scroll_until_find(locator=locator,
-                                       timeout_method=timeout_method,
-                                       contains=contains):
-            return None
-        return cast('WebElementExtended', self)
+        if self._scroll_until_find(locator=locator,
+                                   timeout_method=timeout_method,
+                                   contains=contains):
+            return cast('WebElementExtended', self)
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      locator=locator,
+                                      timeout_method=timeout_method,
+                                      contains=contains)
 
     def scroll_and_get(self,
                        locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
@@ -312,7 +434,8 @@ class WebElementExtended(WebElementClick,
                 return WebElementExtended(logger=self.logger,
                                           driver=element.parent,
                                           element_id=element.id)
-        raise WebElementExtendedError(message=f"Ошибка при выполнении scroll_and_get. Не удалось найти элемент",
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"element is None",
                                       locator=locator,
                                       timeout_method=timeout_method,
                                       tries=tries)
@@ -323,21 +446,28 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         element = self._get_parent()
-        if element is None:
-            return None     # TODO raise instead return None
-        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        if element is not None:
+            return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"element is None")
 
     def get_parents(self) -> Union[List['WebElementExtended'], None]:
         """
         # TODO fill
         """
-        elements = self._get_parents()
-        elements_ext = []
-        if elements is None or elements == []:
-            return None
-        for element in elements:
-            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
-        return elements_ext
+        try:
+            elements = self._get_parents()
+            elements_ext = []
+            if elements is None or elements == []:
+                return None
+            for element in elements:
+                elements_ext.append(
+                    WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
+            return elements_ext
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          original_exception=error) from error
 
     def get_sibling(self,
                     attributes: Dict[str, str],
@@ -346,20 +476,33 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        element = self._get_sibling(attributes=attributes, contains=contains)
-        if element is None:
-            return None
-        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        try:
+            element = self._get_sibling(attributes=attributes, contains=contains)
+            if element is None:
+                return None
+            return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          attributes=attributes,
+                                          contains=contains,
+                                          original_exception=error) from error
 
     def get_siblings(self) -> Union[List['WebElementExtended'], None]:
         """
         # TODO fill
         """
-        elements = self._get_siblings()
-        elements_ext = []
-        for element in elements:
-            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
-        return elements_ext
+        try:
+            elements = self._get_siblings()
+            elements_ext = []
+            for element in elements:
+                elements_ext.append(
+                    WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
+            return elements_ext
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          original_exception=error) from error
 
     def get_cousin(self,
                    ancestor: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -369,14 +512,22 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        ancestor = root.get_element(ancestor)
-        ancestor = WebElement(ancestor.parent, ancestor.id)
-        element = self._get_cousin(ancestor=ancestor, cousin=cousin, contains=contains)
-        if element is None:
-            return None
-        return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        try:
+            root = self.driver.find_element('xpath', '//*')
+            root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
+            ancestor = root.get_element(ancestor)
+            ancestor = WebElement(ancestor.parent, ancestor.id)
+            element = self._get_cousin(ancestor=ancestor, cousin=cousin, contains=contains)
+            if element is None:
+                return None
+            return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          ancestor=ancestor,
+                                          cousin=cousin,
+                                          contains=contains,
+                                          original_exception=error) from error
 
     def get_cousins(self,
                     ancestor: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -386,17 +537,26 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        root = self.driver.find_element('xpath', '//*')
-        root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
-        ancestor = root.get_element(ancestor)
-        ancestor = WebElement(ancestor.parent, ancestor.id)
-        elements = self._get_cousins(ancestor=ancestor, cousin=cousin, contains=contains)
-        elements_ext = []
-        if elements is None or elements == []:
-            return None
-        for element in elements:
-            elements_ext.append(WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
-        return elements_ext
+        try:
+            root = self.driver.find_element('xpath', '//*')
+            root = WebElementExtended(logger=self.logger, driver=root.parent, element_id=root.id)
+            ancestor = root.get_element(ancestor)
+            ancestor = WebElement(ancestor.parent, ancestor.id)
+            elements = self._get_cousins(ancestor=ancestor, cousin=cousin, contains=contains)
+            elements_ext = []
+            if elements is None or elements == []:
+                return None
+            for element in elements:
+                elements_ext.append(
+                    WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id))
+            return elements_ext
+        except Exception as error:
+            raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                                  f"check exception attributes",
+                                          ancestor=ancestor,
+                                          cousin=cousin,
+                                          contains=contains,
+                                          original_exception=error) from error
 
     def is_contains(self,
                     locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str],
@@ -405,7 +565,7 @@ class WebElementExtended(WebElementClick,
         """
         # TODO fill
         """
-        child_element = self.get_element(locator=locator, contains=contains)
+        child_element = self._get_element(locator=locator, contains=contains)
         if child_element is not None:
             return True
         return False
@@ -433,10 +593,20 @@ class WebElementExtended(WebElementClick,
         Возвращает:
             tuple: Координаты центра в виде (x, y). Возвращает None, если произошла ошибка.
         """
-        return self._get_center()
+        center = self._get_center()
+        if center is not None:
+            return center
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      )
 
     def get_coordinates(self) -> Union[Tuple[int, int, int, int], None]:
         """
         # TODO fill
         """
-        return self._get_coordinates()
+        coordinates = self._get_coordinates()
+        if coordinates is not None:
+            return coordinates
+        raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
+                                              f"check exception attributes",
+                                      )
