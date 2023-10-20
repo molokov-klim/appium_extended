@@ -553,3 +553,25 @@ class SaveSourceError(AppiumExtendedError):
         self.original_exception = original_exception
         self.traceback = traceback.format_exc()
 
+
+class WebElementExtendedError(AppiumExtendedError):
+    """
+    Возникает, когда выбрасывается исключение из класса WebElementExtended
+    """
+
+    def __init__(self,
+                 message='',
+                 original_exception: Optional[Exception] = None,
+                 poll_frequency: float = 0.5,
+                 ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                 *args, **kwargs,
+                 ):
+        super().__init__(message)
+        self.poll_frequency = poll_frequency
+        self.ignored_exceptions = ignored_exceptions
+        self.traceback = traceback.format_exc()
+        self.original_exception = original_exception
+        self.args = args
+        self.kwargs = kwargs
+
+

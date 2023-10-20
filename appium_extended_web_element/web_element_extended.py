@@ -5,8 +5,10 @@ from typing import Union, Tuple, Dict, List, cast
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
+from selenium.common import NoSuchDriverException
 from selenium.webdriver.common.by import By
 
+from appium_extended_exceptions.appium_extended_exceptions import WebElementExtendedError
 from appium_extended_web_element.web_element_click import WebElementClick
 from appium_extended_web_element.web_element_dom import WebElementDOM
 from appium_extended_web_element.web_element_scroll import WebElementScroll
@@ -298,15 +300,22 @@ class WebElementExtended(WebElementClick,
     def scroll_and_get(self,
                        locator: Union[Tuple, 'WebElementExtended', Dict[str, str], str],
                        timeout_method: int = 120,
+                       tries: int = 3,
                        ) -> Union['WebElementExtended', None]:
         """
         # TODO fill
         """
-        element = self._scroll_and_get(locator=locator,
-                                       timeout_method=timeout_method)
-        return WebElementExtended(logger=self.logger,
-                                  driver=element.parent,
-                                  element_id=element.id)
+        for i in range(tries):
+            element = self._scroll_and_get(locator=locator,
+                                           timeout_method=timeout_method)
+            if element is not None:
+                return WebElementExtended(logger=self.logger,
+                                          driver=element.parent,
+                                          element_id=element.id)
+        raise WebElementExtendedError(message=f"Ошибка при выполнении scroll_and_get. Не удалось найти элемент",
+                                      locator=locator,
+                                      timeout_method=timeout_method,
+                                      tries=tries)
 
     # DOM
     def get_parent(self) -> Union['WebElementExtended', None]:
@@ -315,7 +324,7 @@ class WebElementExtended(WebElementClick,
         """
         element = self._get_parent()
         if element is None:
-            return None
+            return None     # TODO raise instead return None
         return WebElementExtended(logger=self.logger, driver=element.parent, element_id=element.id)
 
     def get_parents(self) -> Union[List['WebElementExtended'], None]:
