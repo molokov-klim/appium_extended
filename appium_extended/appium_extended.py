@@ -23,7 +23,7 @@ from appium_extended_exceptions.appium_extended_exceptions import TapError, GetE
     FindAndGetElementError, IsElementWithinScreenError, IsTextOnScreenError, IsImageOnScreenError, SaveSourceError, \
     GetScreenshotError, ExtractPointCoordinatesError, ExtractPointCoordinatesByTypingError, SaveScreenshotError, \
     DrawByCoordinatesError, WaitReturnTrueError, WaitForNotError, WaitForError, SwipeError, AppiumExtendedError, \
-    IsWaitForError, IsWaitForNotError
+    IsWaitForError, IsWaitForNotError, WebElementExtendedError
 
 from appium_extended_web_element.web_element_extended import WebElementExtended
 
@@ -569,28 +569,30 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                              tries=tries, )
             for i in range(tries):
                 for recycler in recyclers:
-                    if recycler.scroll_until_find(locator=locator, contains=contains) is not None:
-                        try:
-                            return self.get_element(locator=locator,
-                                                    timeout_elem=timeout_elem,
-                                                    timeout_method=timeout_method,
-                                                    elements_range=elements_range,
-                                                    contains=contains,
-                                                    poll_frequency=poll_frequency,
-                                                    ignored_exceptions=ignored_exceptions, )
-                        except NoSuchDriverException:
-                            self.reconnect()
-                        except GetElementError as error:
-                            raise FindAndGetElementError(message="Не удалось извлечь элемент",
-                                                         locator=locator,
-                                                         timeout_elem=timeout_elem,
-                                                         timeout_method=timeout_method,
-                                                         elements_range=elements_range,
-                                                         contains=contains,
-                                                         poll_frequency=poll_frequency,
-                                                         ignored_exceptions=ignored_exceptions,
-                                                         tries=tries,
-                                                         original_exception=error) from error
+                    try:
+                        recycler.scroll_until_find(locator=locator, contains=contains)
+                        return self.get_element(locator=locator,
+                                                timeout_elem=timeout_elem,
+                                                timeout_method=timeout_method,
+                                                elements_range=elements_range,
+                                                contains=contains,
+                                                poll_frequency=poll_frequency,
+                                                ignored_exceptions=ignored_exceptions, )
+                    except WebElementExtendedError:
+                        continue
+                    except NoSuchDriverException:
+                        self.reconnect()
+                    except GetElementError as error:
+                        raise FindAndGetElementError(message="Не удалось извлечь элемент",
+                                                     locator=locator,
+                                                     timeout_elem=timeout_elem,
+                                                     timeout_method=timeout_method,
+                                                     elements_range=elements_range,
+                                                     contains=contains,
+                                                     poll_frequency=poll_frequency,
+                                                     ignored_exceptions=ignored_exceptions,
+                                                     tries=tries,
+                                                     original_exception=error) from error
             return None
         except NoSuchDriverException:
             self.reconnect()
