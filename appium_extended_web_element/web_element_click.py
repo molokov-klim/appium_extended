@@ -7,6 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import ElementNotInteractableException, StaleElementReferenceException, \
     InvalidElementStateException
 
+from appium_extended_exceptions.appium_extended_exceptions import WebElementExtendedError
 from appium_extended_web_element.web_element_get import WebElementGet
 from appium_extended_helpers.helpers_decorators import wait_for_window_change
 from appium_extended_utils.utils import find_coordinates_by_vector
@@ -135,6 +136,8 @@ class WebElementClick(WebElementGet):
             action = ActionChains(self.driver)
             action.click(self).click(self).perform()
             return True
+        except WebElementExtendedError:
+            return False
         except InvalidElementStateException:
             return True
         except (ElementNotInteractableException, StaleElementReferenceException) as e:
@@ -189,10 +192,13 @@ class WebElementClick(WebElementGet):
             action.release().perform()
             return True
         elif locator is not None and root is not None:
-            # Если указан локатор элемента и корневой элемент
-            target_element = root.get_element(locator)
-            action.move_to_element(target_element)
-            return True
+            try:
+                # Если указан локатор элемента и корневой элемент
+                target_element = root.get_element(locator)
+                action.move_to_element(target_element)
+                return True
+            except WebElementExtendedError:
+                return False
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
             window_size = self.terminal.get_screen_resolution()

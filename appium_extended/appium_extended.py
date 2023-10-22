@@ -438,6 +438,14 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                 coordinates = self._get_text_coordinates(text=text, language=language, image=image)
             except NoSuchDriverException:
                 self.reconnect()
+            except WebElementExtendedError as error:
+                raise GetTextCoordinatesError(message=f"""
+                                Ошибка при попытке найти координаты изображения с использованием OCR: {error}""",
+                                              text=text,
+                                              language=language,
+                                              image=image,
+                                              ocr=True,
+                                              original_exception=error) from error
             except Exception as error:
                 raise GetTextCoordinatesError(message=f"""
                 Ошибка при попытке найти координаты изображения с использованием OCR: {error}""",
@@ -1444,6 +1452,11 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             return x, y
         except NoSuchDriverException:
             self.reconnect()
+        except WebElementExtendedError as error:
+            raise ExtractPointCoordinatesByTypingError(
+                message=f"Не удалось извлечь координаты точки на основе типа переданной позиции: {error}",
+                position=position,
+                original_exception=error) from error
         except Exception as error:
             raise ExtractPointCoordinatesByTypingError(
                 message=f"Не удалось извлечь координаты точки на основе типа переданной позиции: {error}",

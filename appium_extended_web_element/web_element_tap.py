@@ -8,6 +8,7 @@ from selenium.webdriver.common.actions import interaction
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
+from appium_extended_exceptions.appium_extended_exceptions import WebElementExtendedError
 from appium_extended_web_element.web_element_get import WebElementGet
 
 from appium_extended_helpers.helpers_decorators import wait_for_window_change
@@ -210,13 +211,16 @@ class WebElementTap(WebElementGet):
             actions.perform()
             return True
         elif locator is not None and root is not None:
-            # Если указан локатор элемента и корневой элемент
-            target_element = root.get_element(locator)
-            x, y = target_element._get_center()
-            actions.w3c_actions.pointer_action.move_to_location(x, y)
-            actions.w3c_actions.pointer_action.release()
-            actions.perform()
-            return True
+            try:
+                # Если указан локатор элемента и корневой элемент
+                target_element = root.get_element(locator)
+                x, y = target_element._get_center()
+                actions.w3c_actions.pointer_action.move_to_location(x, y)
+                actions.w3c_actions.pointer_action.release()
+                actions.perform()
+                return True
+            except WebElementExtendedError:
+                return False
         elif direction is not None and distance is not None:
             # Если предоставлены направление и расстояние, вычисляем целевую позицию прокрутки
             window_size = self.terminal.get_screen_resolution()
