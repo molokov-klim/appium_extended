@@ -59,6 +59,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                     elements_range: Union[Tuple, List[WebElementExtended], Dict[str, str], None] = None,
                     contains: bool = True,
                     poll_frequency: float = 0.5,
+                    tries: int = 3,
                     ignored_exceptions: typing.Optional[WaitExcTypes] = None
                     ) -> Union[WebElementExtended, None]:
         """
@@ -105,15 +106,19 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         """
         element = None
         try:
-            element = self._get_element(locator=locator,
-                                        by=by,
-                                        value=value,
-                                        timeout_elem=timeout_elem,
-                                        timeout_method=timeout_method,
-                                        elements_range=elements_range,
-                                        contains=contains,
-                                        poll_frequency=poll_frequency,
-                                        ignored_exceptions=ignored_exceptions)
+            for i in range(tries):
+                element = self._get_element(locator=locator,
+                                            by=by,
+                                            value=value,
+                                            timeout_elem=timeout_elem,
+                                            timeout_method=timeout_method,
+                                            elements_range=elements_range,
+                                            contains=contains,
+                                            poll_frequency=poll_frequency,
+                                            ignored_exceptions=ignored_exceptions)
+                if element is None:
+                    time.sleep(1)
+                    continue
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
