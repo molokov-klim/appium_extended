@@ -6,7 +6,7 @@ from typing import Union, Tuple, Dict, List, Optional, cast, Any
 import numpy as np
 from PIL import Image
 
-from selenium.common.exceptions import NoSuchDriverException, WebDriverException
+from selenium.common.exceptions import NoSuchDriverException, WebDriverException, StaleElementReferenceException
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver import WebElement
@@ -107,18 +107,23 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         element = None
         try:
             for i in range(tries):
-                element = self._get_element(locator=locator,
-                                            by=by,
-                                            value=value,
-                                            timeout_elem=timeout_elem,
-                                            timeout_method=timeout_method,
-                                            elements_range=elements_range,
-                                            contains=contains,
-                                            poll_frequency=poll_frequency,
-                                            ignored_exceptions=ignored_exceptions)
+                try:
+                    element = self._get_element(locator=locator,
+                                                by=by,
+                                                value=value,
+                                                timeout_elem=timeout_elem,
+                                                timeout_method=timeout_method,
+                                                elements_range=elements_range,
+                                                contains=contains,
+                                                poll_frequency=poll_frequency,
+                                                ignored_exceptions=ignored_exceptions)
+                except StaleElementReferenceException:
+                    time.sleep(3)
+                    continue
                 if element is None:
                     time.sleep(1)
                     continue
+
         except NoSuchDriverException:
             self.reconnect()
         except Exception as error:
