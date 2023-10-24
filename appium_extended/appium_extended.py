@@ -1392,7 +1392,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             - Если имя файла не указано, будет использовано имя 'screenshot.png'.
         """
         try:
-            assert self.save_screenshot(path=path, filename=filename)
+            self.image._save_screenshot(path=path, filename=filename)
             return cast('AppiumExtended', self)
         except NoSuchDriverException:
             self.reconnect()

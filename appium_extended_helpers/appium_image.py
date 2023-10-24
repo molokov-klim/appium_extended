@@ -606,7 +606,7 @@ class AppiumImage:
             return self.to_grayscale(image=image)
         return image
 
-    def save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
+    def _save_screenshot(self, path: str = '', filename: str = 'screenshot.png') -> bool:
         """
         Сохраняет скриншот экрана в указанный файл.
 
