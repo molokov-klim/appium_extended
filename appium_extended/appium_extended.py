@@ -596,6 +596,8 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                                 contains=contains,
                                                 poll_frequency=poll_frequency,
                                                 ignored_exceptions=ignored_exceptions, )
+                    except StaleElementReferenceException:
+                        continue
                     except WebElementExtendedError:
                         continue
                     except NoSuchDriverException:
