@@ -1,11 +1,13 @@
 # coding: utf-8
 import inspect
 import logging
+import time
 from typing import Union, Tuple, Dict, List, cast
 
 from appium.webdriver import WebElement
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.mobileby import MobileBy
+from selenium.common import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 
 from appium_extended_exceptions.appium_extended_exceptions import WebElementExtendedError
@@ -428,12 +430,16 @@ class WebElementExtended(WebElementClick,
         # TODO fill
         """
         for i in range(tries):
-            element = self._scroll_and_get(locator=locator,
-                                           timeout_method=timeout_method)
-            if element is not None:
-                return WebElementExtended(logger=self.logger,
-                                          driver=element.parent,
-                                          element_id=element.id)
+            try:
+                element = self._scroll_and_get(locator=locator,
+                                               timeout_method=timeout_method)
+                if element is not None:
+                    return WebElementExtended(logger=self.logger,
+                                              driver=element.parent,
+                                              element_id=element.id)
+            except StaleElementReferenceException:
+                time.sleep(3)
+                continue
         raise WebElementExtendedError(message=f"Ошибка при выполнении {inspect.currentframe().f_code.co_name}. "
                                               f"element is None",
                                       locator=locator,
