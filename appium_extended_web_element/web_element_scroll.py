@@ -300,15 +300,15 @@ class WebElementScroll(WebElementGet):
                                             ignored_exceptions=ignored_exceptions, )
                 if element is not None:
                     return True
+                current_element_image = self.screenshot_as_base64
+                if current_element_image == last_element_image:
+                    break
+                last_element_image = self.screenshot_as_base64
+                recycler._scroll_down()
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
                 continue
-            current_element_image = self.screenshot_as_base64
-            if current_element_image == last_element_image:
-                break
-            last_element_image = self.screenshot_as_base64
-            recycler._scroll_down()
 
         # Прокрутка вверх до поиска элемента
         while time.time() - start_time < timeout_method:
@@ -325,15 +325,15 @@ class WebElementScroll(WebElementGet):
                                             ignored_exceptions=ignored_exceptions, )
                 if element is not None:
                     return True
+                current_element_image = self.screenshot_as_base64
+                if current_element_image == last_element_image:
+                    break
+                last_element_image = self.screenshot_as_base64
+                recycler._scroll_up()
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
                 continue
-            current_element_image = self.screenshot_as_base64
-            if current_element_image == last_element_image:
-                break
-            last_element_image = self.screenshot_as_base64
-            recycler._scroll_up()
 
         self.logger.error("_scroll_until_find(): Элемент не найден")
         return False
