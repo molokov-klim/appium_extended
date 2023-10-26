@@ -309,6 +309,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                element = None
                 recycler._scroll_down()
                 continue
 
@@ -336,6 +337,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                element = None
                 recycler._scroll_down()
                 continue
 
@@ -404,6 +406,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                element = None
                 recycler._scroll_down()
                 continue
 
@@ -431,19 +434,15 @@ class WebElementScroll(WebElementIs):
                     if current_element_image == last_element_image:
                         break
                     last_element_image = self.screenshot_as_base64
-                    recycler._scroll_down()
+                    recycler._scroll_up()
                 if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                element = None
                 recycler._scroll_down()
                 continue
-            current_element_image = self.screenshot_as_base64
-            if current_element_image == last_element_image:
-                break
-            last_element_image = self.screenshot_as_base64
-            recycler._scroll_up()
 
         self.logger.error("_scroll_and_get(): Элемент не найден")
         return None
