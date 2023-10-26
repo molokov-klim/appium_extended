@@ -298,25 +298,17 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None:
-                    continue
-                if not self._is_within_screen(element):
-                    continue
+                if element is None or not self._is_within_screen(element):
+                    current_element_image = self.screenshot_as_base64
+                    if current_element_image == last_element_image:
+                        break
+                    last_element_image = self.screenshot_as_base64
+                    recycler._scroll_down()
                 if isinstance(element, WebElement):
                     return True
-                current_element_image = self.screenshot_as_base64
-                if current_element_image == last_element_image:
-                    break
-                last_element_image = self.screenshot_as_base64
-                recycler._scroll_down()
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
-                continue
-            except WebDriverException as error:
-                print(f"{error.msg=}")
-                print(f"{error.screen=}")
-                print(f"{error.stacktrace=}")
                 continue
 
         # Прокрутка вверх до поиска элемента
@@ -332,22 +324,14 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None:
-                    continue
-                if not self._is_within_screen(element):
-                    continue
+                if element is None or not self._is_within_screen(element):
+                    current_element_image = self.screenshot_as_base64
+                    if current_element_image == last_element_image:
+                        break
+                    last_element_image = self.screenshot_as_base64
+                    recycler._scroll_up()
                 if isinstance(element, WebElement):
                     return True
-                current_element_image = self.screenshot_as_base64
-                if current_element_image == last_element_image:
-                    break
-                last_element_image = self.screenshot_as_base64
-                recycler._scroll_up()
-            except WebDriverException as error:
-                print(f"{error.msg=}")
-                print(f"{error.screen=}")
-                print(f"{error.stacktrace=}")
-                continue
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
@@ -407,21 +391,18 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None:
-                    continue
-                if not self._is_within_screen(element):
-                    continue
+                if element is None or not self._is_within_screen(element):
+                    current_element_image = self.screenshot_as_base64
+                    if current_element_image == last_element_image:
+                        break
+                    last_element_image = self.screenshot_as_base64
+                    recycler._scroll_down()
                 if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
                 continue
-            current_element_image = self.screenshot_as_base64
-            if current_element_image == last_element_image:
-                break
-            last_element_image = self.screenshot_as_base64
-            recycler._scroll_down()
 
         # Прокрутка вверх до поиска элемента
         while time.time() - start_time < timeout_method:
@@ -442,10 +423,12 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None:
-                    continue
-                if not self._is_within_screen(element):
-                    continue
+                if element is None or not self._is_within_screen(element):
+                    current_element_image = self.screenshot_as_base64
+                    if current_element_image == last_element_image:
+                        break
+                    last_element_image = self.screenshot_as_base64
+                    recycler._scroll_down()
                 if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:
