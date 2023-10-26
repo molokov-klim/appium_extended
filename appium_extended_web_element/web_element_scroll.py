@@ -298,12 +298,11 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if not element.get_attribute('displayed') != 'true':
-                    # Если элемент не отображается на экране
+                if element is None:
                     continue
                 if not self._is_within_screen(element):
                     continue
-                if element is not None:
+                if isinstance(element, WebElement):
                     return True
                 current_element_image = self.screenshot_as_base64
                 if current_element_image == last_element_image:
@@ -333,12 +332,11 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if not element.get_attribute('displayed') != 'true':
-                    # Если элемент не отображается на экране
+                if element is None:
                     continue
                 if not self._is_within_screen(element):
                     continue
-                if element is not None:
+                if isinstance(element, WebElement):
                     return True
                 current_element_image = self.screenshot_as_base64
                 if current_element_image == last_element_image:
@@ -409,12 +407,11 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if not element.get_attribute('displayed') != 'true':
-                    # Если элемент не отображается на экране
+                if element is None:
                     continue
                 if not self._is_within_screen(element):
                     continue
-                if element is not None:
+                if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:
                 continue
@@ -445,12 +442,11 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if not element.get_attribute('displayed') != 'true':
-                    # Если элемент не отображается на экране
+                if element is None:
                     continue
                 if not self._is_within_screen(element):
                     continue
-                if element is not None:
+                if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:
                 continue
