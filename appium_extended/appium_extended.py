@@ -588,7 +588,7 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
             for i in range(tries):
                 for recycler in recyclers:
                     try:
-                        recycler.scroll_until_find(locator=locator, contains=contains)
+                        recycler.scroll_until_find(locator=locator, timeout_method=timeout_method, contains=contains)
                         return self.get_element(locator=locator,
                                                 timeout_elem=timeout_elem,
                                                 timeout_method=timeout_method,

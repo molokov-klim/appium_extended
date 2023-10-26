@@ -309,6 +309,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                recycler._scroll_down()
                 continue
 
         # Прокрутка вверх до поиска элемента
@@ -335,6 +336,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                recycler._scroll_down()
                 continue
 
         self.logger.error("_scroll_until_find(): Элемент не найден")
@@ -402,6 +404,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                recycler._scroll_down()
                 continue
 
         # Прокрутка вверх до поиска элемента
@@ -434,6 +437,7 @@ class WebElementScroll(WebElementIs):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                recycler._scroll_down()
                 continue
             current_element_image = self.screenshot_as_base64
             if current_element_image == last_element_image:
