@@ -1,23 +1,23 @@
 # coding: utf-8
-import logging
 import time
 import typing
 from typing import Union, Tuple, Dict, Optional
 
 from appium.webdriver import WebElement
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException, \
+    WebDriverException
 from selenium.types import WaitExcTypes
 
-from appium_extended_web_element.web_element_get import WebElementGet
+from appium_extended_web_element.web_element_is import WebElementIs
 
 
-class WebElementScroll(WebElementGet):
+class WebElementScroll(WebElementIs):
     """
     Класс для выполнения действий прокрутки элемента.
     Наследуется от класса WebElementGet.
     """
 
-    def __init__(self, logger: logging.Logger, driver, element_id):
+    def __init__(self, logger, driver, element_id):
         super().__init__(logger=logger, driver=driver, element_id=element_id)
 
     def _scroll_down(self,
@@ -298,6 +298,11 @@ class WebElementScroll(WebElementGet):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+                if not element.get_attribute('displayed') != 'true':
+                    # Если элемент не отображается на экране
+                    continue
+                if not self._is_within_screen(element):
+                    continue
                 if element is not None:
                     return True
                 current_element_image = self.screenshot_as_base64
@@ -308,6 +313,11 @@ class WebElementScroll(WebElementGet):
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
+                continue
+            except WebDriverException as error:
+                print(f"{error.msg=}")
+                print(f"{error.screen=}")
+                print(f"{error.stacktrace=}")
                 continue
 
         # Прокрутка вверх до поиска элемента
@@ -323,6 +333,11 @@ class WebElementScroll(WebElementGet):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+                if not element.get_attribute('displayed') != 'true':
+                    # Если элемент не отображается на экране
+                    continue
+                if not self._is_within_screen(element):
+                    continue
                 if element is not None:
                     return True
                 current_element_image = self.screenshot_as_base64
@@ -330,6 +345,11 @@ class WebElementScroll(WebElementGet):
                     break
                 last_element_image = self.screenshot_as_base64
                 recycler._scroll_up()
+            except WebDriverException as error:
+                print(f"{error.msg=}")
+                print(f"{error.screen=}")
+                print(f"{error.stacktrace=}")
+                continue
             except NoSuchElementException:
                 continue
             except StaleElementReferenceException:
@@ -389,6 +409,11 @@ class WebElementScroll(WebElementGet):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+                if not element.get_attribute('displayed') != 'true':
+                    # Если элемент не отображается на экране
+                    continue
+                if not self._is_within_screen(element):
+                    continue
                 if element is not None:
                     return element
             except NoSuchElementException:
@@ -420,6 +445,11 @@ class WebElementScroll(WebElementGet):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+                if not element.get_attribute('displayed') != 'true':
+                    # Если элемент не отображается на экране
+                    continue
+                if not self._is_within_screen(element):
+                    continue
                 if element is not None:
                     return element
             except NoSuchElementException:
