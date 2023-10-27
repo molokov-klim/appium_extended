@@ -8,7 +8,7 @@ from typing import Union, Dict, List, Tuple
 import xml.etree.ElementTree as ET
 
 from appium.webdriver import WebElement
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
 
 from appium.webdriver.common.mobileby import MobileBy
 from appium.webdriver.common.appiumby import AppiumBy
@@ -247,7 +247,8 @@ class WebElementGet(WebElement):
         return None
 
     def _get_attributes(self,
-                        desired_attributes: List[str] = None) -> Dict[str, str]:
+                        desired_attributes: List[str] = None,
+                        tries: int = 3) -> Dict[str, str]:
         """
         Получает атрибуты элемента.
         Если хотя бы один запрашиваемый атрибут не найден, возвращает все атрибуты.
@@ -265,44 +266,48 @@ class WebElementGet(WebElement):
             и их значениями.
             Если desired_attributes не указан или атрибут не найден у элемента, возвращает словарь со всеми атрибутами.
         """
-        # Инициализация пустого словаря для хранения атрибутов
-        result = {}
+        for _ in range(tries):
+            try:
+                # Инициализация пустого словаря для хранения атрибутов
+                result = {}
 
-        # Если desired_attributes не указан, установка значения 'all'
-        if not desired_attributes:
-            desired_attributes = 'all'
+                # Если desired_attributes не указан, установка значения 'all'
+                if not desired_attributes:
+                    desired_attributes = 'all'
 
-        # Если desired_attributes не указан, установка значения 'all'
-        root = ET.fromstring(self.parent.page_source)
+                # Если desired_attributes не указан, установка значения 'all'
+                root = ET.fromstring(self.parent.page_source)
 
-        # Поиск требуемого элемента по критериям атрибутов
-        found_element = None
-        for element in root.iter():
-            if 'bounds' in element.attrib and 'class' in element.attrib:
-                if self.get_attribute('bounds') == element.attrib['bounds'] and self.get_attribute('class') == \
-                        element.attrib['class']:
-                    found_element = element
-                    break
+                # Поиск требуемого элемента по критериям атрибутов
+                found_element = None
+                for element in root.iter():
+                    if 'bounds' in element.attrib and 'class' in element.attrib:
+                        if self.get_attribute('bounds') == element.attrib['bounds'] and self.get_attribute('class') == \
+                                element.attrib['class']:
+                            found_element = element
+                            break
 
-        # Если элемент найден, получение его атрибутов
-        if found_element is not None:
-            attributes = found_element.attrib
-            # Сохранение атрибутов в словаре result
-            for attribute_name, attribute_value in attributes.items():
-                result[attribute_name] = attribute_value
+                # Если элемент найден, получение его атрибутов
+                if found_element is not None:
+                    attributes = found_element.attrib
+                    # Сохранение атрибутов в словаре result
+                    for attribute_name, attribute_value in attributes.items():
+                        result[attribute_name] = attribute_value
 
-        # Если desired_attributes указан, фильтрация словаря result
-        if desired_attributes:
-            new_result = {}
-            for attribute in desired_attributes:
-                if attribute not in result:
-                    # Возврат всех атрибутов если не найден искомый
-                    return result
-                new_result[attribute] = result[attribute]
-            # Возврат отфильтрованных атрибутов
-            return new_result
-        # Возврат всех атрибутов
-        return result
+                # Если desired_attributes указан, фильтрация словаря result
+                if desired_attributes:
+                    new_result = {}
+                    for attribute in desired_attributes:
+                        if attribute not in result:
+                            # Возврат всех атрибутов если не найден искомый
+                            return result
+                        new_result[attribute] = result[attribute]
+                    # Возврат отфильтрованных атрибутов
+                    return new_result
+                # Возврат всех атрибутов
+                return result
+            except StaleElementReferenceException:
+                continue
 
     def _get_xpath(self) -> Union[str, None]:
         """
@@ -343,7 +348,7 @@ class WebElementGet(WebElement):
             return xpath
         except (AttributeError, KeyError) as e:
             self.logger.error("Ошибка при формировании XPath: {}".format(str(e)))
-        except Exception as e:
+        except WebDriverException as e:
             self.logger.error("Неизвестная ошибка при формировании XPath: {}".format(str(e)))
         return None
 
@@ -366,8 +371,8 @@ class WebElementGet(WebElement):
             y = (top + bottom) / 2
 
             return x, y
-        except Exception as e:
-            self.logger.error("some exception with _get_center(): {}".format(e))
+        except WebDriverException as e:
+            self.logger.error("exception with _get_center(): {}".format(e))
             return None
 
     def _get_coordinates(self) -> Union[Tuple[int, int, int, int], None]:
@@ -381,17 +386,21 @@ class WebElementGet(WebElement):
             self.logger.error("Ошибка в методе _get_coordinates()")
             self.logger.exception(e)
 
-    def _get_first_child_class(self) -> str:
+    def _get_first_child_class(self, tries: int = 3) -> str:
         """
         Возвращает класс первого дочернего элемента, отличный от родительского
         """
-        parent_element = self
-        parent_class = parent_element.get_attribute('class')
-        child_elements = parent_element.find_elements("xpath", "//*[1]")
-        for i, child_element in enumerate(child_elements):
-            child_class = child_element.get_attribute('class')
-            if parent_class != child_class:
-                return str(child_class)
+        for _ in range(tries):
+            try:
+                parent_element = self
+                parent_class = parent_element.get_attribute('class')
+                child_elements = parent_element.find_elements("xpath", "//*[1]")
+                for i, child_element in enumerate(child_elements):
+                    child_class = child_element.get_attribute('class')
+                    if parent_class != child_class:
+                        return str(child_class)
+            except StaleElementReferenceException:
+                continue
 
     def _get_top_child_from_parent(self,
                                    locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
@@ -401,6 +410,7 @@ class WebElementGet(WebElement):
                                    contains: bool = True,
                                    poll_frequency: float = 0.5,
                                    ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                   tries: int = 3,
                                    ) -> \
             Union[WebElement, None]:
         """
@@ -414,22 +424,26 @@ class WebElementGet(WebElement):
             Самый верхний дочерний элемент родительского элемента, указанному в локаторе дочерних элементов,
             или None, если соответствующий дочерний элемент не найден.
         """
-        if locator is None:
-            locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator,
-                                      timeout_elements=timeout_elements,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions, )
-        if len(children) <= 1:
-            while not len(children) > 1:
-                if len(children) == 0:
-                    return None
-                children = children[0].find_elements(by='xpath', value=f'//*')
-        top_child = sorted(children, key=lambda x: x.location['y'])[0]
-        return top_child
+        for _ in range(tries):
+            try:
+                if locator is None:
+                    locator = {'class': self._get_first_child_class()}
+                children = self._get_elements(locator=locator,
+                                              timeout_elements=timeout_elements,
+                                              timeout_method=timeout_method,
+                                              elements_range=elements_range,
+                                              contains=contains,
+                                              poll_frequency=poll_frequency,
+                                              ignored_exceptions=ignored_exceptions, )
+                if len(children) <= 1:
+                    while not len(children) > 1:
+                        if len(children) == 0:
+                            return None
+                        children = children[0].find_elements(by='xpath', value=f'//*')
+                top_child = sorted(children, key=lambda x: x.location['y'])[0]
+                return top_child
+            except StaleElementReferenceException:
+                continue
 
     def _get_bottom_child_from_parent(self,
                                       locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
@@ -439,6 +453,7 @@ class WebElementGet(WebElement):
                                       contains: bool = True,
                                       poll_frequency: float = 0.5,
                                       ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                      tries: int = 3
                                       ) -> \
             Union[WebElement, None]:
         """
@@ -450,25 +465,29 @@ class WebElementGet(WebElement):
         Returns:
             Найденный элемент или None, в случае его отсутствия.
         """
-        if locator is None:
-            locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator,
-                                      timeout_elements=timeout_elements,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,
-                                      )
-        if len(children) == 0:
-            return None
-        if len(children) <= 1:
-            while not len(children) > 1:
+        for _ in range(tries):
+            try:
+                if locator is None:
+                    locator = {'class': self._get_first_child_class()}
+                children = self._get_elements(locator=locator,
+                                              timeout_elements=timeout_elements,
+                                              timeout_method=timeout_method,
+                                              elements_range=elements_range,
+                                              contains=contains,
+                                              poll_frequency=poll_frequency,
+                                              ignored_exceptions=ignored_exceptions,
+                                              )
                 if len(children) == 0:
                     return None
-                children = children[0].find_elements(by='xpath', value=f'//*')
-        bottom_child = sorted(children, key=lambda x: x.location['y'] + x.size['height'])[-1]
-        return bottom_child
+                if len(children) <= 1:
+                    while not len(children) > 1:
+                        if len(children) == 0:
+                            return None
+                        children = children[0].find_elements(by='xpath', value=f'//*')
+                bottom_child = sorted(children, key=lambda x: x.location['y'] + x.size['height'])[-1]
+                return bottom_child
+            except StaleElementReferenceException:
+                continue
 
     def _get_center_child_from_parent(self,
                                       locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
@@ -478,6 +497,7 @@ class WebElementGet(WebElement):
                                       contains: bool = True,
                                       poll_frequency: float = 0.5,
                                       ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                      tries: int = 3
                                       ) -> \
             Union[WebElement, None]:
         """
@@ -491,23 +511,27 @@ class WebElementGet(WebElement):
             Центральный дочерний элемент родительского элемента, указанному в локаторе дочерних элементов,
             или None, если соответствующий дочерний элемент не найден.
         """
-        if locator is None:
-            locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator,
-                                      timeout_elements=timeout_elements,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,
-                                      )
-        if len(children) <= 1:
-            while not len(children) > 1:
-                if len(children) == 0:
-                    return None
-                children = children[0].find_elements(by='xpath', value=f'//*')
-        center_child = sorted(children, key=lambda x: x.location['y'])[len(children) // 2]
-        return center_child
+        for _ in range(tries):
+            try:
+                if locator is None:
+                    locator = {'class': self._get_first_child_class()}
+                children = self._get_elements(locator=locator,
+                                              timeout_elements=timeout_elements,
+                                              timeout_method=timeout_method,
+                                              elements_range=elements_range,
+                                              contains=contains,
+                                              poll_frequency=poll_frequency,
+                                              ignored_exceptions=ignored_exceptions,
+                                              )
+                if len(children) <= 1:
+                    while not len(children) > 1:
+                        if len(children) == 0:
+                            return None
+                        children = children[0].find_elements(by='xpath', value=f'//*')
+                center_child = sorted(children, key=lambda x: x.location['y'])[len(children) // 2]
+                return center_child
+            except StaleElementReferenceException:
+                continue
 
     def _get_top_center_child_from_parent(self,
                                           locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
@@ -517,6 +541,7 @@ class WebElementGet(WebElement):
                                           contains: bool = True,
                                           poll_frequency: float = 0.5,
                                           ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                          tries: int = 3
                                           ) -> \
             Union[WebElement, None]:
         """
@@ -531,23 +556,27 @@ class WebElementGet(WebElement):
             указанному в локаторе дочерних элементов,
             или None, если соответствующий дочерний элемент не найден.
         """
-        if locator is None:
-            locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator,
-                                      timeout_elements=timeout_elements,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,
-                                      )
-        if len(children) <= 1:
-            while not len(children) > 1:
-                if len(children) == 0:
-                    return None
-                children = children[0].find_elements(by='xpath', value=f'//*')
-        top_center_child = sorted(children, key=lambda x: x.location['y'])[math.ceil(len(children) / 2 / 2)]
-        return top_center_child
+        for _ in range(tries):
+            try:
+                if locator is None:
+                    locator = {'class': self._get_first_child_class()}
+                children = self._get_elements(locator=locator,
+                                              timeout_elements=timeout_elements,
+                                              timeout_method=timeout_method,
+                                              elements_range=elements_range,
+                                              contains=contains,
+                                              poll_frequency=poll_frequency,
+                                              ignored_exceptions=ignored_exceptions,
+                                              )
+                if len(children) <= 1:
+                    while not len(children) > 1:
+                        if len(children) == 0:
+                            return None
+                        children = children[0].find_elements(by='xpath', value=f'//*')
+                top_center_child = sorted(children, key=lambda x: x.location['y'])[math.ceil(len(children) / 2 / 2)]
+                return top_center_child
+            except StaleElementReferenceException:
+                continue
 
     def _get_bottom_center_child_from_parent(self,
                                              locator: Union[Tuple[str, str], WebElement, Dict[str, str]] = None,
@@ -558,6 +587,7 @@ class WebElementGet(WebElement):
                                              contains: bool = True,
                                              poll_frequency: float = 0.5,
                                              ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                                             tries: int = 3
                                              ) -> \
             Union[WebElement, None]:
         """
@@ -572,22 +602,26 @@ class WebElementGet(WebElement):
             указанному в локаторе дочерних элементов,
             или None, если соответствующий дочерний элемент не найден.
         """
-        if locator is None:
-            locator = {'class': self._get_first_child_class()}
-        children = self._get_elements(locator=locator,
-                                      timeout_elements=timeout_elements,
-                                      timeout_method=timeout_method,
-                                      elements_range=elements_range,
-                                      contains=contains,
-                                      poll_frequency=poll_frequency,
-                                      ignored_exceptions=ignored_exceptions,
-                                      )
-        if len(children) <= 1:
-            while not len(children) > 1:
-                if len(children) == 0:
-                    return None
-                children = children[0].find_elements(by='xpath', value=f'//*')
-        # sorted, 0 - верхний элемент
-        bottom_center_child = sorted(children, key=lambda x: x.location['y'])[
-            math.floor(len(children) / 2 + len(children) / 2 / 2)]
-        return bottom_center_child
+        for _ in range(tries):
+            try:
+                if locator is None:
+                    locator = {'class': self._get_first_child_class()}
+                children = self._get_elements(locator=locator,
+                                              timeout_elements=timeout_elements,
+                                              timeout_method=timeout_method,
+                                              elements_range=elements_range,
+                                              contains=contains,
+                                              poll_frequency=poll_frequency,
+                                              ignored_exceptions=ignored_exceptions,
+                                              )
+                if len(children) <= 1:
+                    while not len(children) > 1:
+                        if len(children) == 0:
+                            return None
+                        children = children[0].find_elements(by='xpath', value=f'//*')
+                # sorted, 0 - верхний элемент
+                bottom_center_child = sorted(children, key=lambda x: x.location['y'])[
+                    math.floor(len(children) / 2 + len(children) / 2 / 2)]
+                return bottom_center_child
+            except StaleElementReferenceException:
+                continue
