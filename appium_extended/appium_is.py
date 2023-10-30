@@ -4,6 +4,7 @@ import typing
 from typing import Union, Dict, Tuple
 
 from appium.webdriver import WebElement
+from selenium.common import WebDriverException
 from selenium.types import WaitExcTypes
 
 from appium_extended.appium_get import AppiumGet
@@ -62,18 +63,21 @@ class AppiumIs(AppiumGet):
                                     ignored_exceptions=ignored_exceptions)
         if element is None:
             return False
-        if not element.get_attribute('displayed') == 'true':
-            # Если элемент не отображается на экране
-            return False
-        element_location = element.location  # Получаем координаты элемента
-        element_size = element.size  # Получаем размеры элемента
-        if (
-                element_location['y'] + element_size['height'] > screen_height or
-                element_location['x'] + element_size['width'] > screen_width or
-                element_location['y'] < 0 or
-                element_location['x'] < 0
-        ):
-            # Если элемент находится за пределами экрана
+        try:
+            if not element.get_attribute('displayed') == 'true':
+                # Если элемент не отображается на экране
+                return False
+            element_location = element.location  # Получаем координаты элемента
+            element_size = element.size  # Получаем размеры элемента
+            if (
+                    element_location['y'] + element_size['height'] > screen_height or
+                    element_location['x'] + element_size['width'] > screen_width or
+                    element_location['y'] < 0 or
+                    element_location['x'] < 0
+            ):
+                # Если элемент находится за пределами экрана
+                return False
+        except WebDriverException:
             return False
         # Если элемент находится на экране
         return True
