@@ -292,14 +292,13 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None or not self._is_within_screen(element):
+                if element is None:
                     recycler._scroll_down()
                     time.sleep(3)  # чтобы все эффекты прокрутки исчезли
                     current_element_image = self.screenshot_as_base64
                     if current_element_image == last_element_image:
                         break
                     last_element_image = self.screenshot_as_base64
-
                 if isinstance(element, WebElement):
                     return True
             except NoSuchElementException:
@@ -322,7 +321,7 @@ class WebElementScroll(WebElementIs):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                if element is None or not self._is_within_screen(element):
+                if element is None:
                     recycler._scroll_up()
                     time.sleep(3)  # чтобы все эффекты прокрутки исчезли
                     current_element_image = self.screenshot_as_base64

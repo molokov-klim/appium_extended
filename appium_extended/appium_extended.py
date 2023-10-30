@@ -544,15 +544,22 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Raises:
             ValueError: Возникает, если элемент не найден. Исключение вызывается внутренним методом get_element.
         """
-        try:
-            if self.is_element_within_screen(locator=locator,
-                                             timeout_elem=timeout_elem,
-                                             timeout_method=timeout_method,
-                                             elements_range=elements_range,
-                                             contains=contains,
-                                             poll_frequency=poll_frequency,
-                                             ignored_exceptions=ignored_exceptions, ):
-                try:
+        for i in range(tries):
+            try:
+                recyclers = self.get_elements(
+                    locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
+                if recyclers is None:
+                    raise FindAndGetElementError(message="Не удалось обнаружить прокручиваемые элементы на экране",
+                                                 locator=locator,
+                                                 timeout_elem=timeout_elem,
+                                                 timeout_method=timeout_method,
+                                                 elements_range=elements_range,
+                                                 contains=contains,
+                                                 poll_frequency=poll_frequency,
+                                                 ignored_exceptions=ignored_exceptions,
+                                                 tries=tries, )
+                for recycler in recyclers:
+                    recycler.scroll_until_find(locator=locator, timeout_method=timeout_method, contains=contains)
                     return self.get_element(locator=locator,
                                             timeout_elem=timeout_elem,
                                             timeout_method=timeout_method,
@@ -560,74 +567,25 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
-                except NoSuchDriverException:
-                    self.reconnect()
-                except GetElementError as error:
-                    raise FindAndGetElementError(message="""
-                    Не удалось получить элемент (несмотря на то, что он обнаружен на экране)""",
-                                                 locator=locator,
-                                                 timeout_elem=timeout_elem,
-                                                 timeout_method=timeout_method,
-                                                 elements_range=elements_range,
-                                                 contains=contains,
-                                                 poll_frequency=poll_frequency,
-                                                 ignored_exceptions=ignored_exceptions,
-                                                 tries=tries,
-                                                 original_exception=error) from error
-            for i in range(tries):
-                try:
-                    recyclers = self.get_elements(
-                        locator={'scrollable': 'true', 'enabled': 'true', 'displayed': 'true'})
-                    if recyclers is None:
-                        raise FindAndGetElementError(message="Не удалось обнаружить прокручиваемые элементы на экране",
-                                                     locator=locator,
-                                                     timeout_elem=timeout_elem,
-                                                     timeout_method=timeout_method,
-                                                     elements_range=elements_range,
-                                                     contains=contains,
-                                                     poll_frequency=poll_frequency,
-                                                     ignored_exceptions=ignored_exceptions,
-                                                     tries=tries, )
-                    for recycler in recyclers:
-                        recycler.scroll_until_find(locator=locator, timeout_method=timeout_method, contains=contains)
-                        return self.get_element(locator=locator,
-                                                timeout_elem=timeout_elem,
-                                                timeout_method=timeout_method,
-                                                elements_range=elements_range,
-                                                contains=contains,
-                                                poll_frequency=poll_frequency,
-                                                ignored_exceptions=ignored_exceptions, )
-                except StaleElementReferenceException:
-                    continue
-                except WebElementExtendedError:
-                    continue
-                except NoSuchDriverException:
-                    self.reconnect()
-                except GetElementError as error:
-                    raise FindAndGetElementError(message="Не удалось извлечь элемент",
-                                                 locator=locator,
-                                                 timeout_elem=timeout_elem,
-                                                 timeout_method=timeout_method,
-                                                 elements_range=elements_range,
-                                                 contains=contains,
-                                                 poll_frequency=poll_frequency,
-                                                 ignored_exceptions=ignored_exceptions,
-                                                 tries=tries,
-                                                 original_exception=error) from error
-            return None
-        except NoSuchDriverException:
-            self.reconnect()
-        except Exception as error:
-            raise FindAndGetElementError(message=f"Ошибка при попытке найти и извлечь элемент: {error}",
-                                         locator=locator,
-                                         timeout_elem=timeout_elem,
-                                         timeout_method=timeout_method,
-                                         elements_range=elements_range,
-                                         contains=contains,
-                                         poll_frequency=poll_frequency,
-                                         ignored_exceptions=ignored_exceptions,
-                                         tries=tries,
-                                         original_exception=error) from error
+            except StaleElementReferenceException:
+                continue
+            except WebElementExtendedError:
+                continue
+            except NoSuchDriverException:
+                self.reconnect()
+            except GetElementError as error:
+                raise FindAndGetElementError(message="Не удалось извлечь элемент",
+                                             locator=locator,
+                                             timeout_elem=timeout_elem,
+                                             timeout_method=timeout_method,
+                                             elements_range=elements_range,
+                                             contains=contains,
+                                             poll_frequency=poll_frequency,
+                                             ignored_exceptions=ignored_exceptions,
+                                             tries=tries,
+                                             original_exception=error) from error
+        return None
+
 
     def is_element_within_screen(self,
                                  locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
