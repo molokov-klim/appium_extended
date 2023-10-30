@@ -544,6 +544,18 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
         Raises:
             ValueError: Возникает, если элемент не найден. Исключение вызывается внутренним методом get_element.
         """
+        try:
+            element = self.get_element(locator=locator,
+                                       timeout_elem=timeout_elem,
+                                       timeout_method=timeout_method,
+                                       elements_range=elements_range,
+                                       contains=contains,
+                                       poll_frequency=poll_frequency,
+                                       tries=tries,
+                                       ignored_exceptions=ignored_exceptions)
+            return element
+        except GetElementError:
+            pass
         for i in range(tries):
             try:
                 recyclers = self.get_elements(
@@ -585,7 +597,6 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                              tries=tries,
                                              original_exception=error) from error
         return None
-
 
     def is_element_within_screen(self,
                                  locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,

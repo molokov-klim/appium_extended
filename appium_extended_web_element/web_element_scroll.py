@@ -334,7 +334,7 @@ class WebElementScroll(WebElementIs):
                 continue
             except StaleElementReferenceException:
                 element = None
-                recycler._scroll_down()
+                recycler._scroll_up()
                 continue
 
         self.logger.error("_scroll_until_find(): Элемент не найден")
