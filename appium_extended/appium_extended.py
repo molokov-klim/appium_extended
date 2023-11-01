@@ -579,24 +579,25 @@ class AppiumExtended(AppiumIs, AppiumTap, AppiumSwipe, AppiumWait):
                                             contains=contains,
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
+            except NoSuchDriverException:
+                self.reconnect()
             except StaleElementReferenceException:
                 continue
             except WebElementExtendedError:
                 continue
-            except NoSuchDriverException:
-                self.reconnect()
+            except GetElementsError:
+                continue
             except GetElementError as error:
-                raise FindAndGetElementError(message="Не удалось извлечь элемент",
-                                             locator=locator,
-                                             timeout_elem=timeout_elem,
-                                             timeout_method=timeout_method,
-                                             elements_range=elements_range,
-                                             contains=contains,
-                                             poll_frequency=poll_frequency,
-                                             ignored_exceptions=ignored_exceptions,
-                                             tries=tries,
-                                             original_exception=error) from error
-        return None
+                continue
+        raise FindAndGetElementError(message="Не удалось извлечь элемент",
+                                     locator=locator,
+                                     timeout_elem=timeout_elem,
+                                     timeout_method=timeout_method,
+                                     elements_range=elements_range,
+                                     contains=contains,
+                                     poll_frequency=poll_frequency,
+                                     ignored_exceptions=ignored_exceptions,
+                                     tries=tries)
 
     def is_element_within_screen(self,
                                  locator: Union[Tuple, WebElement, 'WebElementExtended', Dict[str, str], str] = None,
