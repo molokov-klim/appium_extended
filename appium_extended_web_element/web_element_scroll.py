@@ -270,11 +270,6 @@ class WebElementScroll(WebElementIs):
         """
         recycler = self
 
-        # Проверка, является ли элемент scrollable
-        if recycler.get_attribute('scrollable') != 'true':
-            self.logger.error("Элемент не крутиться")
-            return False
-
         start_time = time.time()
 
         last_element_image = None
@@ -362,11 +357,6 @@ class WebElementScroll(WebElementIs):
 
         """
         recycler = self
-
-        # Проверка, является ли элемент scrollable
-        if recycler.get_attribute('scrollable') != 'true':
-            self.logger.error("Элемент не крутится")
-            return None
 
         start_time = time.time()
 
