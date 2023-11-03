@@ -343,6 +343,7 @@ class WebElementScroll(WebElementIs):
                         contains: bool = True,
                         poll_frequency: float = 0.5,
                         ignored_exceptions: typing.Optional[WaitExcTypes] = None,
+                        tries: int = 3,
                         ) -> Optional[WebElement]:
         """
         Крутит элемент вниз, а затем вверх для поиска элемента по заданному локатору.
@@ -382,8 +383,12 @@ class WebElementScroll(WebElementIs):
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
                 if element is None or not self._is_within_screen(element):
-                    recycler._scroll_down()
-                    time.sleep(3)  # чтобы все эффекты прокрутки исчезли
+                    for _ in range(tries):
+                        recycler._scroll_down()
+                        time.sleep(3)  # чтобы все эффекты прокрутки исчезли
+                        current_element_image = self.screenshot_as_base64
+                        if current_element_image != last_element_image:
+                            break
                     current_element_image = self.screenshot_as_base64
                     if current_element_image == last_element_image:
                         break
@@ -418,12 +423,17 @@ class WebElementScroll(WebElementIs):
                                             poll_frequency=poll_frequency,
                                             ignored_exceptions=ignored_exceptions, )
                 if element is None or not self._is_within_screen(element):
-                    recycler._scroll_up()
-                    time.sleep(3)  # чтобы все эффекты прокрутки исчезли
+                    for _ in range(tries):
+                        recycler._scroll_down()
+                        time.sleep(3)  # чтобы все эффекты прокрутки исчезли
+                        current_element_image = self.screenshot_as_base64
+                        if current_element_image != last_element_image:
+                            break
                     current_element_image = self.screenshot_as_base64
                     if current_element_image == last_element_image:
                         break
                     last_element_image = self.screenshot_as_base64
+                    continue
                 if isinstance(element, WebElement):
                     return element
             except NoSuchElementException:

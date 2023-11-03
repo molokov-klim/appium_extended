@@ -432,7 +432,8 @@ class WebElementExtended(WebElementClick,
         for i in range(tries):
             try:
                 element = self._scroll_and_get(locator=locator,
-                                               timeout_method=timeout_method)
+                                               timeout_method=timeout_method,
+                                               tries=tries)
                 if element is not None:
                     return WebElementExtended(logger=self.logger,
                                               driver=element.parent,
